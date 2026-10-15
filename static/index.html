@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="/assets/css/friends.css?v=lunar-profile1">
   <link rel="stylesheet" href="/assets/css/community.css?v=lunar-profile1">
   <link rel="stylesheet" href="/assets/css/lunar-home-profile.css?v=lunar-profile1">
+  <link rel="stylesheet" href="/assets/css/lunar-ai.css?v=ai1">
 </head>
 <body class="center lunar-home">
   <div class="nav-bar"></div>
@@ -56,5 +57,45 @@
     <section class="lunar-changelog" id="lunar-changelog" aria-label="Lunar changelog"><div class="lunar-changelog-glow"></div><div class="lunar-changelog-head"><div><span class="lunar-changelog-kicker"><i class="fa-solid fa-sparkles"></i> LUNAR UPDATE LOG</span><h2>What's new</h2><p>Recent improvements across Lunar.</p></div><span class="lunar-changelog-live"><i></i> Live</span></div><div class="lunar-changelog-list" id="lunar-changelog-list"><div class="lunar-changelog-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span>Loading updates...</span></div></div></section>
   </div>
   <script src="/assets/js/vendor.js"></script><script src="assets/js/search.js"></script><script src="assets/js/home.js"></script><script src="./assets/ultraviolet/uv.bundle.js"></script><script src="./assets/ultraviolet/uv.config.js"></script><script src="/assets/scramjet/scramjet.all.js"></script><script src="/assets/scramjet/scramjet.config.js"></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-WKJQ5QHQTJ"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());gtag("config","G-WKJQ5QHQTJ")</script><script src="/assets/js/lunar.js"></script><script src="/assets/js/lunar-home.js?v=lunar9"></script><script src="/assets/js/lunar-home-profile.js?v=lunar-profile2"></script><script src="/assets/js/lunar-presence-heartbeat.js?v=presence3"></script><script src="/assets/js/lunar-redesign.js?v=figma10"></script>
+
+  <button type="button" id="lunar-ai-launcher" class="lunar-ai-launcher" aria-label="Open Lunar AI" title="Lunar AI">
+    <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+  </button>
+  <div id="lunar-ai-modal" class="lunar-ai-modal" hidden>
+    <div class="lunar-ai-backdrop" data-ai-close></div>
+    <section class="lunar-ai-window" role="dialog" aria-modal="true" aria-labelledby="lunar-ai-title">
+      <aside class="lunar-ai-sidebar">
+        <div class="lunar-ai-brand"><span class="lunar-ai-brand-mark"><i class="fa-solid fa-wand-magic-sparkles"></i></span><span>Lunar AI</span></div>
+        <button type="button" id="lunar-ai-new-chat" class="lunar-ai-new-chat"><i class="fa-solid fa-plus"></i><span>New chat</span></button>
+        <div class="lunar-ai-history-label">Recent chats</div>
+        <div id="lunar-ai-history" class="lunar-ai-history"></div>
+        <div class="lunar-ai-sidebar-foot"><i class="fa-solid fa-cloud"></i><span>Your conversations are saved to your Lunar account.</span></div>
+      </aside>
+      <main class="lunar-ai-main">
+        <header class="lunar-ai-header">
+          <div class="lunar-ai-header-title">
+            <button type="button" id="lunar-ai-mobile-menu" class="lunar-ai-icon-button lunar-ai-mobile-menu" aria-label="Open chat history"><i class="fa-solid fa-bars"></i></button>
+            <span id="lunar-ai-title">Lunar AI</span>
+            <span class="lunar-ai-model-pill">study assistant</span>
+          </div>
+          <button type="button" id="lunar-ai-close" class="lunar-ai-icon-button" aria-label="Close Lunar AI"><i class="fa-solid fa-xmark"></i></button>
+        </header>
+        <div id="lunar-ai-messages" class="lunar-ai-messages" aria-live="polite"></div>
+        <div id="lunar-ai-status" class="lunar-ai-status" role="status"></div>
+        <div class="lunar-ai-composer-wrap">
+          <div id="lunar-ai-pending" class="lunar-ai-pending"></div>
+          <form id="lunar-ai-form" class="lunar-ai-composer">
+            <input id="lunar-ai-file-input" type="file" accept=".txt,text/plain,image/png,image/jpeg,image/webp" multiple hidden />
+            <button type="button" id="lunar-ai-upload" class="lunar-ai-upload-button" aria-label="Upload a text document or image" title="Upload .txt or image"><i class="fa-solid fa-plus"></i></button>
+            <textarea id="lunar-ai-input" rows="1" maxlength="20000" placeholder="Message Lunar AI..." aria-label="Message Lunar AI"></textarea>
+            <button type="submit" id="lunar-ai-send" class="lunar-ai-send-button" aria-label="Send message" disabled><i class="fa-solid fa-arrow-up"></i></button>
+          </form>
+          <p class="lunar-ai-disclaimer">Lunar AI can make mistakes. Check important answers, and avoid uploading private information.</p>
+        </div>
+      </main>
+    </section>
+  </div>
+  <script src="/assets/js/lunar-ai.js?v=ai1"></script>
+
 </body>
 </html>
