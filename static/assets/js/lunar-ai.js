@@ -184,6 +184,7 @@
       item.append(icon, name, remove);
       pending.appendChild(item);
     });
+    sendButton.disabled = busy || (!textarea.value.trim() && !pendingFiles.length);
   }
 
   async function refreshChats() {
@@ -254,7 +255,7 @@
 
   function updateBusy(value) {
     busy = value;
-    sendButton.disabled = value;
+    sendButton.disabled = value || (!textarea.value.trim() && !pendingFiles.length);
     uploadButton.disabled = value;
     newChatButton.disabled = value;
     textarea.disabled = value;
