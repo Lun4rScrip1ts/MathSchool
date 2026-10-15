@@ -49,6 +49,14 @@ const generalLimiter = rateLimit({
   message: "Too many requests, please try again later.",
 });
 
+const aiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many AI requests. Please wait a minute and try again." },
+});
+
 if (config.challenge !== false) {
   console.log(chalk.green("🔒 Password protection is enabled! Listing logins below"));
   Object.entries(config.users).forEach(([username, password]) => {
@@ -64,6 +72,7 @@ app.use(express.json({ limit: "12mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", generalLimiter, memberCounterRouter);
+app.use("/api/ai/chats/:id/messages", aiLimiter);
 app.use("/api", generalLimiter, communityRouter);
 app.use("/api", generalLimiter, spotifyRouter);
 
