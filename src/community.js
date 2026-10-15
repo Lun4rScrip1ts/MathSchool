@@ -1695,7 +1695,10 @@ router.post("/ai/chats/:id/messages", requireUser, async (req, res) => {
   const currentParts = [{ text: userText || "Please analyze the attached file and help me understand it." }, ...imageParts];
   contents.push({ role: "user", parts: currentParts });
 
+  let providerTimeout;
   try {
+    const providerController = new AbortController();
+    providerTimeout = setTimeout(() => providerController.abort(), 45000);
     const model = cleanText(process.env.GEMINI_MODEL, 80) || "gemini-3.6-flash";
     const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent?key=" + encodeURIComponent(apiKey), {
       method: "POST",
@@ -1705,8 +1708,9 @@ router.post("/ai/chats/:id/messages", requireUser, async (req, res) => {
         contents,
         generationConfig: { temperature: 0.7, maxOutputTokens: 1200 },
       }),
-      signal: AbortSignal.timeout(45000),
+      signal: providerController.signal,
     });
+    clearTimeout(providerTimeout);
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       const providerMessage = cleanText(data?.error?.message, 300);
@@ -1726,6 +1730,7 @@ router.post("/ai/chats/:id/messages", requireUser, async (req, res) => {
     await persist();
     res.json({ chat: publicAiChat(chat, true), answer });
   } catch (error) {
+    if (providerTimeout) clearTimeout(providerTimeout);
     console.warn("[Lunar AI] Request failed:", error.message);
     res.status(502).json({ error: "Could not reach the AI provider. Please try again in a moment." });
   }
