@@ -42,6 +42,7 @@ let state = {
   reports: [],
   movies: [],
   passwordResets: {},
+  aiChats: {},
 };
 let writeQueue = Promise.resolve();
 
@@ -62,6 +63,7 @@ async function loadState() {
         reports: Array.isArray(parsed.reports) ? parsed.reports : [],
         movies: Array.isArray(parsed.movies) ? parsed.movies.slice(-500) : [],
         passwordResets: parsed.passwordResets && typeof parsed.passwordResets === "object" ? parsed.passwordResets : {},
+        aiChats: parsed.aiChats && typeof parsed.aiChats === "object" ? parsed.aiChats : {},
       };
       state.friendships = normalizeFriendshipEntries(state.friendships, state.friendRequests);
       for (const user of Object.values(state.users)) {
@@ -1590,6 +1592,143 @@ router.delete("/friends/gifs/favorites/:id", requireUser, async (req, res) => {
 router.get("/friends/gifs/config", requireUser, (_req, res) => {
   if (!process.env.GIPHY_API_KEY) return res.status(503).json({ error: "GIF search is not configured. Add GIPHY_API_KEY to Railway variables." });
   res.json({ apiKey: process.env.GIPHY_API_KEY });
+});
+
+
+const MAX_AI_CHATS_PER_USER = 50;
+const MAX_AI_MESSAGES_PER_CHAT = 100;
+const MAX_AI_TEXT_LENGTH = 20000;
+const MAX_AI_IMAGE_BYTES = 4 * 1024 * 1024;
+
+function publicAiChat(chat, includeMessages = false) {
+  const result = {
+    id: chat.id,
+    title: chat.title,
+    createdAt: chat.createdAt,
+    updatedAt: chat.updatedAt,
+    messageCount: Array.isArray(chat.messages) ? chat.messages.length : 0,
+  };
+  if (includeMessages) result.messages = Array.isArray(chat.messages) ? chat.messages : [];
+  return result;
+}
+
+function getUserAiChats(userId) {
+  if (!Array.isArray(state.aiChats[userId])) state.aiChats[userId] = [];
+  return state.aiChats[userId];
+}
+
+router.get("/ai/chats", requireUser, (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({ chats: getUserAiChats(req.user.id).slice().sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt)).map(chat => publicAiChat(chat)) });
+});
+
+router.post("/ai/chats", requireUser, async (req, res) => {
+  const chats = getUserAiChats(req.user.id);
+  if (chats.length >= MAX_AI_CHATS_PER_USER) return res.status(400).json({ error: "You have reached the 50-chat limit. Delete an older chat to create another." });
+  const now = new Date().toISOString();
+  const chat = { id: randomUUID(), title: "New chat", createdAt: now, updatedAt: now, messages: [] };
+  chats.unshift(chat);
+  await persist();
+  res.status(201).json({ chat: publicAiChat(chat, true) });
+});
+
+router.get("/ai/chats/:id", requireUser, (req, res) => {
+  const chat = getUserAiChats(req.user.id).find(item => item.id === req.params.id);
+  if (!chat) return res.status(404).json({ error: "Chat not found." });
+  res.set("Cache-Control", "no-store");
+  res.json({ chat: publicAiChat(chat, true) });
+});
+
+router.delete("/ai/chats/:id", requireUser, async (req, res) => {
+  const chats = getUserAiChats(req.user.id);
+  const index = chats.findIndex(item => item.id === req.params.id);
+  if (index < 0) return res.status(404).json({ error: "Chat not found." });
+  chats.splice(index, 1);
+  await persist();
+  res.json({ ok: true });
+});
+
+router.post("/ai/chats/:id/messages", requireUser, async (req, res) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return res.status(503).json({ error: "AI is not configured yet. Add GEMINI_API_KEY to your server environment variables." });
+
+  const chat = getUserAiChats(req.user.id).find(item => item.id === req.params.id);
+  if (!chat) return res.status(404).json({ error: "Chat not found." });
+  if (!Array.isArray(chat.messages)) chat.messages = [];
+  if (chat.messages.length >= MAX_AI_MESSAGES_PER_CHAT - 2) return res.status(400).json({ error: "This chat has reached its message limit. Start a new chat to continue." });
+
+  const message = cleanText(req.body?.message, MAX_AI_TEXT_LENGTH);
+  const attachments = Array.isArray(req.body?.attachments) ? req.body.attachments.slice(0, 3) : [];
+  const imageParts = [];
+  const attachmentLabels = [];
+  const documentTexts = [];
+  let totalImageBytes = 0;
+
+  for (const attachment of attachments) {
+    const name = cleanText(attachment?.name, 160) || "attachment";
+    const type = String(attachment?.type || "").toLowerCase();
+    attachmentLabels.push(name);
+    if (type === "text/plain" || name.toLowerCase().endsWith(".txt")) {
+      const text = typeof attachment?.text === "string" ? attachment.text.slice(0, 12000) : "";
+      if (text) documentTexts.push("Contents of " + name + ":\n" + text);
+      continue;
+    }
+    if (!["image/png", "image/jpeg", "image/webp"].includes(type)) {
+      return res.status(400).json({ error: "Only .txt, PNG, JPG, and WEBP files are supported." });
+    }
+    const dataUrl = typeof attachment?.data === "string" ? attachment.data : "";
+    const match = dataUrl.match(/^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/);
+    if (!match || match[1] !== type) return res.status(400).json({ error: "An uploaded image could not be read. Please choose it again." });
+    const buffer = Buffer.from(match[2], "base64");
+    totalImageBytes += buffer.length;
+    if (buffer.length > MAX_AI_IMAGE_BYTES || totalImageBytes > MAX_AI_IMAGE_BYTES) return res.status(413).json({ error: "Images must total 4 MB or less per message." });
+    imageParts.push({ inlineData: { mimeType: type, data: buffer.toString("base64") } });
+  }
+
+  if (!message && !attachments.length) return res.status(400).json({ error: "Write a message or attach a file first." });
+  const userText = [message, ...documentTexts, ...imageParts.map((_, index) => "Please inspect attached image " + (index + 1) + ".")].filter(Boolean).join("\n\n").slice(0, MAX_AI_TEXT_LENGTH);
+  const savedUserText = [message, ...documentTexts, ...attachmentLabels.map(name => "[Attachment: " + name + "]")].filter(Boolean).join("\n\n").slice(0, MAX_AI_TEXT_LENGTH);
+  const contents = chat.messages.slice(-12).map(item => ({
+    role: item.role === "assistant" ? "model" : "user",
+    parts: [{ text: String(item.content || "").slice(0, MAX_AI_TEXT_LENGTH) }],
+  }));
+  const currentParts = [{ text: userText || "Please analyze the attached file and help me understand it." }, ...imageParts];
+  contents.push({ role: "user", parts: currentParts });
+
+  try {
+    const model = cleanText(process.env.GEMINI_MODEL, 80) || "gemini-3.6-flash";
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent?key=" + encodeURIComponent(apiKey), {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: "You are Lunar AI, a friendly and careful study assistant. Help users understand questions and images step by step. Be accurate, explain uncertainty, and do not claim to see details that are unclear. Keep responses clear and useful." }] },
+        contents,
+        generationConfig: { temperature: 0.7, maxOutputTokens: 1200 },
+      }),
+      signal: AbortSignal.timeout(45000),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const providerMessage = cleanText(data?.error?.message, 300);
+      console.warn("[Lunar AI] Provider request failed:", response.status, providerMessage);
+      return res.status(502).json({ error: response.status === 429 ? "The free AI limit has been reached. Try again later." : "The AI provider could not answer right now. Check the server API key and model settings." });
+    }
+    const answer = (Array.isArray(data?.candidates?.[0]?.content?.parts) ? data.candidates[0].content.parts.map(part => part.text || "").join("") : "").trim();
+    if (!answer) return res.status(502).json({ error: "The AI returned an empty response. Please try again." });
+
+    const now = new Date().toISOString();
+    const userEntry = { id: randomUUID(), role: "user", content: savedUserText || "Please analyze the attached file.", attachments: attachmentLabels, createdAt: now };
+    const assistantEntry = { id: randomUUID(), role: "assistant", content: answer, attachments: [], createdAt: new Date().toISOString() };
+    chat.messages.push(userEntry, assistantEntry);
+    if (chat.messages.length > MAX_AI_MESSAGES_PER_CHAT) chat.messages.splice(0, chat.messages.length - MAX_AI_MESSAGES_PER_CHAT);
+    if (chat.title === "New chat") chat.title = cleanText(message || attachmentLabels[0] || "New chat", 60) || "New chat";
+    chat.updatedAt = assistantEntry.createdAt;
+    await persist();
+    res.json({ chat: publicAiChat(chat, true), answer });
+  } catch (error) {
+    console.warn("[Lunar AI] Request failed:", error.message);
+    res.status(502).json({ error: "Could not reach the AI provider. Please try again in a moment." });
+  }
 });
 
 await loadState();
