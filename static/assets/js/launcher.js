@@ -240,6 +240,56 @@ function createPinButton(app, appIndex) {
   return button;
 }
 
+function createGameThumbnail(app) {
+  const category = app.hubCategory || (app.categories || []).find(value => value !== "all" && value !== "open-source") || "arcade";
+  const palettes = {
+    puzzle: ["#7c3aed", "#312e81", "🧩"],
+    arcade: ["#ec4899", "#831843", "🕹️"],
+    shooter: ["#ef4444", "#7f1d1d", "🎯"],
+    racing: ["#f59e0b", "#78350f", "🏎️"],
+    sports: ["#10b981", "#064e3b", "⚽"],
+    platformer: ["#06b6d4", "#164e63", "🏃"],
+    casual: ["#f472b6", "#831843", "🎈"],
+    board: ["#64748b", "#1e293b", "♟️"],
+    "word-quiz": ["#3b82f6", "#1e3a8a", "📝"],
+    "3d": ["#8b5cf6", "#4c1d95", "🌐"],
+    open-source: ["#5865f2", "#20264f", "🎮"]
+  };
+  const palette = palettes[category] || palettes["open-source"];
+  const title = String(app.name || "Game").replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&apos;"
+  })[character]);
+  const shortTitle = title.length > 22 ? title.slice(0, 20) + "…" : title;
+  const description = String(app.hubDescription || "Open-source browser game").replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&apos;"
+  })[character]).slice(0, 54);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="290" height="290" viewBox="0 0 290 290">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${palette[0]}"/><stop offset="1" stop-color="${palette[1]}"/></linearGradient>
+      <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#fff" stroke-opacity=".08"/></pattern>
+    </defs>
+    <rect width="290" height="290" rx="24" fill="url(#bg)"/>
+    <rect width="290" height="290" rx="24" fill="url(#grid)"/>
+    <circle cx="230" cy="55" r="66" fill="#fff" fill-opacity=".08"/>
+    <circle cx="44" cy="252" r="78" fill="#fff" fill-opacity=".06"/>
+    <rect x="22" y="22" width="246" height="246" rx="18" fill="#080b18" fill-opacity=".18" stroke="#fff" stroke-opacity=".18"/>
+    <text x="145" y="115" text-anchor="middle" font-size="66" font-family="Segoe UI Emoji, Apple Color Emoji, sans-serif">${palette[2]}</text>
+    <text x="145" y="169" text-anchor="middle" font-size="${shortTitle.length > 15 ? 18 : 23}" font-weight="700" fill="#fff" font-family="Arial, sans-serif">${shortTitle}</text>
+    <text x="145" y="197" text-anchor="middle" font-size="11" fill="#fff" fill-opacity=".8" font-family="Arial, sans-serif">${description}</text>
+    <rect x="82" y="225" width="126" height="24" rx="12" fill="#fff" fill-opacity=".16"/>
+    <text x="145" y="241" text-anchor="middle" font-size="10" letter-spacing="1.4" fill="#fff" font-family="Arial, sans-serif">OPEN SOURCE</text>
+  </svg>`;
+  return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+}
+
 function renderAppCard(app, appIndex, isCustom = false) {
   const columnDiv = document.createElement("div");
   columnDiv.classList.add("column");
@@ -261,7 +311,7 @@ function renderAppCard(app, appIndex, isCustom = false) {
   if (app.image) {
     image.src = app.image;
   } else {
-    image.style.display = "none";
+    image.src = createGameThumbnail(app);
   }
 
   const paragraph = document.createElement("p");
