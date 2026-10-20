@@ -299,6 +299,7 @@ function renderAppCard(app, appIndex, isCustom = false) {
   const appId = getAppStorageId(app, appIndex);
   columnDiv.setAttribute("data-app-index", appIndex);
   columnDiv.setAttribute("data-app-id", appId);
+  columnDiv._catalogueEntry = app;
 
   const link = document.createElement("a");
   link.onclick = () => handleAppClick(app);
@@ -345,7 +346,7 @@ function renderAppCard(app, appIndex, isCustom = false) {
 }
 
 function getJsonPath() {
-  if (isGamesPage) return "/assets/json/games.min.json?v=lunar9";
+  if (isGamesPage) return "/assets/json/games.min.json?v=lunar10";
   if (isAppsPage) return "/assets/json/apps.min.json?v=lunar9";
   return "/assets/json/apps.min.json";
 }
@@ -447,30 +448,38 @@ function loadCustomAppsInline() {
 }
 
 function applyFilters() {
-  const searchTerm = (document.getElementById("search")?.value ?? "").toLowerCase();
-  const selectedCategories = Array.from(document.querySelectorAll("#category option:checked")).map(option => option.value);
+  const searchTerm = (document.getElementById("search")?.value ?? "").trim().toLowerCase();
+  const searchWords = searchTerm.split(/\s+/).filter(Boolean);
 
   Array.from(document.getElementsByClassName("column")).forEach(card => {
-    const appName = card.getElementsByTagName("p")[0].textContent.toLowerCase();
-    const categories = card.getAttribute("data-category").split(" ");
+    const appName = card.getElementsByTagName("p")[0]?.textContent?.toLowerCase() || "";
+    const app = card._catalogueEntry || {};
+    const searchableText = [
+      appName,
+      app.hubDescription,
+      app.hubCategory,
+      app.hubTech,
+      app.hubSlug,
+      app.sourceRepo,
+      app.link,
+      ...(Array.isArray(app.categories) ? app.categories : [])
+    ].filter(Boolean).join(" ").toLowerCase();
 
-    const matchesSearch = !searchTerm || appName.includes(searchTerm);
-    const matchesCategory = selectedCategories.length === 0 || selectedCategories.some(cat => categories.includes(cat));
-
-    card.style.display = matchesSearch && matchesCategory ? "block" : "none";
+    const matchesSearch = searchWords.every(word => searchableText.includes(word));
+    card.style.display = matchesSearch ? "block" : "none";
   });
-}
-
-function filterByCategory() {
-  applyFilters();
 }
 
 function filterBySearchTerm() {
   applyFilters();
 }
 
-window.category = filterByCategory;
 window.bar = filterBySearchTerm;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("search");
+  if (searchInput) searchInput.addEventListener("input", filterBySearchTerm);
+});
 
 document.addEventListener("DOMContentLoaded", async () => {
   try { await store.loadAccountSettings?.(); } catch {}
