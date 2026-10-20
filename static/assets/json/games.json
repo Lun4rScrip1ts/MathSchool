@@ -2722,5 +2722,1951 @@
       "all",
       "emu"
     ]
+  },
+  {
+    "name": "6 Octagons",
+    "link": "https://sausi-7.github.io/games/games/puzzle/6oct/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "6oct",
+    "hubCategory": "puzzle",
+    "hubDescription": "Octagon-tile sliding puzzle.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Rock Paper Scissors",
+    "link": "https://sausi-7.github.io/games/games/board/rock-paper-scissors/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "board"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "rock-paper-scissors",
+    "hubCategory": "board",
+    "hubDescription": "The timeless hand game vs the AI.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Sudoku",
+    "link": "https://sausi-7.github.io/games/games/puzzle/sudoku/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "sudoku",
+    "hubCategory": "puzzle",
+    "hubDescription": "Classic 9x9 number logic puzzle.",
+    "hubTech": "html"
+  },
+  {
+    "name": "Abhita",
+    "link": "https://sausi-7.github.io/games/games/arcade/abhita/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "abhita",
+    "hubCategory": "arcade",
+    "hubDescription": "Reflex-driven dodge mini-game.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Alien Battle",
+    "link": "https://sausi-7.github.io/games/games/shooter/alien-battle/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "alien-battle",
+    "hubCategory": "shooter",
+    "hubDescription": "Top-down alien shooter. Survive the swarm.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Anti-Gravity",
+    "link": "https://sausi-7.github.io/games/games/platformer/antigravity/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "platformer"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "antigravity",
+    "hubCategory": "platformer",
+    "hubDescription": "Flip gravity to navigate hazards.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Archer",
+    "link": "https://sausi-7.github.io/games/games/sports/archer/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "sports"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "archer",
+    "hubCategory": "sports",
+    "hubDescription": "Aim, draw, and release. Hit your target.",
+    "hubTech": "html"
+  },
+  {
+    "name": "Balance Stack",
+    "link": "https://sausi-7.github.io/games/games/arcade/balance-stack/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "balance-stack",
+    "hubCategory": "arcade",
+    "hubDescription": "Stack blocks without toppling the tower.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Basketball",
+    "link": "https://sausi-7.github.io/games/games/sports/basketball/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "sports"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "basketball",
+    "hubCategory": "sports",
+    "hubDescription": "Arc the ball through the hoop.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Bird Shooter",
+    "link": "https://sausi-7.github.io/games/games/shooter/bird-shooter/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "bird-shooter",
+    "hubCategory": "shooter",
+    "hubDescription": "Track and shoot flying birds.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Bomb Blast",
+    "link": "https://sausi-7.github.io/games/games/arcade/bomb-blast/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "bomb-blast",
+    "hubCategory": "arcade",
+    "hubDescription": "Time the blast to chain destruction.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Boom Dots",
+    "link": "https://sausi-7.github.io/games/games/arcade/boom-dots/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "boom-dots",
+    "hubCategory": "arcade",
+    "hubDescription": "Tap to detonate dots and clear the screen.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Bowling",
+    "link": "https://sausi-7.github.io/games/games/sports/bowling/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "sports"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "bowling",
+    "hubCategory": "sports",
+    "hubDescription": "Knock down all the pins.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Breakoid",
+    "link": "https://sausi-7.github.io/games/games/arcade/breakoid/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "breakoid",
+    "hubCategory": "arcade",
+    "hubDescription": "Breakout-style brick smashing.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Bubble Pop",
+    "link": "https://sausi-7.github.io/games/games/casual/bubble-pop/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "casual"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "bubble-pop",
+    "hubCategory": "casual",
+    "hubDescription": "Pop matching bubbles to score.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Bubble Shooter",
+    "link": "https://sausi-7.github.io/games/games/casual/bubble-shooter/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "casual"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "bubble-shooter",
+    "hubCategory": "casual",
+    "hubDescription": "Shoot bubbles into matching color clusters.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Bug Smasher",
+    "link": "https://sausi-7.github.io/games/games/arcade/bug-smasher/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "bug-smasher",
+    "hubCategory": "arcade",
+    "hubDescription": "Squash bugs before they reach the goal.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Buttermilk",
+    "link": "https://sausi-7.github.io/games/games/casual/buttermilk/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "casual"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "buttermilk",
+    "hubCategory": "casual",
+    "hubDescription": "Cute pour-and-mix idle game.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Candy Crush",
+    "link": "https://sausi-7.github.io/games/games/casual/candy-crush/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "casual"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "candy-crush",
+    "hubCategory": "casual",
+    "hubDescription": "Match-3 candy puzzle.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Candy Crusher",
+    "link": "https://sausi-7.github.io/games/games/casual/candy-crusher/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "casual"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "candy-crusher",
+    "hubCategory": "casual",
+    "hubDescription": "Smash candy patterns for points.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Cannon Blaster",
+    "link": "https://sausi-7.github.io/games/games/shooter/cannon-blaster/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "cannon-blaster",
+    "hubCategory": "shooter",
+    "hubDescription": "Aim and fire cannonballs at targets.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Cargo Stack",
+    "link": "https://sausi-7.github.io/games/games/puzzle/cargo-stack/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "cargo-stack",
+    "hubCategory": "puzzle",
+    "hubDescription": "Pack cargo crates without overflow.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Car Race",
+    "link": "https://sausi-7.github.io/games/games/racing/car-race/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "racing"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "car-race",
+    "hubCategory": "racing",
+    "hubDescription": "3D car-racing run with traffic dodging.",
+    "hubTech": "three"
+  },
+  {
+    "name": "Carrom",
+    "link": "https://sausi-7.github.io/games/games/board/carrom/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "board"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "carrom",
+    "hubCategory": "board",
+    "hubDescription": "Pocket the carrom pieces with skill.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Chess",
+    "link": "https://sausi-7.github.io/games/games/board/chess/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "board"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "chess",
+    "hubCategory": "board",
+    "hubDescription": "Classic chess vs the computer.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Circle Path",
+    "link": "https://sausi-7.github.io/games/games/arcade/circle-path/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "circle-path",
+    "hubCategory": "arcade",
+    "hubDescription": "Trace the rotating circle without slipping.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Circuit Bulb",
+    "link": "https://sausi-7.github.io/games/games/puzzle/circuit-bulb/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "circuit-bulb",
+    "hubCategory": "puzzle",
+    "hubDescription": "Wire circuits to light the bulb.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Catch Me If You Can",
+    "link": "https://sausi-7.github.io/games/games/arcade/catch-me-if-you-can/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "catch-me-if-you-can",
+    "hubCategory": "arcade",
+    "hubDescription": "Outrun the chasers in a wide arena.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Collector",
+    "link": "https://sausi-7.github.io/games/games/arcade/collector/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "collector",
+    "hubCategory": "arcade",
+    "hubDescription": "Sweep up coins before time runs out.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Color Dash",
+    "link": "https://sausi-7.github.io/games/games/arcade/color-dash/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "color-dash",
+    "hubCategory": "arcade",
+    "hubDescription": "Match the player's color to pass each gate.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Colour Pour",
+    "link": "https://sausi-7.github.io/games/games/puzzle/colour-pour/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "colour-pour",
+    "hubCategory": "puzzle",
+    "hubDescription": "Sort liquids into single-color tubes.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Connected",
+    "link": "https://sausi-7.github.io/games/games/puzzle/connected/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "connected",
+    "hubCategory": "puzzle",
+    "hubDescription": "Link nodes without crossing lines.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Cooking",
+    "link": "https://sausi-7.github.io/games/games/casual/cooking/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "casual"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "cooking",
+    "hubCategory": "casual",
+    "hubDescription": "Plate orders before the timer hits zero.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Cool Platformer",
+    "link": "https://sausi-7.github.io/games/games/platformer/cool-platformer/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "platformer"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "cool-platformer",
+    "hubCategory": "platformer",
+    "hubDescription": "Run, jump, and dash through hazards.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Cosmic Cleaner",
+    "link": "https://sausi-7.github.io/games/games/3d/cosmic-cleaner/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "3d"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "cosmic-cleaner",
+    "hubCategory": "3d",
+    "hubDescription": "3D space-junk vacuum-up game.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Cricket 1-2-3",
+    "link": "https://sausi-7.github.io/games/games/sports/cricket-123/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "sports"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "cricket-123",
+    "hubCategory": "sports",
+    "hubDescription": "Bat through fast deliveries.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Crowd Control",
+    "link": "https://sausi-7.github.io/games/games/arcade/crowd-control/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "crowd-control",
+    "hubCategory": "arcade",
+    "hubDescription": "Steer your growing crowd through obstacles.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Curve Snake",
+    "link": "https://sausi-7.github.io/games/games/arcade/curve-snake/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "curve-snake",
+    "hubCategory": "arcade",
+    "hubDescription": "Snake-style game with smooth curve trails.",
+    "hubTech": "html"
+  },
+  {
+    "name": "Cut the Rope",
+    "link": "https://sausi-7.github.io/games/games/puzzle/cut-rope/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "cut-rope",
+    "hubCategory": "puzzle",
+    "hubDescription": "Slice ropes to land the candy in the goal.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Demon",
+    "link": "https://sausi-7.github.io/games/games/arcade/demon/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "demon",
+    "hubCategory": "arcade",
+    "hubDescription": "Survive a horde of demonic enemies.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Devil King",
+    "link": "https://sausi-7.github.io/games/games/platformer/devil-king/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "platformer"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "devil-king",
+    "hubCategory": "platformer",
+    "hubDescription": "Hop hazards in a devilish trial run.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Dodge Enemy",
+    "link": "https://sausi-7.github.io/games/games/arcade/dodge-enemy/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "dodge-enemy",
+    "hubCategory": "arcade",
+    "hubDescription": "Slip past charging enemies.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Dodge Master",
+    "link": "https://sausi-7.github.io/games/games/arcade/dodge-master/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "dodge-master",
+    "hubCategory": "arcade",
+    "hubDescription": "Endless dodging at increasing speed.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Dream Weaver",
+    "link": "https://sausi-7.github.io/games/games/arcade/dream-weaver/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "dream-weaver",
+    "hubCategory": "arcade",
+    "hubDescription": "Weave glowing trails through a dreamscape.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Ellars",
+    "link": "https://sausi-7.github.io/games/games/arcade/ellars/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "ellars",
+    "hubCategory": "arcade",
+    "hubDescription": "Surreal arcade dodger.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Endless Mafia",
+    "link": "https://sausi-7.github.io/games/games/arcade/endless-mafia/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "endless-mafia",
+    "hubCategory": "arcade",
+    "hubDescription": "Brawl through endless waves of mafia thugs.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Endless Runner",
+    "link": "https://sausi-7.github.io/games/games/racing/endless-runner/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "racing"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "endless-runner",
+    "hubCategory": "racing",
+    "hubDescription": "Run forever. Dodge everything.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Fighter Fury",
+    "link": "https://sausi-7.github.io/games/games/shooter/fighter-fury/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "fighter-fury",
+    "hubCategory": "shooter",
+    "hubDescription": "Side-scrolling jet shooter.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Fighter Jet",
+    "link": "https://sausi-7.github.io/games/games/shooter/fighter-jet/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "fighter-jet",
+    "hubCategory": "shooter",
+    "hubDescription": "Top-down jet combat.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Flappy",
+    "link": "https://sausi-7.github.io/games/games/arcade/flappy/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "flappy",
+    "hubCategory": "arcade",
+    "hubDescription": "Tap to flap. Don't hit the pipes.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Flip Jump",
+    "link": "https://sausi-7.github.io/games/games/platformer/flip-jump/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "platformer"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "flip-jump",
+    "hubCategory": "platformer",
+    "hubDescription": "Flip the world to land safely.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Fly Monkey",
+    "link": "https://sausi-7.github.io/games/games/arcade/fly-monkey/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "fly-monkey",
+    "hubCategory": "arcade",
+    "hubDescription": "Swing the monkey through the canopy.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Football",
+    "link": "https://sausi-7.github.io/games/games/sports/football/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "sports"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "football",
+    "hubCategory": "sports",
+    "hubDescription": "Score goals in a fast-paced footy match.",
+    "hubTech": "html"
+  },
+  {
+    "name": "Forest Runner",
+    "link": "https://sausi-7.github.io/games/games/racing/forest-runner/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "racing"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "forest-runner",
+    "hubCategory": "racing",
+    "hubDescription": "Sprint through a forest — dodge logs and gaps.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Four Dots",
+    "link": "https://sausi-7.github.io/games/games/puzzle/four-dots/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "four-dots",
+    "hubCategory": "puzzle",
+    "hubDescription": "Tap dots in the right pattern.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Fruit Basket",
+    "link": "https://sausi-7.github.io/games/games/casual/fruit-basket/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "casual"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "fruit-basket",
+    "hubCategory": "casual",
+    "hubDescription": "Catch falling fruits in your basket.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Fruit Cosmics",
+    "link": "https://sausi-7.github.io/games/games/casual/fruit-cosmics/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "casual"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "fruit-cosmics",
+    "hubCategory": "casual",
+    "hubDescription": "Cosmic-themed fruit smasher.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Fruit Merge",
+    "link": "https://sausi-7.github.io/games/games/casual/fruit-merge/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "casual"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "fruit-merge",
+    "hubCategory": "casual",
+    "hubDescription": "Drop fruits — merge same kinds to evolve.",
+    "hubTech": "html"
+  },
+  {
+    "name": "LumaBounce",
+    "link": "https://sausi-7.github.io/games/games/arcade/luma-bounce/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "luma-bounce",
+    "hubCategory": "arcade",
+    "hubDescription": "Bouncy reflex arcade game.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Glass Step",
+    "link": "https://sausi-7.github.io/games/games/arcade/glass-step/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "glass-step",
+    "hubCategory": "arcade",
+    "hubDescription": "Pick the safe glass tile. Don't fall.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Gunman",
+    "link": "https://sausi-7.github.io/games/games/shooter/gunman/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "gunman",
+    "hubCategory": "shooter",
+    "hubDescription": "Quick-draw gunfight game.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Gun Run",
+    "link": "https://sausi-7.github.io/games/games/shooter/gun-run/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "gun-run",
+    "hubCategory": "shooter",
+    "hubDescription": "Run-and-gun side-scroller.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Hex Puzzle",
+    "link": "https://sausi-7.github.io/games/games/puzzle/hex-puzzle/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "hex-puzzle",
+    "hubCategory": "puzzle",
+    "hubDescription": "Place hex blocks to clear the board.",
+    "hubTech": "html"
+  },
+  {
+    "name": "Hungry Player",
+    "link": "https://sausi-7.github.io/games/games/arcade/hungry-player/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "hungry-player",
+    "hubCategory": "arcade",
+    "hubDescription": "Gobble food, dodge hazards, grow.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Jump Dot",
+    "link": "https://sausi-7.github.io/games/games/arcade/jump-dot/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "jump-dot",
+    "hubCategory": "arcade",
+    "hubDescription": "Tap to jump the dot over rotating hazards.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Kaiju Krush",
+    "link": "https://sausi-7.github.io/games/games/arcade/kaiju-krush/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "kaiju-krush",
+    "hubCategory": "arcade",
+    "hubDescription": "Smash through the city as a giant kaiju.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Laser Bounce",
+    "link": "https://sausi-7.github.io/games/games/puzzle/laser-bounce/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "laser-bounce",
+    "hubCategory": "puzzle",
+    "hubDescription": "Reflect lasers to hit all targets.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Link",
+    "link": "https://sausi-7.github.io/games/games/puzzle/link/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "link",
+    "hubCategory": "puzzle",
+    "hubDescription": "Link matching tiles by shortest path.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Ludo",
+    "link": "https://sausi-7.github.io/games/games/board/ludo/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "board"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "ludo",
+    "hubCategory": "board",
+    "hubDescription": "Classic Ludo — you vs 3 AI opponents.",
+    "hubTech": "html"
+  },
+  {
+    "name": "Mario-Like",
+    "link": "https://sausi-7.github.io/games/games/platformer/mario/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "platformer"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "mario",
+    "hubCategory": "platformer",
+    "hubDescription": "Side-scrolling platformer adventure.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Math Quest",
+    "link": "https://sausi-7.github.io/games/games/word-quiz/math-quest/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "word-quiz"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "math-quest",
+    "hubCategory": "word-quiz",
+    "hubDescription": "Speed math challenge.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Memory",
+    "link": "https://sausi-7.github.io/games/games/puzzle/memory/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "memory",
+    "hubCategory": "puzzle",
+    "hubDescription": "Flip cards. Find pairs.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Memory Cards",
+    "link": "https://sausi-7.github.io/games/games/puzzle/memory-cards/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "memory-cards",
+    "hubCategory": "puzzle",
+    "hubDescription": "Card-matching memory test.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Number Merge",
+    "link": "https://sausi-7.github.io/games/games/puzzle/number-merge/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "number-merge",
+    "hubCategory": "puzzle",
+    "hubDescription": "Merge same numbers, climb the score.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "One Car",
+    "link": "https://sausi-7.github.io/games/games/racing/one-car/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "racing"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "one-car",
+    "hubCategory": "racing",
+    "hubDescription": "Steer one car through dense traffic.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Orbital Outpost",
+    "link": "https://sausi-7.github.io/games/games/3d/orbital-outpost/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "3d"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "orbital-outpost",
+    "hubCategory": "3d",
+    "hubDescription": "3D space-station defense.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Pac-Man",
+    "link": "https://sausi-7.github.io/games/games/arcade/pacman/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "pacman",
+    "hubCategory": "arcade",
+    "hubDescription": "Eat dots. Avoid ghosts.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Pairing",
+    "link": "https://sausi-7.github.io/games/games/puzzle/pairing/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "pairing",
+    "hubCategory": "puzzle",
+    "hubDescription": "Pair up matching items quickly.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Parkour",
+    "link": "https://sausi-7.github.io/games/games/platformer/parkour/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "platformer"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "parkour",
+    "hubCategory": "platformer",
+    "hubDescription": "Wall-run, slide, and vault forward.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Pathfinder",
+    "link": "https://sausi-7.github.io/games/games/puzzle/pathfinder/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "pathfinder",
+    "hubCategory": "puzzle",
+    "hubDescription": "Solve maze paths under time pressure.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Perfect Square",
+    "link": "https://sausi-7.github.io/games/games/puzzle/perfect-square/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "perfect-square",
+    "hubCategory": "puzzle",
+    "hubDescription": "Tap when the square aligns perfectly.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Pirates",
+    "link": "https://sausi-7.github.io/games/games/arcade/pirates/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "pirates",
+    "hubCategory": "arcade",
+    "hubDescription": "Sail and battle on the high seas.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Planet Visitor",
+    "link": "https://sausi-7.github.io/games/games/3d/planet-visitor/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "3d"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "planet-visitor",
+    "hubCategory": "3d",
+    "hubDescription": "Land on alien planets in 3D.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Planet War",
+    "link": "https://sausi-7.github.io/games/games/3d/planet-war/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "3d"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "planet-war",
+    "hubCategory": "3d",
+    "hubDescription": "Defend your planet from cosmic invaders.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Projectile Enemy",
+    "link": "https://sausi-7.github.io/games/games/shooter/projectile-enemy/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "projectile-enemy",
+    "hubCategory": "shooter",
+    "hubDescription": "Dodge and counter ranged enemies.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Quiz",
+    "link": "https://sausi-7.github.io/games/games/word-quiz/quiz/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "word-quiz"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "quiz",
+    "hubCategory": "word-quiz",
+    "hubDescription": "Test your knowledge across categories.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Red Light, Green Light",
+    "link": "https://sausi-7.github.io/games/games/arcade/red-light-green-light/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "red-light-green-light",
+    "hubCategory": "arcade",
+    "hubDescription": "Move on green. Freeze on red.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Road Cross",
+    "link": "https://sausi-7.github.io/games/games/arcade/road-cross/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "road-cross",
+    "hubCategory": "arcade",
+    "hubDescription": "Cross busy roads safely.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Road Fighter",
+    "link": "https://sausi-7.github.io/games/games/racing/road-fighter/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "racing"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "road-fighter",
+    "hubCategory": "racing",
+    "hubDescription": "Top-down race weaving through traffic.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Robot Destruction",
+    "link": "https://sausi-7.github.io/games/games/shooter/robot-destruction/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "robot-destruction",
+    "hubCategory": "shooter",
+    "hubDescription": "Blast incoming robots to scrap.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Screw Master",
+    "link": "https://sausi-7.github.io/games/games/puzzle/screw-master/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "screw-master",
+    "hubCategory": "puzzle",
+    "hubDescription": "Unscrew and sort the metal pieces.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Shadow Runner",
+    "link": "https://sausi-7.github.io/games/games/racing/shadow-runner/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "racing"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "shadow-runner",
+    "hubCategory": "racing",
+    "hubDescription": "Sprint through a shadow world.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Shadow Shooter",
+    "link": "https://sausi-7.github.io/games/games/shooter/shadow-shooter/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "shadow-shooter",
+    "hubCategory": "shooter",
+    "hubDescription": "Pick off shadow enemies from cover.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Shape Collector",
+    "link": "https://sausi-7.github.io/games/games/arcade/shape-collector/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "shape-collector",
+    "hubCategory": "arcade",
+    "hubDescription": "Catch only the matching shapes.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Shape Fitter",
+    "link": "https://sausi-7.github.io/games/games/puzzle/shape-fitter/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "shape-fitter",
+    "hubCategory": "puzzle",
+    "hubDescription": "Fit shapes into the right slots.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Shoot Enemy",
+    "link": "https://sausi-7.github.io/games/games/shooter/shoot-enemy/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "shoot-enemy",
+    "hubCategory": "shooter",
+    "hubDescription": "Pick off enemies before they reach you.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Shooter",
+    "link": "https://sausi-7.github.io/games/games/shooter/shooter/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "shooter",
+    "hubCategory": "shooter",
+    "hubDescription": "Top-down arena shooter.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Signal Circuit",
+    "link": "https://sausi-7.github.io/games/games/puzzle/signal-circuit/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "signal-circuit",
+    "hubCategory": "puzzle",
+    "hubDescription": "Route signals through circuit gates.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Sky High",
+    "link": "https://sausi-7.github.io/games/games/arcade/sky-high/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "sky-high",
+    "hubCategory": "arcade",
+    "hubDescription": "Climb endlessly into the sky.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Slide Puzzle",
+    "link": "https://sausi-7.github.io/games/games/puzzle/slide-puzzle/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "slide-puzzle",
+    "hubCategory": "puzzle",
+    "hubDescription": "Reassemble the image by sliding tiles.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Snake",
+    "link": "https://sausi-7.github.io/games/games/arcade/snake/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "snake",
+    "hubCategory": "arcade",
+    "hubDescription": "Eat. Grow. Don't hit yourself.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Snake & Ladder",
+    "link": "https://sausi-7.github.io/games/games/board/snake-and-ladder/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "board"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "snake-and-ladder",
+    "hubCategory": "board",
+    "hubDescription": "Roll the dice. Climb. Slide. Win.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Sniper",
+    "link": "https://sausi-7.github.io/games/games/shooter/sniper/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "sniper",
+    "hubCategory": "shooter",
+    "hubDescription": "Steady your scope. One shot, one kill.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Space Fighter",
+    "link": "https://sausi-7.github.io/games/games/shooter/space-fighter/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "space-fighter",
+    "hubCategory": "shooter",
+    "hubDescription": "Dogfight through asteroid fields.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Spaceman",
+    "link": "https://sausi-7.github.io/games/games/arcade/spaceman/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "spaceman",
+    "hubCategory": "arcade",
+    "hubDescription": "Float and survive in zero gravity.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Space Waves",
+    "link": "https://sausi-7.github.io/games/games/arcade/space-waves/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "space-waves",
+    "hubCategory": "arcade",
+    "hubDescription": "Surf waves of space debris.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Square One",
+    "link": "https://sausi-7.github.io/games/games/puzzle/square-one/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "square-one",
+    "hubCategory": "puzzle",
+    "hubDescription": "Slide squares to clear the board.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Stack Tower",
+    "link": "https://sausi-7.github.io/games/games/3d/stack-tower/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "3d"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "stack-tower",
+    "hubCategory": "3d",
+    "hubDescription": "Stack 3D blocks for the highest tower.",
+    "hubTech": "three"
+  },
+  {
+    "name": "Stick Game",
+    "link": "https://sausi-7.github.io/games/games/arcade/stick-game/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "stick-game",
+    "hubCategory": "arcade",
+    "hubDescription": "Draw sticks to bridge gaps.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Stick Toss",
+    "link": "https://sausi-7.github.io/games/games/arcade/stick-toss/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "stick-toss",
+    "hubCategory": "arcade",
+    "hubDescription": "Toss sticks at the spinning target.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Straight Rush",
+    "link": "https://sausi-7.github.io/games/games/racing/straight-rush/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "racing"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "straight-rush",
+    "hubCategory": "racing",
+    "hubDescription": "Sprint forward — react to oncoming hazards.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Survival Run",
+    "link": "https://sausi-7.github.io/games/games/racing/survival-run/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "racing"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "survival-run",
+    "hubCategory": "racing",
+    "hubDescription": "Outrun the danger as long as you can.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Survivor",
+    "link": "https://sausi-7.github.io/games/games/shooter/survivor/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "survivor",
+    "hubCategory": "shooter",
+    "hubDescription": "Vampire-survivors-style horde survival.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Table Tennis",
+    "link": "https://sausi-7.github.io/games/games/sports/table-tennis/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "sports"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "table-tennis",
+    "hubCategory": "sports",
+    "hubDescription": "Volley the ping-pong ball.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Tap Target",
+    "link": "https://sausi-7.github.io/games/games/arcade/tap-target/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "tap-target",
+    "hubCategory": "arcade",
+    "hubDescription": "Tap targets before they vanish.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Tee Shooter",
+    "link": "https://sausi-7.github.io/games/games/shooter/tee-shooter/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "tee-shooter",
+    "hubCategory": "shooter",
+    "hubDescription": "Tee-up trick-shot shooter.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Tetris",
+    "link": "https://sausi-7.github.io/games/games/puzzle/tetris/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "tetris",
+    "hubCategory": "puzzle",
+    "hubDescription": "The classic falling-block puzzle.",
+    "hubTech": "html"
+  },
+  {
+    "name": "That Level Again — 1",
+    "link": "https://sausi-7.github.io/games/games/platformer/that-level-again-1/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "platformer"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "that-level-again-1",
+    "hubCategory": "platformer",
+    "hubDescription": "Trick-platformer level 1.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "That Level Again — 2",
+    "link": "https://sausi-7.github.io/games/games/platformer/that-level-again-2/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "platformer"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "that-level-again-2",
+    "hubCategory": "platformer",
+    "hubDescription": "Trick-platformer level 2.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "That Level Again — 3",
+    "link": "https://sausi-7.github.io/games/games/platformer/that-level-again-3/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "platformer"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "that-level-again-3",
+    "hubCategory": "platformer",
+    "hubDescription": "Trick-platformer level 3.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "That Level Again — 4",
+    "link": "https://sausi-7.github.io/games/games/platformer/that-level-again-4/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "platformer"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "that-level-again-4",
+    "hubCategory": "platformer",
+    "hubDescription": "Trick-platformer level 4.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "That Level Again — 5",
+    "link": "https://sausi-7.github.io/games/games/platformer/that-level-again-5/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "platformer"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "that-level-again-5",
+    "hubCategory": "platformer",
+    "hubDescription": "Trick-platformer level 5.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Thunder God",
+    "link": "https://sausi-7.github.io/games/games/shooter/thunder-god/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "thunder-god",
+    "hubCategory": "shooter",
+    "hubDescription": "Smite enemies with lightning.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Tic-Tac-Toe",
+    "link": "https://sausi-7.github.io/games/games/board/tic-tac-toe/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "board"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "tic-tac-toe",
+    "hubCategory": "board",
+    "hubDescription": "X's and O's. Three in a row wins.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Tile Tap",
+    "link": "https://sausi-7.github.io/games/games/puzzle/tile-tap/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "tile-tap",
+    "hubCategory": "puzzle",
+    "hubDescription": "Tap only the dark tiles. Don't miss.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Tower Shooter",
+    "link": "https://sausi-7.github.io/games/games/shooter/tower-shooter/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "tower-shooter",
+    "hubCategory": "shooter",
+    "hubDescription": "Defend your tower from waves of enemies.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Trench Defence",
+    "link": "https://sausi-7.github.io/games/games/shooter/trench-defence/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "trench-defence",
+    "hubCategory": "shooter",
+    "hubDescription": "Hold the trench against the assault.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Two Cars",
+    "link": "https://sausi-7.github.io/games/games/racing/two-cars/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "racing"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "two-cars",
+    "hubCategory": "racing",
+    "hubDescription": "Steer two cars at once. Catch & dodge.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Two Cars AI",
+    "link": "https://sausi-7.github.io/games/games/racing/two-cars-ai/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "racing"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "two-cars-ai",
+    "hubCategory": "racing",
+    "hubDescription": "AI-twist on the two-cars classic.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Unruly",
+    "link": "https://sausi-7.github.io/games/games/puzzle/unruly/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "unruly",
+    "hubCategory": "puzzle",
+    "hubDescription": "Place tiles by no-three-in-a-row rules.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Vaccine Shooter",
+    "link": "https://sausi-7.github.io/games/games/shooter/vaccine-shooter/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "vaccine-shooter",
+    "hubCategory": "shooter",
+    "hubDescription": "Shoot viruses with your vaccine gun.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Whack-a-Bug",
+    "link": "https://sausi-7.github.io/games/games/arcade/whack-a-bug/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "whack-a-bug",
+    "hubCategory": "arcade",
+    "hubDescription": "Bonk the bugs as they pop up.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Wordlee",
+    "link": "https://sausi-7.github.io/games/games/word-quiz/wordle/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "word-quiz"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "wordle",
+    "hubCategory": "word-quiz",
+    "hubDescription": "Guess the 5-letter word in 6 tries.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Words of Wonder",
+    "link": "https://sausi-7.github.io/games/games/word-quiz/words-of-wonder/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "word-quiz"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "words-of-wonder",
+    "hubCategory": "word-quiz",
+    "hubDescription": "Build words from a wheel of letters.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Penalty Shootout",
+    "link": "https://sausi-7.github.io/games/games/sports/penalty/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "sports"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "penalty",
+    "hubCategory": "sports",
+    "hubDescription": "One-on-one penalty kicks vs the keeper.",
+    "hubTech": "phaser"
+  },
+  {
+    "name": "Swipe Assassin",
+    "link": "https://sausi-7.github.io/games/games/arcade/swipe-assassin/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "arcade"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "swipe-assassin",
+    "hubCategory": "arcade",
+    "hubDescription": "Swipe to slice incoming threats.",
+    "hubTech": "html"
+  },
+  {
+    "name": "Level Devil",
+    "link": "https://sausi-7.github.io/games/games/platformer/level-devil/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "platformer"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "level-devil",
+    "hubCategory": "platformer",
+    "hubDescription": "Trickster platformer that hates you.",
+    "hubTech": "three"
+  },
+  {
+    "name": "Line Trap",
+    "link": "https://sausi-7.github.io/games/games/puzzle/line-trap/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "puzzle"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "line-trap",
+    "hubCategory": "puzzle",
+    "hubDescription": "Trap the dot inside your line.",
+    "hubTech": "html"
+  },
+  {
+    "name": "Window Shooter",
+    "link": "https://sausi-7.github.io/games/games/shooter/window-shooter/index.html",
+    "categories": [
+      "all",
+      "open-source",
+      "shooter"
+    ],
+    "openSourceHub": true,
+    "hubSlug": "window-shooter",
+    "hubCategory": "shooter",
+    "hubDescription": "Pick off enemies through the window.",
+    "hubTech": "phaser"
   }
 ]
