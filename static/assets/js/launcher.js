@@ -253,7 +253,7 @@ function createGameThumbnail(app) {
     board: ["#64748b", "#1e293b", "♟️"],
     "word-quiz": ["#3b82f6", "#1e3a8a", "📝"],
     "3d": ["#8b5cf6", "#4c1d95", "🌐"],
-    open-source: ["#5865f2", "#20264f", "🎮"]
+    "open-source": ["#5865f2", "#20264f", "🎮"]
   };
   const palette = palettes[category] || palettes["open-source"];
   const title = String(app.name || "Game").replace(/[&<>"']/g, character => ({
