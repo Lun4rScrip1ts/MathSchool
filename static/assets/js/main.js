@@ -138,6 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <a class="navbar-link" href="/./movies"><i class="fa-solid fa-film navbar-icon"></i><span>Movies</span></a>
         <a class="navbar-link" href="/./apps"><i class="fa-solid fa-table-cells navbar-icon"></i><span>Apps</span></a>
         <a class="navbar-link" href="/./settings"><i class="fa-solid fa-gear navbar-icon settings-icon"></i><span>Settings</span></a>
+        <a class="navbar-link lunar-console-nav" href="/./lunar-console" hidden><i class="fa-solid fa-moon navbar-icon"></i><span>Lunar Console</span></a>
         <a class="navbar-link lunar-account-nav" href="/./account"><i class="fa-solid fa-user navbar-icon"></i><span>Account</span></a>
       </div>`;
     nav.innerHTML = html;
@@ -158,6 +159,8 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(data => {
         const accountLink = document.querySelector(".lunar-account-nav span");
         if (accountLink && data?.user) accountLink.textContent = "Profile";
+        const consoleLink = document.querySelector(".lunar-console-nav");
+        if (consoleLink) consoleLink.hidden = String(data?.user?.username || "").toLowerCase() !== "lunar";
       })
       .catch(() => {});
   }
