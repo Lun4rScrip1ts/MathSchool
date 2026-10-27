@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="/assets/css/nav.css?v=lunar15">
   <link rel="stylesheet" href="/assets/css/community.css">
   <link rel="stylesheet" href="/assets/css/lunar.css?v=lunar10">
-  <link rel="stylesheet" href="/assets/css/lunar-console.css?v=console5">
+  <link rel="stylesheet" href="/assets/css/lunar-console.css?v=console6">
   <script src="/assets/js/storage.js?v=lunar8"></script>
   <script src="/assets/js/main.js?v=lunar19"></script>
   <script src="/assets/js/lunar-settings.js?v=lunar10"></script>
@@ -37,7 +37,7 @@
         </div>
         <div id="lunar-discord-feed" class="lunar-discord-feed" role="log" aria-live="polite" aria-label="Discord channel messages"><div class="lunar-chat-empty">Loading messages…</div></div>
         <form id="lunar-discord-form" class="lunar-console-compose">
-          <div class="lunar-console-compose-input-row"><textarea id="lunar-discord-message" maxlength="1500" rows="2" placeholder="Message the Discord channel…" aria-label="Message the Discord channel"></textarea><button type="button" class="lunar-console-emoji-button" id="lunar-console-emoji-button" title="Add emoji" aria-label="Add emoji"><i class="fa-regular fa-face-smile"></i></button></div>
+          <div class="lunar-console-compose-input-row"><textarea id="lunar-discord-message" maxlength="1500" rows="2" placeholder="Message the Discord channel… Type :smile for emoji" aria-label="Message the Discord channel"></textarea></div>
           <div class="lunar-console-compose-footer"><span id="lunar-discord-count">0 / 1500</span><button class="key-button" id="lunar-discord-send" type="submit"><i class="fa-solid fa-paper-plane"></i> Send to Discord</button></div>
           <div id="lunar-discord-feedback" class="lunar-console-feedback" role="status" aria-live="polite"></div>
         </form>
@@ -45,9 +45,7 @@
       <p class="lunar-console-note"><i class="fa-solid fa-shield-halved"></i> Only the @lunar website account can access this page. Discord credentials stay on the server.</p>
     </section>
   </main>
-  <div id="lunar-console-emoji-picker" class="lunar-console-emoji-picker" hidden><div class="lunar-console-emoji-head"><strong>Choose emoji</strong><button type="button" id="lunar-console-emoji-close" aria-label="Close emoji picker">×</button></div><div id="lunar-console-emoji-host"></div></div>
-  <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
-  <script src="/assets/js/lunar-console.js?v=console5"></script>
+  <script src="/assets/js/lunar-console.js?v=console6"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" defer></script>
 </body>
 </html>
