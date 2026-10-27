@@ -11,7 +11,7 @@
   <link rel="stylesheet" id="global" href="/assets/css/global.css" />
   <link rel="stylesheet" href="/assets/css/container.css" />
   <link rel="stylesheet" href="/assets/css/nav.css?v=lunar14" />
-  <link rel="stylesheet" href="/assets/css/settings.css?v=lunar15" />
+  <link rel="stylesheet" href="/assets/css/settings.css?v=lunar16" />
   <script src="/assets/js/storage.js?v=lunar8"></script>
   <script src="/assets/js/main.js?v=lunar17"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -284,6 +284,18 @@
           <span class="lunar-console-status"><i class="fa-solid fa-lock"></i> Private</span>
         </div>
         <p>Owner-only tools for your Lunar account. This panel is restricted to the signed-in @lunar account.</p>
+        <div class="lunar-console-section lunar-discord-chat">
+          <div class="lunar-chat-heading">
+            <div>
+              <label>Discord channel chat</label>
+              <p class="lunar-console-help">Recent messages from the connected Discord channel.</p>
+            </div>
+            <span id="lunar-chat-status" class="lunar-chat-status">Connecting…</span>
+          </div>
+          <div id="lunar-discord-feed" class="lunar-discord-feed" role="log" aria-live="polite" aria-label="Discord channel messages">
+            <div class="lunar-chat-empty">Loading messages…</div>
+          </div>
+        </div>
         <div class="lunar-console-section">
           <label for="lunar-discord-message">Discord channel message</label>
           <p class="lunar-console-help">Send a message to the Discord channel connected to your server webhook.</p>
@@ -346,7 +358,7 @@
       </div>
     </div>
   </div>
-  <script src="/assets/js/settings.js?v=lunar20"></script>
+  <script src="/assets/js/settings.js?v=lunar21"></script>
   <script src="/assets/js/lunar-settings.js?v=lunar10"></script>
   <!-- DO NOT REMOVE-->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-WKJQ5QHQTJ"></script>
