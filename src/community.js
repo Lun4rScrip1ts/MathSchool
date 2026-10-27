@@ -470,13 +470,30 @@ router.get("/lunar-console/discord-messages", requireUser, async (req, res) => {
     const messages = await response.json();
     res.set("Cache-Control", "no-store");
     res.json({
-      messages: messages.map(message => ({
-        id: message.id,
-        username: message.author?.global_name || message.author?.username || "Unknown",
-        content: String(message.content || "").slice(0, 2000),
-        timestamp: message.timestamp,
-        isBot: Boolean(message.author?.bot)
-      })).reverse()
+      messages: messages.map(message => {
+        const author = message.author || {};
+        const userId = /^\d{17,20}$/.test(String(author.id || "")) ? String(author.id) : "";
+        const avatarUrl = userId
+          ? author.avatar
+            ? "https://cdn.discordapp.com/avatars/" + userId + "/" + author.avatar + ".png?size=96"
+            : "https://cdn.discordapp.com/embed/avatars/" + (Number((BigInt(userId) >> 22n) % 6n)) + ".png"
+          : "";
+        return {
+          id: message.id,
+          userId,
+          username: String(author.username || "unknown"),
+          displayName: String(author.global_name || author.username || "Unknown"),
+          avatarUrl,
+          content: String(message.content || "").slice(0, 2000),
+          attachments: Array.isArray(message.attachments) ? message.attachments.slice(0, 10).map(attachment => ({
+            filename: String(attachment.filename || "Attachment").slice(0, 150),
+            url: /^https:\/\//i.test(String(attachment.url || "")) ? attachment.url : "",
+            contentType: String(attachment.content_type || "")
+          })) : [],
+          timestamp: message.timestamp,
+          isBot: Boolean(author.bot || message.webhook_id)
+        };
+      }).reverse()
     });
   } catch (error) {
     console.error("[Lunar Console] Discord message fetch error:", error.message);
