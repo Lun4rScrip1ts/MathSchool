@@ -193,7 +193,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "Could not load members.");
       cachedMembers = Array.isArray(result.members) ? result.members : [];
-      memberCount.textContent = cachedMembers.length + " members";
+      const onlineCount = cachedMembers.filter(member => ["online", "idle", "dnd"].includes(member.status)).length;
+      if (result.gatewayReady && result.presenceCount > 0) {
+        memberCount.textContent = onlineCount + " online · " + cachedMembers.length + " total";
+      } else if (result.gatewayError) {
+        memberCount.textContent = "Presence unavailable";
+      } else if (!result.gatewayReady) {
+        memberCount.textContent = "Connecting to Discord…";
+      } else {
+        memberCount.textContent = cachedMembers.length + " members · waiting for status";
+      }
       renderMembers();
     } catch (error) {
       memberCount.textContent = "Unavailable";
