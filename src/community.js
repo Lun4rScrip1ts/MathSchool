@@ -449,6 +449,8 @@ let discordGatewaySocket = null;
 let discordGatewayHeartbeat = null;
 let discordGatewaySequence = null;
 let discordGatewayReconnectTimer = null;
+let discordGatewayReady = false;
+let discordGatewayLastError = "";
 
 function connectDiscordTypingGateway() {
   const token = process.env.DISCORD_BOT_TOKEN;
@@ -470,7 +472,7 @@ function connectDiscordTypingGateway() {
           op: 2,
           d: {
             token,
-            intents: (1 << 1) | (1 << 8) | (1 << 9) | (1 << 11) | (1 << 15),
+            intents: (1 << 0) | (1 << 1) | (1 << 8) | (1 << 9) | (1 << 11) | (1 << 15),
             properties: { os: process.platform, browser: "Lunar Console", device: "Lunar Console" }
           }
         }));
@@ -479,13 +481,25 @@ function connectDiscordTypingGateway() {
         if (discordGatewaySocket?.readyState === WebSocket.OPEN) discordGatewaySocket.send(JSON.stringify({ op: 1, d: discordGatewaySequence }));
       }
       if (packet.op === 7 || packet.op === 9) {
+        discordGatewayReady = false;
+        discordGatewayLastError = packet.op === 9 ? "Discord rejected the Gateway session. Check bot intents and permissions." : "Discord requested a Gateway reconnect.";
         try { discordGatewaySocket.close(); } catch {}
+      }
+      if (packet.op === 0 && packet.t === "READY") {
+        discordGatewayReady = true;
+        discordGatewayLastError = "";
+        console.log("[Lunar Console] Discord Gateway connected.");
+      }
+      if (packet.op === 0 && packet.t === "RESUMED") {
+        discordGatewayReady = true;
+        discordGatewayLastError = "";
       }
       if (packet.t === "GUILD_CREATE" && Array.isArray(packet.d?.presences)) {
         for (const presence of packet.d.presences) {
           const id = String(presence.user?.id || "");
           if (id) discordMemberPresence.set(id, { status: presence.status || "offline", activities: Array.isArray(presence.activities) ? presence.activities.slice(0, 3).map(activity => String(activity.name || "").slice(0, 80)) : [] });
         }
+        console.log("[Lunar Console] Initial Discord presences received:", packet.d.presences.length);
       }
       if (packet.t === "PRESENCE_UPDATE" && packet.d?.user?.id) {
         discordMemberPresence.set(String(packet.d.user.id), { status: packet.d.status || "offline", activities: Array.isArray(packet.d.activities) ? packet.d.activities.slice(0, 3).map(activity => String(activity.name || "").slice(0, 80)) : [] });
@@ -578,7 +592,7 @@ router.get("/lunar-console/discord-members", requireUser, async (req, res) => {
     const rank = { online: 0, idle: 1, dnd: 2, offline: 3 };
     result.sort((a, b) => rank[a.status] - rank[b.status] || a.displayName.localeCompare(b.displayName));
     res.set("Cache-Control", "no-store");
-    res.json({ members: result, total: result.length, guildName: channel.guild_id });
+    res.json({ members: result, total: result.length, gatewayReady: discordGatewayReady, presenceCount: discordMemberPresence.size, gatewayError: discordGatewayLastError });
   } catch (error) {
     console.error("[Lunar Console] Discord members fetch failed:", error.message);
     res.status(502).json({ error: "Could not reach Discord to load server members." });
