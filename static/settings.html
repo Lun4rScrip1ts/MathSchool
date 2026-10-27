@@ -274,6 +274,29 @@
 
         <button class="key-button" id="interface-reset-btn" type="button">Reset Interface Settings</button>
       </div>
+      <section class="settings-card lunar-console-card" id="lunar-console-card" hidden>
+        <div class="lunar-console-heading">
+          <span class="lunar-console-icon"><i class="fa-solid fa-moon"></i></span>
+          <div>
+            <span class="lunar-console-kicker">OWNER ACCESS</span>
+            <h3>Lunar Console</h3>
+          </div>
+          <span class="lunar-console-status"><i class="fa-solid fa-lock"></i> Private</span>
+        </div>
+        <p>Owner-only tools for your Lunar account. This panel is restricted to the signed-in @lunar account.</p>
+        <div class="lunar-console-section">
+          <label for="lunar-discord-message">Discord channel message</label>
+          <p class="lunar-console-help">Send a message to the Discord channel connected to your server webhook.</p>
+          <textarea id="lunar-discord-message" maxlength="1500" rows="5" placeholder="Write a message for your Discord channel..."></textarea>
+          <div class="lunar-console-compose-footer">
+            <span id="lunar-discord-count">0 / 1500</span>
+            <button class="key-button" id="lunar-discord-send" type="button"><i class="fa-solid fa-paper-plane"></i> Send to Discord</button>
+          </div>
+          <div class="lunar-console-feedback" id="lunar-discord-feedback" role="status" aria-live="polite"></div>
+        </div>
+        <div class="lunar-console-note"><i class="fa-solid fa-shield-halved"></i><span>Messages are submitted through the server. The webhook URL stays private and other accounts are rejected by the backend.</span></div>
+      </section>
+
       <div class="settings-card">
         <h3>Search Engine</h3>
         <p>Change the search engine when searching.</p>
@@ -323,7 +346,7 @@
       </div>
     </div>
   </div>
-  <script src="/assets/js/settings.js?v=lunar18"></script>
+  <script src="/assets/js/settings.js?v=lunar19"></script>
   <script src="/assets/js/lunar-settings.js?v=lunar10"></script>
   <!-- DO NOT REMOVE-->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-WKJQ5QHQTJ"></script>
