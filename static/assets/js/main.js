@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const accountLink = document.querySelector(".lunar-account-nav span");
         if (accountLink && data?.user) accountLink.textContent = "Profile";
         const consoleLink = document.querySelector(".lunar-console-nav");
-        if (consoleLink) consoleLink.hidden = String(data?.user?.username || "").toLowerCase() !== "lunar";
+        if (consoleLink) { const isOwner = String(data?.user?.username || "").toLowerCase() === "lunar"; consoleLink.hidden = !isOwner; consoleLink.style.display = isOwner ? "" : "none"; }
       })
       .catch(() => {});
   }
