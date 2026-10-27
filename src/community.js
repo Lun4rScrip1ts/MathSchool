@@ -442,6 +442,48 @@ router.patch("/reports/:id", requireUser, async (req, res) => {
   res.json({ report: publicReport(report) });
 });
 
+router.get("/lunar-console/discord-messages", requireUser, async (req, res) => {
+  if (String(req.user.username || "").toLowerCase() !== "lunar") {
+    return res.status(403).json({ error: "This console is only available to @lunar." });
+  }
+
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  const channelId = process.env.DISCORD_CHANNEL_ID;
+  if (!botToken || !channelId) {
+    return res.status(503).json({ error: "Discord chat reading is not configured. Add DISCORD_BOT_TOKEN and DISCORD_CHANNEL_ID." });
+  }
+
+  if (!/^\d{17,20}$/.test(channelId)) {
+    return res.status(503).json({ error: "DISCORD_CHANNEL_ID must be the numeric ID of your Discord channel." });
+  }
+
+  try {
+    const response = await fetch("https://discord.com/api/v10/channels/" + channelId + "/messages?limit=50", {
+      headers: { Authorization: "Bot " + botToken }
+    });
+    if (!response.ok) {
+      console.error("[Lunar Console] Discord message fetch failed:", response.status);
+      return res.status(response.status === 401 || response.status === 403 ? 502 : 503).json({
+        error: response.status === 401 ? "Discord rejected the bot token." : response.status === 403 ? "The bot cannot read this channel. Check its channel permissions." : "Could not load Discord messages."
+      });
+    }
+    const messages = await response.json();
+    res.set("Cache-Control", "no-store");
+    res.json({
+      messages: messages.map(message => ({
+        id: message.id,
+        username: message.author?.global_name || message.author?.username || "Unknown",
+        content: String(message.content || "").slice(0, 2000),
+        timestamp: message.timestamp,
+        isBot: Boolean(message.author?.bot)
+      })).reverse()
+    });
+  } catch (error) {
+    console.error("[Lunar Console] Discord message fetch error:", error.message);
+    res.status(502).json({ error: "Could not reach Discord to load messages." });
+  }
+});
+
 router.post("/lunar-console/discord-message", requireUser, async (req, res) => {
   if (String(req.user.username || "").toLowerCase() !== "lunar") {
     return res.status(403).json({ error: "This console is only available to @lunar." });
