@@ -497,3 +497,26 @@ body.interface-glass .settings-card.interface-settings-card label{
 .background-saved-actions{display:flex;align-items:center;gap:5px}
 .background-saved-delete{width:30px!important;min-width:30px!important;margin:0!important;padding:6px!important;color:#ff9b9b!important}
 .background-saved-delete:hover{background:rgba(255,70,70,.12)!important;border-color:rgba(255,100,100,.3)!important;color:#ffb1b1!important}
+
+
+.lunar-console-card[hidden]{display:none!important}
+.settings-container .lunar-console-card{width:min(840px,calc(100% - 40px));flex:0 1 840px;box-sizing:border-box;background:radial-gradient(600px 240px at 0% 0%,rgba(125,105,255,.17),transparent 65%),linear-gradient(145deg,rgba(19,23,34,.97),rgba(9,12,18,.94));border-color:rgba(157,145,255,.25)}
+.lunar-console-heading{display:flex;align-items:center;gap:13px;margin-bottom:10px}
+.lunar-console-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(140deg,rgba(144,121,255,.28),rgba(83,111,255,.12));border:1px solid rgba(172,158,255,.28);font-size:20px;color:#c9c0ff}
+.lunar-console-kicker{font-size:10px;letter-spacing:.17em;font-weight:800;color:#aaa0ff}
+.lunar-console-heading h3{margin:3px 0 0;font-size:22px}
+.lunar-console-status{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid rgba(155,146,255,.2);border-radius:20px;color:#c8c0ff;background:rgba(124,108,255,.09);font-size:11px}
+.lunar-console-section{margin-top:18px;padding:17px;border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.025)}
+.settings-card .lunar-console-help{margin:4px 0 12px;font-size:12px;color:var(--text-muted)}
+.settings-card textarea#lunar-discord-message{display:block;box-sizing:border-box;width:100%;max-width:100%;min-height:120px;resize:vertical;text-align:left;padding:13px 14px;font:inherit;font-size:14px;line-height:1.55;color:var(--text);background:rgba(5,8,14,.58);border:1px solid var(--border);border-radius:12px;outline:none}
+.settings-card textarea#lunar-discord-message:focus{border-color:rgba(152,137,255,.6);box-shadow:0 0 0 3px rgba(130,110,255,.1)}
+.lunar-console-compose-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}
+.lunar-console-compose-footer>span{font-size:11px;color:var(--text-muted)}
+.settings-card .lunar-console-compose-footer .key-button{width:auto;max-width:none;height:44px;margin:0;padding:10px 15px;font-size:13px;background:linear-gradient(135deg,rgba(132,111,255,.22),rgba(82,110,255,.13));border-color:rgba(155,140,255,.28)}
+.lunar-console-compose-footer .key-button:disabled{opacity:.55;cursor:wait}
+.lunar-console-feedback{min-height:18px;margin-top:8px;font-size:12px;color:var(--text-muted)}
+.lunar-console-feedback.is-success{color:#78ddb0}
+.lunar-console-feedback.is-error{color:#ff9898}
+.lunar-console-note{display:flex;align-items:flex-start;gap:9px;margin-top:14px;padding:11px 12px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.025);color:var(--text-muted);font-size:11px;line-height:1.5}
+.lunar-console-note i{color:#aaa0ff;margin-top:2px}
+@media(max-width:768px){.settings-container .lunar-console-card{width:100%;flex-basis:100%}.lunar-console-section{padding:12px}.lunar-console-compose-footer{align-items:stretch;flex-direction:column}.settings-card .lunar-console-compose-footer .key-button{width:100%;max-width:none}}
