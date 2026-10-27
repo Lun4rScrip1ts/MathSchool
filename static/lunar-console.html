@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
+  <title>Lunar Console</title>
+  <link rel="icon" href="/icons/LunarStudios.png">
+  <link rel="stylesheet" href="/assets/css/global.css">
+  <link rel="stylesheet" href="/assets/css/container.css">
+  <link rel="stylesheet" href="/assets/css/nav.css?v=lunar15">
+  <link rel="stylesheet" href="/assets/css/community.css">
+  <link rel="stylesheet" href="/assets/css/lunar.css?v=lunar10">
+  <link rel="stylesheet" href="/assets/css/lunar-console.css?v=console1">
+  <script src="/assets/js/storage.js?v=lunar8"></script>
+  <script src="/assets/js/main.js?v=lunar18"></script>
+  <script src="/assets/js/lunar-settings.js?v=lunar10"></script>
+</head>
+<body>
+  <div class="nav-bar"></div>
+  <main class="lunar-console-page">
+    <section class="lunar-console-panel">
+      <header class="lunar-console-page-heading">
+        <div class="lunar-console-mark"><i class="fa-solid fa-moon"></i></div>
+        <div>
+          <span class="lunar-console-kicker">OWNER ACCESS</span>
+          <h1>Lunar Console</h1>
+          <p>Chat with your connected Discord channel directly from Lunar.</p>
+        </div>
+        <span class="lunar-console-private"><i class="fa-solid fa-lock"></i> Private</span>
+      </header>
+      <section class="lunar-console-chat-section">
+        <div class="lunar-console-chat-heading">
+          <div><h2>Channel chat</h2><p>Recent messages update automatically.</p></div>
+          <span id="lunar-chat-status">Connecting…</span>
+        </div>
+        <div id="lunar-discord-feed" class="lunar-discord-feed" role="log" aria-live="polite" aria-label="Discord channel messages"><div class="lunar-chat-empty">Loading messages…</div></div>
+        <form id="lunar-discord-form" class="lunar-console-compose">
+          <textarea id="lunar-discord-message" maxlength="1500" rows="3" placeholder="Message the Discord channel…" aria-label="Message the Discord channel"></textarea>
+          <div class="lunar-console-compose-footer"><span id="lunar-discord-count">0 / 1500</span><button class="key-button" id="lunar-discord-send" type="submit"><i class="fa-solid fa-paper-plane"></i> Send message</button></div>
+          <div id="lunar-discord-feedback" class="lunar-console-feedback" role="status" aria-live="polite"></div>
+        </form>
+      </section>
+      <p class="lunar-console-note"><i class="fa-solid fa-shield-halved"></i> Only the @lunar website account can access this page. Discord credentials stay on the server.</p>
+    </section>
+  </main>
+  <script src="/assets/js/lunar-console.js?v=console1"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" defer></script>
+</body>
+</html>
