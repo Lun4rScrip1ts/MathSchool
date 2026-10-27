@@ -13,10 +13,77 @@ document.addEventListener("DOMContentLoaded", () => {
       discordFeedback.classList.toggle("is-error", kind === "error");
     };
 
+    const discordFeed = document.getElementById("lunar-discord-feed");
+    const discordChatStatus = document.getElementById("lunar-chat-status");
+
+    const loadDiscordMessages = async () => {
+      if (!discordFeed || lunarConsole.hidden) return;
+      try {
+        const response = await fetch("/api/lunar-console/discord-messages", {
+          credentials: "same-origin",
+          cache: "no-store"
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || "Could not load Discord messages.");
+        const messages = Array.isArray(result.messages) ? result.messages : [];
+        discordFeed.replaceChildren();
+
+        if (!messages.length) {
+          const empty = document.createElement("div");
+          empty.className = "lunar-chat-empty";
+          empty.textContent = "No messages in this channel yet.";
+          discordFeed.appendChild(empty);
+        }
+
+        for (const message of messages) {
+          const item = document.createElement("article");
+          item.className = "lunar-chat-message";
+          const header = document.createElement("div");
+          header.className = "lunar-chat-message-header";
+          const author = document.createElement("strong");
+          author.textContent = message.username || "Unknown";
+          header.appendChild(author);
+
+          if (message.isBot) {
+            const botTag = document.createElement("span");
+            botTag.className = "lunar-chat-bot-tag";
+            botTag.textContent = "BOT";
+            header.appendChild(botTag);
+          }
+
+          const time = document.createElement("time");
+          const date = new Date(message.timestamp);
+          time.dateTime = date.toISOString();
+          time.textContent = date.toLocaleString();
+          header.appendChild(time);
+
+          const content = document.createElement("p");
+          content.className = "lunar-chat-message-content";
+          content.textContent = message.content || (message.isBot ? "Bot message or embed" : "No text content");
+          item.append(header, content);
+          discordFeed.appendChild(item);
+        }
+
+        discordFeed.scrollTop = discordFeed.scrollHeight;
+        if (discordChatStatus) discordChatStatus.textContent = "Live · refreshes every 5s";
+      } catch (error) {
+        if (discordChatStatus) discordChatStatus.textContent = "Not connected";
+        discordFeed.replaceChildren();
+        const empty = document.createElement("div");
+        empty.className = "lunar-chat-empty lunar-chat-error";
+        empty.textContent = error.message || "Could not load Discord messages.";
+        discordFeed.appendChild(empty);
+      }
+    };
+
     fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" })
       .then(response => response.ok ? response.json() : null)
       .then(data => {
         lunarConsole.hidden = String(data?.user?.username || "").toLowerCase() !== "lunar";
+        if (!lunarConsole.hidden) {
+          loadDiscordMessages();
+          window.setInterval(loadDiscordMessages, 5000);
+        }
       })
       .catch(() => { lunarConsole.hidden = true; });
 
