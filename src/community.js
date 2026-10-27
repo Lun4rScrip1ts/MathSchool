@@ -442,6 +442,86 @@ router.patch("/reports/:id", requireUser, async (req, res) => {
   res.json({ report: publicReport(report) });
 });
 
+
+const discordTypingUsers = new Map();
+let discordGatewaySocket = null;
+let discordGatewayHeartbeat = null;
+let discordGatewaySequence = null;
+let discordGatewayReconnectTimer = null;
+
+function connectDiscordTypingGateway() {
+  const token = process.env.DISCORD_BOT_TOKEN;
+  const channelId = process.env.DISCORD_CHANNEL_ID;
+  if (!token || !/^\d{17,20}$/.test(channelId || "") || typeof WebSocket === "undefined") return;
+  if (discordGatewayReconnectTimer) clearTimeout(discordGatewayReconnectTimer);
+  try {
+    discordGatewaySocket = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json");
+    discordGatewaySocket.addEventListener("message", event => {
+      let packet;
+      try { packet = JSON.parse(String(event.data)); } catch { return; }
+      if (packet.s !== null && packet.s !== undefined) discordGatewaySequence = packet.s;
+      if (packet.op === 10) {
+        if (discordGatewayHeartbeat) clearInterval(discordGatewayHeartbeat);
+        discordGatewayHeartbeat = setInterval(() => {
+          if (discordGatewaySocket?.readyState === WebSocket.OPEN) discordGatewaySocket.send(JSON.stringify({ op: 1, d: discordGatewaySequence }));
+        }, packet.d.heartbeat_interval);
+        discordGatewaySocket.send(JSON.stringify({
+          op: 2,
+          d: {
+            token,
+            intents: (1 << 9) | (1 << 11) | (1 << 15),
+            properties: { os: process.platform, browser: "Lunar Console", device: "Lunar Console" }
+          }
+        }));
+      }
+      if (packet.op === 1) {
+        if (discordGatewaySocket?.readyState === WebSocket.OPEN) discordGatewaySocket.send(JSON.stringify({ op: 1, d: discordGatewaySequence }));
+      }
+      if (packet.op === 7 || packet.op === 9) {
+        try { discordGatewaySocket.close(); } catch {}
+      }
+      if (packet.t === "TYPING_START" && packet.d?.channel_id === channelId) {
+        const userId = String(packet.d.user_id || "");
+        if (!userId || userId === packet.d.member?.user?.id) {
+          if (!userId) return;
+        }
+        discordTypingUsers.set(userId, { userId, timestamp: Date.now() });
+      }
+      if (packet.t === "GUILD_CREATE" && Array.isArray(packet.d?.members)) {
+        for (const member of packet.d.members) {
+          const id = member.user?.id;
+          if (id && discordTypingUsers.has(id)) discordTypingUsers.set(id, { ...discordTypingUsers.get(id), username: member.user.global_name || member.user.username });
+        }
+      }
+    });
+    discordGatewaySocket.addEventListener("close", () => {
+      if (discordGatewayHeartbeat) clearInterval(discordGatewayHeartbeat);
+      discordGatewayHeartbeat = null;
+      discordGatewayReconnectTimer = setTimeout(connectDiscordTypingGateway, 5000);
+    });
+    discordGatewaySocket.addEventListener("error", () => {
+      try { discordGatewaySocket.close(); } catch {}
+    });
+  } catch {
+    discordGatewayReconnectTimer = setTimeout(connectDiscordTypingGateway, 5000);
+  }
+}
+connectDiscordTypingGateway();
+setInterval(() => {
+  for (const [id, user] of discordTypingUsers) {
+    if (Date.now() - user.timestamp > 10000) discordTypingUsers.delete(id);
+  }
+}, 2000);
+
+router.get("/lunar-console/discord-typing", requireUser, async (req, res) => {
+  if (String(req.user.username || "").toLowerCase() !== "lunar") return res.status(403).json({ error: "This console is only available to @lunar." });
+  const channelId = process.env.DISCORD_CHANNEL_ID;
+  if (!channelId) return res.status(503).json({ error: "Discord channel is not configured." });
+  const users = [...discordTypingUsers.values()].filter(user => Date.now() - user.timestamp < 10000);
+  res.set("Cache-Control", "no-store");
+  res.json({ users });
+});
+
 router.get("/lunar-console/discord-messages", requireUser, async (req, res) => {
   if (String(req.user.username || "").toLowerCase() !== "lunar") {
     return res.status(403).json({ error: "This console is only available to @lunar." });
