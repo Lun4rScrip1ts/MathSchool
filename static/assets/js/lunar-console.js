@@ -7,6 +7,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const send = document.getElementById("lunar-discord-send");
   const feedback = document.getElementById("lunar-discord-feedback");
   const count = document.getElementById("lunar-discord-count");
+  const memberList = document.getElementById("lunar-member-list");
+  const memberCount = document.getElementById("lunar-member-count");
+  const memberSearch = document.getElementById("lunar-member-search");
+  let cachedMembers = [];
   const emojiSuggestions = document.createElement("div");
   emojiSuggestions.className = "lunar-emoji-suggestions";
   emojiSuggestions.hidden = true;
@@ -162,6 +166,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   };
 
+  const renderMembers = () => {
+    const query = String(memberSearch.value || "").trim().toLowerCase();
+    const filtered = cachedMembers.filter(member => (member.displayName + " " + member.username).toLowerCase().includes(query));
+    memberList.replaceChildren();
+    if (!filtered.length) { const empty = document.createElement("div"); empty.className = "lunar-member-empty"; empty.textContent = query ? "No matching members." : "No members found."; memberList.appendChild(empty); return; }
+    const labels = { online: "Online", idle: "Idle", dnd: "Do Not Disturb", offline: "Offline" };
+    let lastStatus = "";
+    for (const member of filtered) {
+      const statusName = labels[member.status] || "Offline";
+      if (statusName !== lastStatus) { const group = document.createElement("div"); group.className = "lunar-member-group"; group.textContent = statusName; memberList.appendChild(group); lastStatus = statusName; }
+      const row = document.createElement("div"); row.className = "lunar-member-row"; row.title = "@" + member.username;
+      const wrap = document.createElement("div"); wrap.className = "lunar-member-avatar-wrap";
+      const avatar = document.createElement("img"); avatar.className = "lunar-member-avatar"; avatar.src = member.avatarUrl; avatar.alt = ""; avatar.loading = "lazy";
+      avatar.addEventListener("error", () => { avatar.src = "https://cdn.discordapp.com/embed/avatars/0.png"; }, { once: true });
+      const dot = document.createElement("span"); dot.className = "lunar-member-status " + (member.status || "offline"); wrap.append(avatar, dot);
+      const details = document.createElement("div"); details.className = "lunar-member-details";
+      const name = document.createElement("span"); name.className = "lunar-member-name"; name.textContent = member.displayName || member.username;
+      const subtitle = document.createElement("span"); subtitle.className = "lunar-member-subtitle"; subtitle.textContent = member.bot ? "Bot · @" + member.username : "@" + member.username;
+      details.append(name, subtitle); row.append(wrap, details); memberList.appendChild(row);
+    }
+  };
+  const loadMembers = async () => {
+    try {
+      const response = await fetch("/api/lunar-console/discord-members", { credentials: "same-origin", cache: "no-store" });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Could not load members.");
+      cachedMembers = Array.isArray(result.members) ? result.members : [];
+      memberCount.textContent = cachedMembers.length + " members";
+      renderMembers();
+    } catch (error) {
+      memberCount.textContent = "Unavailable";
+      memberList.replaceChildren();
+      const message = document.createElement("div"); message.className = "lunar-member-empty"; message.textContent = error.message || "Could not load members."; memberList.appendChild(message);
+    }
+  };
+  memberSearch.addEventListener("input", renderMembers);
   input.addEventListener("input", () => { count.textContent = input.value.length + " / 1500"; renderEmojiSuggestions(); });
   input.addEventListener("click", renderEmojiSuggestions);
   input.addEventListener("keyup", event => { if (["ArrowLeft", "ArrowRight"].includes(event.key)) renderEmojiSuggestions(); });
@@ -216,6 +256,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   await loadMessages();
   await loadTyping();
+  await loadMembers();
   window.setInterval(loadMessages, 5000);
+  window.setInterval(loadMembers, 30000);
   window.setInterval(loadTyping, 1500);
 });
