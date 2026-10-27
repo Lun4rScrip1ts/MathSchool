@@ -1,4 +1,63 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const lunarConsole = document.getElementById("lunar-console-card");
+  const discordMessage = document.getElementById("lunar-discord-message");
+  const discordSend = document.getElementById("lunar-discord-send");
+  const discordFeedback = document.getElementById("lunar-discord-feedback");
+  const discordCount = document.getElementById("lunar-discord-count");
+
+  if (lunarConsole && discordMessage && discordSend) {
+    const setFeedback = (message, kind = "") => {
+      if (!discordFeedback) return;
+      discordFeedback.textContent = message;
+      discordFeedback.classList.toggle("is-success", kind === "success");
+      discordFeedback.classList.toggle("is-error", kind === "error");
+    };
+
+    fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        lunarConsole.hidden = String(data?.user?.username || "").toLowerCase() !== "lunar";
+      })
+      .catch(() => { lunarConsole.hidden = true; });
+
+    discordMessage.addEventListener("input", () => {
+      if (discordCount) discordCount.textContent = discordMessage.value.length + " / 1500";
+    });
+
+    discordSend.addEventListener("click", async () => {
+      const message = discordMessage.value.trim();
+      if (!message) {
+        setFeedback("Write a message first.", "error");
+        discordMessage.focus();
+        return;
+      }
+
+      discordSend.disabled = true;
+      discordSend.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+      setFeedback("");
+
+      try {
+        const response = await fetch("/api/lunar-console/discord-message", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || "Could not send the message.");
+        discordMessage.value = "";
+        if (discordCount) discordCount.textContent = "0 / 1500";
+        setFeedback("Message sent to Discord.", "success");
+      } catch (error) {
+        setFeedback(error.message || "Could not send the message.", "error");
+      } finally {
+        discordSend.disabled = false;
+        discordSend.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send to Discord';
+      }
+    });
+  }
+
+
   const adTypeElement = document.getElementById("adType");
   if (adTypeElement) {
     adTypeElement.addEventListener("change", function () {
