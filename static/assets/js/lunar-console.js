@@ -47,9 +47,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         item.className = "lunar-chat-message";
         const header = document.createElement("div");
         header.className = "lunar-chat-message-header";
+        const avatar = document.createElement("img");
+        avatar.className = "lunar-chat-avatar";
+        avatar.alt = "";
+        avatar.loading = "lazy";
+        avatar.referrerPolicy = "no-referrer";
+        avatar.src = message.avatarUrl || "https://cdn.discordapp.com/embed/avatars/0.png";
+        avatar.addEventListener("error", () => {
+          avatar.src = "https://cdn.discordapp.com/embed/avatars/0.png";
+        }, { once: true });
+        const authorBlock = document.createElement("div");
+        authorBlock.className = "lunar-chat-author";
         const author = document.createElement("strong");
-        author.textContent = message.username || "Unknown";
-        header.appendChild(author);
+        author.textContent = message.displayName || message.username || "Unknown";
+        authorBlock.appendChild(author);
+        if (message.username) {
+          const username = document.createElement("span");
+          username.className = "lunar-chat-username";
+          username.textContent = "@" + message.username;
+          authorBlock.appendChild(username);
+        }
+        header.append(avatar, authorBlock);
         if (message.isBot) {
           const tag = document.createElement("span");
           tag.className = "lunar-chat-bot-tag";
@@ -63,8 +81,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         header.appendChild(time);
         const content = document.createElement("p");
         content.className = "lunar-chat-message-content";
-        content.textContent = message.content || (message.isBot ? "Bot message or embed" : "No text content");
+        content.textContent = message.content || (message.attachments?.length ? "" : message.isBot ? "Bot message or embed" : "No text content");
         item.append(header, content);
+        for (const attachment of Array.isArray(message.attachments) ? message.attachments : []) {
+          if (!attachment.url) continue;
+          if (String(attachment.contentType || "").startsWith("image/")) {
+            const image = document.createElement("img");
+            image.className = "lunar-chat-attachment-image";
+            image.src = attachment.url;
+            image.alt = attachment.filename || "Discord image";
+            image.loading = "lazy";
+            image.referrerPolicy = "no-referrer";
+            item.appendChild(image);
+          } else {
+            const link = document.createElement("a");
+            link.className = "lunar-chat-attachment-link";
+            link.href = attachment.url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = attachment.filename || "Open attachment";
+            item.appendChild(link);
+          }
+        }
         feed.appendChild(item);
       }
       feed.scrollTop = feed.scrollHeight;
