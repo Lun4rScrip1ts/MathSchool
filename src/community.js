@@ -485,7 +485,7 @@ function connectDiscordTypingGateway() {
         if (!userId || userId === packet.d.member?.user?.id) {
           if (!userId) return;
         }
-        discordTypingUsers.set(userId, { userId, timestamp: Date.now() });
+        discordTypingUsers.set(userId, { userId, username: packet.d.member?.user?.global_name || packet.d.member?.user?.username || "", timestamp: Date.now() });
       }
       if (packet.t === "GUILD_CREATE" && Array.isArray(packet.d?.members)) {
         for (const member of packet.d.members) {
