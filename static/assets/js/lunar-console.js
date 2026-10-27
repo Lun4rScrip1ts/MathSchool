@@ -7,10 +7,55 @@ document.addEventListener("DOMContentLoaded", async () => {
   const send = document.getElementById("lunar-discord-send");
   const feedback = document.getElementById("lunar-discord-feedback");
   const count = document.getElementById("lunar-discord-count");
-  const emojiButton = document.getElementById("lunar-console-emoji-button");
-  const emojiPicker = document.getElementById("lunar-console-emoji-picker");
-  const emojiHost = document.getElementById("lunar-console-emoji-host");
-  const emojiClose = document.getElementById("lunar-console-emoji-close");
+  const emojiSuggestions = document.createElement("div");
+  emojiSuggestions.className = "lunar-emoji-suggestions";
+  emojiSuggestions.hidden = true;
+  input.insertAdjacentElement("afterend", emojiSuggestions);
+  const emojiList = [{"name":"smile","emoji":"😄"},{"name":"grin","emoji":"😁"},{"name":"joy","emoji":"😂"},{"name":"rofl","emoji":"🤣"},{"name":"smiley","emoji":"😃"},{"name":"laughing","emoji":"😆"},{"name":"wink","emoji":"😉"},{"name":"blush","emoji":"😊"},{"name":"heart_eyes","emoji":"😍"},{"name":"thinking","emoji":"🤔"},{"name":"think","emoji":"🤔"},{"name":"sob","emoji":"😭"},{"name":"cry","emoji":"😢"},{"name":"sad","emoji":"🙁"},{"name":"angry","emoji":"😠"},{"name":"rage","emoji":"😡"},{"name":"fire","emoji":"🔥"},{"name":"heart","emoji":"❤️"},{"name":"white_heart","emoji":"🤍"},{"name":"purple_heart","emoji":"💜"},{"name":"broken_heart","emoji":"💔"},{"name":"thumbsup","emoji":"👍"},{"name":"+1","emoji":"👍"},{"name":"thumbsdown","emoji":"👎"},{"name":"-1","emoji":"👎"},{"name":"wave","emoji":"👋"},{"name":"clap","emoji":"👏"},{"name":"pray","emoji":"🙏"},{"name":"eyes","emoji":"👀"},{"name":"skull","emoji":"💀"},{"name":"sparkles","emoji":"✨"},{"name":"star","emoji":"⭐"},{"name":"check","emoji":"✅"},{"name":"x","emoji":"❌"},{"name":"warning","emoji":"⚠️"},{"name":"sob","emoji":"😭"},{"name":"sunglasses","emoji":"😎"},{"name":"nerd","emoji":"🤓"},{"name":"skull","emoji":"💀"},{"name":"100","emoji":"💯"},{"name":"tada","emoji":"🎉"},{"name":"party","emoji":"🥳"},{"name":"thinking_face","emoji":"🤔"},{"name":"heartpulse","emoji":"💗"},{"name":"blue_heart","emoji":"💙"},{"name":"green_heart","emoji":"💚"},{"name":"yellow_heart","emoji":"💛"},{"name":"orange_heart","emoji":"🧡"},{"name":"black_heart","emoji":"🖤"},{"name":"kiss","emoji":"😘"},{"name":"pleading","emoji":"🥺"},{"name":"sweat_smile","emoji":"😅"},{"name":"upside_down","emoji":"🙃"},{"name":"shrug","emoji":"🤷"},{"name":"wave","emoji":"👋"},{"name":"rocket","emoji":"🚀"},{"name":"checkered_flag","emoji":"🏁"},{"name":"eyes","emoji":"👀"},{"name":"100","emoji":"💯"},{"name":"poop","emoji":"💩"},{"name":"coffee","emoji":"☕"},{"name":"pizza","emoji":"🍕"},{"name":"cat","emoji":"🐱"},{"name":"dog","emoji":"🐶"},{"name":"alien","emoji":"👽"},{"name":"ghost","emoji":"👻"},{"name":"moon","emoji":"🌙"},{"name":"sun","emoji":"☀️"},{"name":"rainbow","emoji":"🌈"},{"name":"snowflake","emoji":"❄️"},{"name":"muscle","emoji":"💪"},{"name":"handshake","emoji":"🤝"},{"name":"ok_hand","emoji":"👌"},{"name":"peace","emoji":"✌️"},{"name":"point_up","emoji":"☝️"},{"name":"thinking","emoji":"🤔"},{"name":"heart_on_fire","emoji":"❤️‍🔥"}];
+  let activeEmojiIndex = 0;
+  let matchingEmojis = [];
+  const closeEmojiSuggestions = () => { emojiSuggestions.hidden = true; matchingEmojis = []; activeEmojiIndex = 0; };
+  const renderEmojiSuggestions = () => {
+    const cursor = input.selectionStart ?? input.value.length;
+    const before = input.value.slice(0, cursor);
+    const match = before.match(/:([a-z0-9_+-]{1,24})$/i);
+    if (!match) { closeEmojiSuggestions(); return; }
+    const query = match[1].toLowerCase();
+    matchingEmojis = emojiList.filter(item => item.name.includes(query)).slice(0, 8);
+    if (!matchingEmojis.length) { closeEmojiSuggestions(); return; }
+    activeEmojiIndex = Math.min(activeEmojiIndex, matchingEmojis.length - 1);
+    emojiSuggestions.replaceChildren();
+    matchingEmojis.forEach((item, index) => {
+      const option = document.createElement("button");
+      option.type = "button";
+      option.className = "lunar-emoji-option" + (index === activeEmojiIndex ? " active" : "");
+      option.setAttribute("role", "option");
+      option.setAttribute("aria-selected", String(index === activeEmojiIndex));
+      const emoji = document.createElement("span");
+      emoji.className = "lunar-emoji-option-icon";
+      emoji.textContent = item.emoji;
+      const name = document.createElement("span");
+      name.className = "lunar-emoji-option-name";
+      name.textContent = ":" + item.name + ":";
+      option.append(emoji, name);
+      option.addEventListener("mousedown", event => { event.preventDefault(); chooseEmoji(index); });
+      emojiSuggestions.appendChild(option);
+    });
+    emojiSuggestions.hidden = false;
+  };
+  const chooseEmoji = index => {
+    const item = matchingEmojis[index];
+    if (!item) return;
+    const cursor = input.selectionStart ?? input.value.length;
+    const before = input.value.slice(0, cursor);
+    const match = before.match(/:([a-z0-9_+-]{1,24})$/i);
+    if (!match) return closeEmojiSuggestions();
+    const start = cursor - match[0].length;
+    input.setRangeText(item.emoji, start, cursor, "end");
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    closeEmojiSuggestions();
+    input.focus();
+  };
   const showFeedback = (message, kind = "") => {
     feedback.textContent = message;
     feedback.classList.toggle("is-success", kind === "success");
@@ -117,46 +162,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   };
 
-  input.addEventListener("input", () => { count.textContent = input.value.length + " / 1500"; });
-  const closeEmojiPicker = () => { if (emojiPicker) emojiPicker.hidden = true; };
-  if (emojiButton && emojiPicker && emojiHost) {
-    emojiButton.addEventListener("click", async () => {
-      try {
-        if (!customElements.get("emoji-picker")) await import("https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js");
-        await customElements.whenDefined("emoji-picker");
-        let picker = emojiHost.querySelector("emoji-picker");
-        if (!picker) {
-          picker = document.createElement("emoji-picker");
-          picker.className = "dark";
-          picker.setAttribute("locale", "en");
-          picker.setAttribute("emoji-version", "17.0");
-          emojiHost.appendChild(picker);
-          picker.addEventListener("emoji-click", event => {
-            const emoji = event.detail?.unicode;
-            if (!emoji) return;
-            const start = input.selectionStart ?? input.value.length;
-            const end = input.selectionEnd ?? start;
-            input.setRangeText(emoji, start, end, "end");
-            input.dispatchEvent(new Event("input", { bubbles: true }));
-            input.focus();
-            closeEmojiPicker();
-          });
-        }
-        emojiPicker.hidden = !emojiPicker.hidden;
-      } catch {
-        showFeedback("Emoji picker could not load. Try refreshing.", "error");
-      }
-    });
-  }
-  if (emojiClose) emojiClose.addEventListener("click", closeEmojiPicker);
-  document.addEventListener("click", event => {
-    if (emojiPicker && !emojiPicker.hidden && !emojiPicker.contains(event.target) && !emojiButton?.contains(event.target)) closeEmojiPicker();
-  });
+  input.addEventListener("input", () => { count.textContent = input.value.length + " / 1500"; renderEmojiSuggestions(); });
+  input.addEventListener("click", renderEmojiSuggestions);
+  input.addEventListener("keyup", event => { if (["ArrowLeft", "ArrowRight"].includes(event.key)) renderEmojiSuggestions(); });
   input.addEventListener("keydown", event => {
-    if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
-      event.preventDefault();
-      form.requestSubmit();
-    }
+    if (!emojiSuggestions.hidden && event.key === "ArrowDown") { event.preventDefault(); activeEmojiIndex = (activeEmojiIndex + 1) % matchingEmojis.length; renderEmojiSuggestions(); return; }
+    if (!emojiSuggestions.hidden && event.key === "ArrowUp") { event.preventDefault(); activeEmojiIndex = (activeEmojiIndex - 1 + matchingEmojis.length) % matchingEmojis.length; renderEmojiSuggestions(); return; }
+    if (!emojiSuggestions.hidden && event.key === "Enter" && !event.shiftKey && !event.isComposing) { event.preventDefault(); chooseEmoji(activeEmojiIndex); return; }
+    if (event.key === "Escape") closeEmojiSuggestions();
+    if (event.key === "Enter" && !event.shiftKey && !event.isComposing) { event.preventDefault(); form.requestSubmit(); }
   });
 
   form.addEventListener("submit", async event => {
@@ -175,6 +189,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "Could not send message.");
       input.value = "";
+      closeEmojiSuggestions();
       count.textContent = "0 / 1500";
       showFeedback("Message sent to Discord.", "success");
       await loadMessages();
@@ -185,6 +200,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       send.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send to Discord';
     }
   });
+  const typingLabel = document.createElement("div");
+  typingLabel.className = "lunar-chat-typing";
+  typingLabel.hidden = true;
+  feed.insertAdjacentElement("beforebegin", typingLabel);
+  const loadTyping = async () => {
+    try {
+      const response = await fetch("/api/lunar-console/discord-typing", { credentials: "same-origin", cache: "no-store" });
+      if (!response.ok) return;
+      const result = await response.json();
+      const users = Array.isArray(result.users) ? result.users : [];
+      typingLabel.hidden = !users.length;
+      typingLabel.textContent = users.length === 1 ? (users[0].username || "Someone") + " is typing…" : users.length === 2 ? (users[0].username || "Someone") + " and " + (users[1].username || "someone") + " are typing…" : users.length > 2 ? "Several people are typing…" : "";
+    } catch {}
+  };
   await loadMessages();
+  await loadTyping();
   window.setInterval(loadMessages, 5000);
+  window.setInterval(loadTyping, 1500);
 });
