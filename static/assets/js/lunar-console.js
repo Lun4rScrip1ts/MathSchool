@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
   }
-  if (emojiClose) emojiClose.addEventListener("click", closeEmojiPicker);\n  window.addEventListener("resize", () => { if (emojiPicker && !emojiPicker.hidden) positionEmojiPicker(); });
+  if (emojiClose) emojiClose.addEventListener("click", closeEmojiPicker);
   document.addEventListener("click", event => {
     if (emojiPicker && !emojiPicker.hidden && !emojiPicker.contains(event.target) && !emojiButton?.contains(event.target)) closeEmojiPicker();
   });
