@@ -481,6 +481,12 @@ function connectDiscordTypingGateway() {
       if (packet.op === 7 || packet.op === 9) {
         try { discordGatewaySocket.close(); } catch {}
       }
+      if (packet.t === "GUILD_CREATE" && Array.isArray(packet.d?.presences)) {
+        for (const presence of packet.d.presences) {
+          const id = String(presence.user?.id || "");
+          if (id) discordMemberPresence.set(id, { status: presence.status || "offline", activities: Array.isArray(presence.activities) ? presence.activities.slice(0, 3).map(activity => String(activity.name || "").slice(0, 80)) : [] });
+        }
+      }
       if (packet.t === "PRESENCE_UPDATE" && packet.d?.user?.id) {
         discordMemberPresence.set(String(packet.d.user.id), { status: packet.d.status || "offline", activities: Array.isArray(packet.d.activities) ? packet.d.activities.slice(0, 3).map(activity => String(activity.name || "").slice(0, 80)) : [] });
       }
