@@ -81,6 +81,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   input.addEventListener("input", () => { count.textContent = input.value.length + " / 1500"; });
   const closeEmojiPicker = () => { if (emojiPicker) emojiPicker.hidden = true; };
+  const positionEmojiPicker = () => {
+    if (!emojiButton || !emojiPicker) return;
+    const buttonRect = emojiButton.getBoundingClientRect();
+    const pickerHeight = Math.min(430, window.innerHeight - 24);
+    const gap = 10;
+    emojiPicker.style.position = "fixed";
+    emojiPicker.style.zIndex = "2147483647";
+    emojiPicker.style.left = Math.max(8, Math.min(buttonRect.right - Math.min(360, window.innerWidth - 16), window.innerWidth - Math.min(360, window.innerWidth - 16) - 8)) + "px";
+    emojiPicker.style.right = "auto";
+    emojiPicker.style.bottom = "auto";
+    emojiPicker.style.top = Math.max(8, buttonRect.top - pickerHeight - gap) + "px";
+    if (buttonRect.top - pickerHeight - gap < 8) {
+      emojiPicker.style.top = Math.min(window.innerHeight - pickerHeight - 8, buttonRect.bottom + gap) + "px";
+    }
+  };
   if (emojiButton && emojiPicker && emojiHost) {
     emojiButton.addEventListener("click", async () => {
       try {
@@ -104,13 +119,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             closeEmojiPicker();
           });
         }
-        emojiPicker.hidden = !emojiPicker.hidden;
+        emojiPicker.hidden = !emojiPicker.hidden;\n        if (!emojiPicker.hidden) positionEmojiPicker();
       } catch {
         showFeedback("Emoji picker could not load. Try refreshing.", "error");
       }
     });
   }
-  if (emojiClose) emojiClose.addEventListener("click", closeEmojiPicker);
+  if (emojiClose) emojiClose.addEventListener("click", closeEmojiPicker);\n  window.addEventListener("resize", () => { if (emojiPicker && !emojiPicker.hidden) positionEmojiPicker(); });
   document.addEventListener("click", event => {
     if (emojiPicker && !emojiPicker.hidden && !emojiPicker.contains(event.target) && !emojiButton?.contains(event.target)) closeEmojiPicker();
   });
