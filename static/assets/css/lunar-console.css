@@ -12,3 +12,26 @@
 .lunar-emoji-option-name{font-size:13px}
 .lunar-chat-typing{padding:8px 3px;color:var(--text-secondary,#9ca3af);font-size:12px}
 .lunar-chat-typing[hidden]{display:none!important}
+
+.lunar-console-chat-layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:14px;align-items:stretch}
+.lunar-console-chat-main{min-width:0}
+.lunar-member-panel{display:flex;flex-direction:column;min-width:0;max-height:520px;border:1px solid var(--border,rgba(148,163,184,.2));border-radius:14px;background:rgba(0,0,0,.14);overflow:hidden}
+.lunar-member-panel-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 12px 10px}
+.lunar-member-panel-heading strong{font-size:14px}
+.lunar-member-panel-heading span{font-size:11px;color:var(--text-secondary,#9ca3af)}
+.lunar-member-search{margin:0 10px 8px;padding:8px 10px;width:calc(100% - 20px);box-sizing:border-box;border:1px solid var(--border,rgba(148,163,184,.2));border-radius:8px;background:rgba(255,255,255,.04);color:inherit;outline:none;font:inherit;font-size:12px}
+.lunar-member-list{min-height:0;overflow-y:auto;padding:2px 7px 9px}
+.lunar-member-group{margin:8px 5px 5px;color:var(--text-secondary,#9ca3af);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.lunar-member-row{display:flex;align-items:center;gap:9px;width:100%;padding:7px 6px;border:0;border-radius:8px;background:transparent;color:inherit;text-align:left}
+.lunar-member-row:hover{background:rgba(148,163,184,.1)}
+.lunar-member-avatar-wrap{position:relative;flex:0 0 32px;width:32px;height:32px}
+.lunar-member-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;background:rgba(148,163,184,.12)}
+.lunar-member-status{position:absolute;right:-1px;bottom:-1px;width:11px;height:11px;border:2px solid #171923;border-radius:50%;background:#747f8d}
+.lunar-member-status.online{background:#3ba55d}.lunar-member-status.idle{background:#faa61a}.lunar-member-status.dnd{background:#ed4245}
+.lunar-member-details{display:flex;flex-direction:column;gap:3px;min-width:0}
+.lunar-member-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:600}
+.lunar-member-subtitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-secondary,#9ca3af);font-size:10px}
+.lunar-member-loading{padding:20px 8px;color:var(--text-secondary,#9ca3af);font-size:12px;text-align:center}
+.lunar-member-empty{padding:18px 8px;color:var(--text-secondary,#9ca3af);font-size:12px;text-align:center}
+@media(max-width:850px){.lunar-console-chat-layout{grid-template-columns:minmax(0,1fr) 210px;gap:10px}}
+@media(max-width:650px){.lunar-console-chat-layout{grid-template-columns:1fr}.lunar-member-panel{max-height:300px}.lunar-discord-feed{max-height:360px}}
