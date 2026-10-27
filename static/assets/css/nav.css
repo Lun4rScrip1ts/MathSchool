@@ -214,3 +214,5 @@ img {
 .lunar-nav-chat{position:relative!important}
 .lunar-nav-chat .lunar-chat-notification-dot{top:6px;right:6px}
 @keyframes lunarNotifyPulse{0%,100%{box-shadow:0 0 0 rgba(255,45,65,0)}50%{box-shadow:0 0 24px rgba(255,45,65,.28)}}
+
+.lunar-console-nav[hidden] { display: none !important; }
