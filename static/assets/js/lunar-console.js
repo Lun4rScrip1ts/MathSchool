@@ -7,6 +7,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const send = document.getElementById("lunar-discord-send");
   const feedback = document.getElementById("lunar-discord-feedback");
   const count = document.getElementById("lunar-discord-count");
+  const emojiButton = document.getElementById("lunar-console-emoji-button");
+  const emojiPicker = document.getElementById("lunar-console-emoji-picker");
+  const emojiHost = document.getElementById("lunar-console-emoji-host");
+  const emojiClose = document.getElementById("lunar-console-emoji-close");
   const showFeedback = (message, kind = "") => {
     feedback.textContent = message;
     feedback.classList.toggle("is-success", kind === "success");
@@ -76,6 +80,47 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   input.addEventListener("input", () => { count.textContent = input.value.length + " / 1500"; });
+  const closeEmojiPicker = () => { if (emojiPicker) emojiPicker.hidden = true; };
+  if (emojiButton && emojiPicker && emojiHost) {
+    emojiButton.addEventListener("click", async () => {
+      try {
+        if (!customElements.get("emoji-picker")) await import("https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js");
+        await customElements.whenDefined("emoji-picker");
+        let picker = emojiHost.querySelector("emoji-picker");
+        if (!picker) {
+          picker = document.createElement("emoji-picker");
+          picker.className = "dark";
+          picker.setAttribute("locale", "en");
+          picker.setAttribute("emoji-version", "17.0");
+          emojiHost.appendChild(picker);
+          picker.addEventListener("emoji-click", event => {
+            const emoji = event.detail?.unicode;
+            if (!emoji) return;
+            const start = input.selectionStart ?? input.value.length;
+            const end = input.selectionEnd ?? start;
+            input.setRangeText(emoji, start, end, "end");
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+            input.focus();
+            closeEmojiPicker();
+          });
+        }
+        emojiPicker.hidden = !emojiPicker.hidden;
+      } catch {
+        showFeedback("Emoji picker could not load. Try refreshing.", "error");
+      }
+    });
+  }
+  if (emojiClose) emojiClose.addEventListener("click", closeEmojiPicker);
+  document.addEventListener("click", event => {
+    if (emojiPicker && !emojiPicker.hidden && !emojiPicker.contains(event.target) && !emojiButton?.contains(event.target)) closeEmojiPicker();
+  });
+  input.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
+
   form.addEventListener("submit", async event => {
     event.preventDefault();
     const message = input.value.trim();
@@ -99,7 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       showFeedback(error.message || "Could not send message.", "error");
     } finally {
       send.disabled = false;
-      send.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send message';
+      send.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send to Discord';
     }
   });
   await loadMessages();
