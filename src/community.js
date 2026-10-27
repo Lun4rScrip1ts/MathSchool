@@ -442,6 +442,48 @@ router.patch("/reports/:id", requireUser, async (req, res) => {
   res.json({ report: publicReport(report) });
 });
 
+router.post("/lunar-console/discord-message", requireUser, async (req, res) => {
+  if (String(req.user.username || "").toLowerCase() !== "lunar") {
+    return res.status(403).json({ error: "This console is only available to @lunar." });
+  }
+
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  if (!webhookUrl) {
+    return res.status(503).json({ error: "Discord webhook is not configured on the server." });
+  }
+
+  const message = req.body?.message;
+  if (typeof message !== "string" || !message.trim() || message.length > 1500) {
+    return res.status(400).json({ error: "Enter a message up to 1500 characters." });
+  }
+
+  let url;
+  try {
+    url = new URL(webhookUrl);
+  } catch {
+    return res.status(503).json({ error: "Discord webhook configuration is invalid." });
+  }
+  if (url.protocol !== "https:" || !["discord.com", "discordapp.com"].includes(url.hostname) || !url.pathname.startsWith("/api/webhooks/")) {
+    return res.status(503).json({ error: "Discord webhook configuration is invalid." });
+  }
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ content: message.trim(), allowed_mentions: { parse: [] } }),
+    });
+    if (!response.ok) {
+      console.warn("[Lunar Console] Discord webhook returned", response.status);
+      return res.status(502).json({ error: "Discord could not accept the message." });
+    }
+    res.json({ ok: true });
+  } catch (error) {
+    console.warn("[Lunar Console] Discord message failed:", error.message);
+    res.status(502).json({ error: "Could not reach Discord. Please try again." });
+  }
+});
+
 router.get("/auth/me", (req, res) => {
   const user = getSessionUser(req);
   res.json({ user: user ? publicUser(user, true) : null });
