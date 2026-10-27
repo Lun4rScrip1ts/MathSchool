@@ -11,7 +11,7 @@
   <link rel="stylesheet" id="global" href="/assets/css/global.css" />
   <link rel="stylesheet" href="/assets/css/container.css" />
   <link rel="stylesheet" href="/assets/css/nav.css?v=lunar14" />
-  <link rel="stylesheet" href="/assets/css/settings.css?v=lunar16" />
+  <link rel="stylesheet" href="/assets/css/settings.css?v=lunar17" />
   <script src="/assets/js/storage.js?v=lunar8"></script>
   <script src="/assets/js/main.js?v=lunar17"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -274,43 +274,74 @@
 
         <button class="key-button" id="interface-reset-btn" type="button">Reset Interface Settings</button>
       </div>
-      <section class="settings-card lunar-console-card" id="lunar-console-card" hidden>
-        <div class="lunar-console-heading">
-          <span class="lunar-console-icon"><i class="fa-solid fa-moon"></i></span>
-          <div>
-            <span class="lunar-console-kicker">OWNER ACCESS</span>
-            <h3>Lunar Console</h3>
-          </div>
-          <span class="lunar-console-status"><i class="fa-solid fa-lock"></i> Private</span>
-        </div>
-        <p>Owner-only tools for your Lunar account. This panel is restricted to the signed-in @lunar account.</p>
-        <div class="lunar-console-section lunar-discord-chat">
-          <div class="lunar-chat-heading">
-            <div>
-              <label>Discord channel chat</label>
-              <p class="lunar-console-help">Recent messages from the connected Discord channel.</p>
-            </div>
-            <span id="lunar-chat-status" class="lunar-chat-status">Connecting…</span>
-          </div>
-          <div id="lunar-discord-feed" class="lunar-discord-feed" role="log" aria-live="polite" aria-label="Discord channel messages">
-            <div class="lunar-chat-empty">Loading messages…</div>
-          </div>
-        </div>
-        <div class="lunar-console-section">
-          <label for="lunar-discord-message">Discord channel message</label>
-          <p class="lunar-console-help">Send a message to the Discord channel connected to your server webhook.</p>
-          <textarea id="lunar-discord-message" maxlength="1500" rows="5" placeholder="Write a message for your Discord channel..."></textarea>
-          <div class="lunar-console-compose-footer">
-            <span id="lunar-discord-count">0 / 1500</span>
-            <button class="key-button" id="lunar-discord-send" type="button"><i class="fa-solid fa-paper-plane"></i> Send to Discord</button>
-          </div>
-          <div class="lunar-console-feedback" id="lunar-discord-feedback" role="status" aria-live="polite"></div>
-        </div>
-        <div class="lunar-console-note"><i class="fa-solid fa-shield-halved"></i><span>Messages are submitted through the server. The webhook URL stays private and other accounts are rejected by the backend.</span></div>
-      </section>
-
       <div class="settings-card">
         <h3>Search Engine</h3>
+        <p>Change the search engine when searching.</p>
+        <select title="engine" id="engine" onchange="changeEngine(this)">
+          <option value="Brave">Brave (Default)</option>
+          <option value="Google">Google</option>
+          <option value="Bing">Bing</option>
+          <option value="Qwant">Qwant</option>
+          <option value="Startpage">Startpage</option>
+          <option value="SearchEncrypt">SearchEncrypt</option>
+          <option value="Ecosia">Ecosia</option>
+        </select>
+        <input class="key-form" type="text" id="engine-form" placeholder="Change Search Engine" name="engine" />
+        <button class="key-button" id="engine-save-btn">Save</button>
+      </div>
+      <div class="settings-card">
+        <h3>Choose your <an>Pro</an>xy</h3>
+        <p>
+          Choose the <an>pro</an>xy you want to use.
+        </p>
+        <select id="pChange">
+          <option value="sj">Scramjet (Default)</option>
+          <option value="uv">Ultraviolet</option>
+        </select>
+
+        <div id="transport-row" style="display:none;">
+          <label>Transport</label>
+          <select id="transport-dropdown">
+            <option value="epoxy">Epoxy (Default)</option>
+            <option value="libcurl">Libcurl</option>
+          </select>
+
+          <label>Wisp Server</label>
+          <input class="key-form" type="text" id="wisp-input" placeholder="wss://your-server/wisp/ (blank = default)" />
+          <button class="key-button" id="wisp-save-btn">Save</button>
+        </div>
+      </div>
+      <div class="settings-card">
+        <h3>Save Data Management</h3>
+        <p>Export your saved data on this site and import it on another site.
+          This is useful because this site might be blocked in the future,
+          but you don't want to lose your save data.
+        </p>
+        <p id="warning">Importing a save file will overwrite your current saves!</p>
+        <button class="key-button" value="Export" onclick="exportSaveData();">Export Save</button>
+        <button class="key-button" value="Import" onclick="importSaveData();">Import Save</button>
+      </div>
+    </div>
+  </div>
+  <script src="/assets/js/settings.js?v=lunar22"></script>
+  <script src="/assets/js/lunar-settings.js?v=lunar10"></script>
+  <!-- DO NOT REMOVE-->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WKJQ5QHQTJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "G-WKJQ5QHQTJ");
+  </script>
+  <!-- DO NOT REMOVE-->
+  <script src="/assets/js/lunar.js?v=lunar11"></script>
+</body>
+
+</html>
+<h3>Search Engine</h3>
         <p>Change the search engine when searching.</p>
         <select title="engine" id="engine" onchange="changeEngine(this)">
           <option value="Brave">Brave (Default)</option>
