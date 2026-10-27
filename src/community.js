@@ -444,6 +444,7 @@ router.patch("/reports/:id", requireUser, async (req, res) => {
 
 
 const discordTypingUsers = new Map();
+const discordMemberPresence = new Map();
 let discordGatewaySocket = null;
 let discordGatewayHeartbeat = null;
 let discordGatewaySequence = null;
@@ -469,7 +470,7 @@ function connectDiscordTypingGateway() {
           op: 2,
           d: {
             token,
-            intents: (1 << 9) | (1 << 11) | (1 << 15),
+            intents: (1 << 1) | (1 << 8) | (1 << 9) | (1 << 11) | (1 << 15),
             properties: { os: process.platform, browser: "Lunar Console", device: "Lunar Console" }
           }
         }));
@@ -479,6 +480,12 @@ function connectDiscordTypingGateway() {
       }
       if (packet.op === 7 || packet.op === 9) {
         try { discordGatewaySocket.close(); } catch {}
+      }
+      if (packet.t === "PRESENCE_UPDATE" && packet.d?.user?.id) {
+        discordMemberPresence.set(String(packet.d.user.id), { status: packet.d.status || "offline", activities: Array.isArray(packet.d.activities) ? packet.d.activities.slice(0, 3).map(activity => String(activity.name || "").slice(0, 80)) : [] });
+      }
+      if (packet.t === "GUILD_MEMBER_UPDATE" && packet.d?.user?.id && !discordMemberPresence.has(String(packet.d.user.id))) {
+        discordMemberPresence.set(String(packet.d.user.id), { status: "offline", activities: [] });
       }
       if (packet.t === "TYPING_START" && packet.d?.channel_id === channelId) {
         const userId = String(packet.d.user_id || "");
@@ -520,6 +527,56 @@ router.get("/lunar-console/discord-typing", requireUser, async (req, res) => {
   const users = [...discordTypingUsers.values()].filter(user => Date.now() - user.timestamp < 10000);
   res.set("Cache-Control", "no-store");
   res.json({ users });
+});
+
+
+router.get("/lunar-console/discord-members", requireUser, async (req, res) => {
+  if (String(req.user.username || "").toLowerCase() !== "lunar") return res.status(403).json({ error: "This console is only available to @lunar." });
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  const channelId = process.env.DISCORD_CHANNEL_ID;
+  if (!botToken || !/^\d{17,20}$/.test(channelId || "")) return res.status(503).json({ error: "Discord bot and channel are not configured." });
+  const headers = { Authorization: "Bot " + botToken };
+  try {
+    const channelResponse = await fetch("https://discord.com/api/v10/channels/" + channelId, { headers });
+    if (!channelResponse.ok) return res.status(502).json({ error: "Could not find the Discord channel. Check the channel ID and bot permissions." });
+    const channel = await channelResponse.json();
+    if (!channel.guild_id) return res.status(400).json({ error: "The configured Discord channel must belong to a server." });
+    const members = [];
+    let after = "0";
+    for (let page = 0; page < 20; page++) {
+      const response = await fetch("https://discord.com/api/v10/guilds/" + channel.guild_id + "/members?limit=1000&after=" + after, { headers });
+      if (!response.ok) return res.status(response.status === 403 ? 502 : 503).json({ error: "Could not load server members. Enable Server Members Intent and check bot permissions." });
+      const batch = await response.json();
+      if (!Array.isArray(batch) || !batch.length) break;
+      members.push(...batch);
+      after = String(batch[batch.length - 1]?.user?.id || "");
+      if (batch.length < 1000 || !after) break;
+    }
+    const result = members.map(member => {
+      const user = member.user || {};
+      const id = String(user.id || "");
+      const avatar = user.avatar
+        ? "https://cdn.discordapp.com/avatars/" + id + "/" + user.avatar + ".png?size=96"
+        : "https://cdn.discordapp.com/embed/avatars/" + (id ? Number((BigInt(id) >> 22n) % 6n) : 0) + ".png";
+      const presence = discordMemberPresence.get(id) || { status: "offline", activities: [] };
+      return {
+        id,
+        username: String(user.username || "unknown"),
+        displayName: String(member.nick || user.global_name || user.username || "Unknown"),
+        avatarUrl: avatar,
+        status: ["online", "idle", "dnd"].includes(presence.status) ? presence.status : "offline",
+        activities: presence.activities || [],
+        bot: Boolean(user.bot)
+      };
+    });
+    const rank = { online: 0, idle: 1, dnd: 2, offline: 3 };
+    result.sort((a, b) => rank[a.status] - rank[b.status] || a.displayName.localeCompare(b.displayName));
+    res.set("Cache-Control", "no-store");
+    res.json({ members: result, total: result.length, guildName: channel.guild_id });
+  } catch (error) {
+    console.error("[Lunar Console] Discord members fetch failed:", error.message);
+    res.status(502).json({ error: "Could not reach Discord to load server members." });
+  }
 });
 
 router.get("/lunar-console/discord-messages", requireUser, async (req, res) => {
