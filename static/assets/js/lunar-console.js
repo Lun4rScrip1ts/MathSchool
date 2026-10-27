@@ -119,7 +119,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             closeEmojiPicker();
           });
         }
-        emojiPicker.hidden = !emojiPicker.hidden;\n        if (!emojiPicker.hidden) positionEmojiPicker();
+        emojiPicker.hidden = !emojiPicker.hidden;
+        if (!emojiPicker.hidden) positionEmojiPicker();
       } catch {
         showFeedback("Emoji picker could not load. Try refreshing.", "error");
       }
