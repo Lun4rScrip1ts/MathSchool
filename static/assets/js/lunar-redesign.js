@@ -65,6 +65,19 @@
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (!data?.user) return;
+        if (String(data.user.username || "").toLowerCase() === "lunar" && !nav.querySelector(".lunar-console-nav")) {
+          const consoleLink = document.createElement("a");
+          consoleLink.className = "lunar-side-link navbar-link lunar-console-nav";
+          consoleLink.href = "/lunar-console";
+          consoleLink.innerHTML = '<i class="fa-solid fa-moon"></i><span>Lunar Console</span>';
+          const spacer = nav.querySelector(".lunar-side-spacer");
+          if (spacer) spacer.before(consoleLink);
+          else nav.querySelector(".lunar-sidebar")?.appendChild(consoleLink);
+          if (normalize(window.location.pathname) === "/lunar-console") {
+            consoleLink.classList.add("is-active");
+            consoleLink.setAttribute("aria-current", "page");
+          }
+        }
         const labels = nav.querySelectorAll('.lunar-account-nav span');
         if (labels[0]) labels[0].textContent = String(data.user.displayName || data.user.username || 'A').slice(0, 1).toUpperCase();
         if (labels[1]) labels[1].textContent = 'Profile';
