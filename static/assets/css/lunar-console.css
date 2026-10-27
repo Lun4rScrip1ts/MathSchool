@@ -35,3 +35,11 @@
 .lunar-member-empty{padding:18px 8px;color:var(--text-secondary,#9ca3af);font-size:12px;text-align:center}
 @media(max-width:850px){.lunar-console-chat-layout{grid-template-columns:minmax(0,1fr) 210px;gap:10px}}
 @media(max-width:650px){.lunar-console-chat-layout{grid-template-columns:1fr}.lunar-member-panel{max-height:300px}.lunar-discord-feed{max-height:360px}}
+
+.lunar-member-avatar-wrap{position:relative!important;display:block!important;flex:0 0 32px!important;width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;overflow:visible!important}
+.lunar-member-avatar{position:relative!important;display:block!important;width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;max-width:32px!important;max-height:32px!important;border-radius:50%!important;object-fit:cover!important}
+.lunar-member-status{position:absolute!important;display:block!important;right:-1px!important;bottom:-1px!important;top:auto!important;left:auto!important;width:10px!important;height:10px!important;min-width:10px!important;min-height:10px!important;max-width:10px!important;max-height:10px!important;padding:0!important;margin:0!important;border:2px solid #171923!important;border-radius:50%!important;box-sizing:content-box!important;z-index:2!important;transform:none!important;pointer-events:none!important}
+.lunar-member-status.offline{background:#747f8d!important}
+.lunar-member-status.online{background:#3ba55d!important}
+.lunar-member-status.idle{background:#faa61a!important}
+.lunar-member-status.dnd{background:#ed4245!important}
