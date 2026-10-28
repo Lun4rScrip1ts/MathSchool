@@ -16,7 +16,7 @@
 <body class="lunar-community-page">
   <div class="nav-bar"></div>
   <main class="account-shell">
-    <section class="account-card profile-public-card">
+    <section class="account-card profile-public-card" id="public-profile-card">
       <div class="profile-public-banner" id="banner"></div>
       <div class="profile-public-body">
         <div class="profile-avatar profile-public-avatar" id="avatar"></div>
@@ -56,6 +56,12 @@
         document.getElementById("status").textContent=x.status||"";
         document.getElementById("bio").textContent=x.bio||"";
         document.getElementById("avatar").innerHTML=x.avatarUrl?'<img src="'+esc(x.avatarUrl)+'" alt="">':esc(n(x.displayName));
+        const publicCard=document.getElementById("public-profile-card");
+        const safeImageUrl=value=>/^(?:\/uploads\/|\/assets\/|https:\/\/)/i.test(String(value||""))?String(value):"";
+        if(x.backgroundUrl){
+          const background=safeImageUrl(x.backgroundUrl);
+          if(background)publicCard.style.backgroundImage=`linear-gradient(180deg,rgba(10,12,18,.28),rgba(10,12,18,.94) 75%),url("${background}")`;
+        }
         if(x.bannerUrl)document.getElementById("banner").style.backgroundImage='url("'+x.bannerUrl+'")';
         document.getElementById("owner").hidden=!x.isOwner;
         document.getElementById("roles").innerHTML=(x.roles||[]).map(z=>'<span class="profile-role '+(z==="Owner"?"owner":"")+'">'+esc(z)+'</span>').join("");
