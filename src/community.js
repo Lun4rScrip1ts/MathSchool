@@ -647,6 +647,13 @@ router.get("/lunar-console/discord-messages", requireUser, async (req, res) => {
             url: /^https:\/\//i.test(String(attachment.url || "")) ? attachment.url : "",
             contentType: String(attachment.content_type || "")
           })) : [],
+          embeds: Array.isArray(message.embeds) ? message.embeds.slice(0, 10).map(embed => ({
+            title: String(embed.title || "").slice(0, 150),
+            url: /^https:\/\//i.test(String(embed.url || "")) ? embed.url : "",
+            imageUrl: /^https:\/\//i.test(String(embed.image?.url || "")) ? embed.image.url : "",
+            videoUrl: /^https:\/\//i.test(String(embed.video?.url || "")) ? embed.video.url : "",
+            thumbnailUrl: /^https:\/\//i.test(String(embed.thumbnail?.url || "")) ? embed.thumbnail.url : ""
+          })) : [],
           timestamp: message.timestamp,
           isBot: Boolean(author.bot || message.webhook_id)
         };
