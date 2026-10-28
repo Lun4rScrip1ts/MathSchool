@@ -72,14 +72,15 @@ app.use(cookieParser());
 app.use(express.json({ limit: "12mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api", generalLimiter, memberCounterRouter);
+app.use("/api", generalLimiter);
 app.use("/api/ai/chats/:id/messages", aiLimiter);
-app.use("/api", generalLimiter, communityRouter);
-app.use("/api", generalLimiter, spotifyRouter);
+app.use("/api", memberCounterRouter);
+app.use("/api", communityRouter);
+app.use("/api", spotifyRouter);
 
 // Expose only a non-secret deployment identifier so connected clients can detect a new deploy.
 // Railway provides these variables automatically for its deployments.
-app.get("/api/version", generalLimiter, (_req, res) => {
+app.get("/api/version", (_req, res) => {
   const deployment = process.env.RAILWAY_DEPLOYMENT_ID || "";
   const commit = process.env.RAILWAY_GIT_COMMIT_SHA || "";
   const version = deployment || commit || "local";
