@@ -90,10 +90,19 @@
       imageEditorStatus.textContent=error.message||"Could not save the edited image.";
     }
   });
+  const setProfileImagePreview=(kind,url)=>{
+    const preview=document.getElementById("profile-"+kind+"-current");
+    if(!preview)return;
+    const image=preview.querySelector("img");
+    preview.hidden=!url;
+    if(url)image.src=url;
+    else image.removeAttribute("src");
+  };
   const applyProfileDraftPreview=(kind,data)=>{
     if(!data)return;
     if(kind==="avatar")document.getElementById("profile-avatar").innerHTML='<img src="'+data+'" alt="">';
     else document.getElementById("profile-"+kind).style.backgroundImage='url("'+data+'")';
+    setProfileImagePreview(kind,data);
   };
   const profileForm=document.getElementById("profile-form"), profileSaveButton=document.getElementById("save-profile-button");
   const tabs=[...document.querySelectorAll(".auth-tab")]; let mode="login", user=null;
@@ -183,6 +192,9 @@
     document.getElementById("profile-bio").value=user.bio||"";
     document.getElementById("profile-banner").style.backgroundImage=user.bannerUrl?'url("'+user.bannerUrl+'")':"";
     document.getElementById("profile-background").style.backgroundImage=user.backgroundUrl?'url("'+user.backgroundUrl+'")':"";
+    setProfileImagePreview("avatar",user.avatarUrl||"");
+    setProfileImagePreview("banner",user.bannerUrl||"");
+    setProfileImagePreview("background",user.backgroundUrl||"");
     renderStickerCatalog(user.stickers || []);
     loadSavedAccounts();
   };
