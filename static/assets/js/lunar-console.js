@@ -149,15 +149,36 @@ document.addEventListener("DOMContentLoaded", async () => {
         content.textContent = message.content || (message.attachments?.length ? "" : message.isBot ? "Bot message or embed" : "No text content");
         item.append(header, content);
         for (const embed of Array.isArray(message.embeds) ? message.embeds : []) {
-          const mediaUrl = embed.image?.url || embed.video?.url || embed.thumbnail?.url || "";
+          const mediaUrl = embed.imageUrl || embed.thumbnailUrl || embed.videoUrl || "";
           if (!/^https:\/\//i.test(mediaUrl)) continue;
-          const media = document.createElement("img");
-          media.className = "lunar-chat-attachment-image lunar-chat-embed-media";
-          media.src = mediaUrl;
-          media.alt = embed.title || "Discord embedded media";
-          media.loading = "lazy";
-          media.referrerPolicy = "no-referrer";
-          item.appendChild(media);
+          if (/\.mp4(?:$|\?)/i.test(embed.videoUrl || mediaUrl)) {
+            const video = document.createElement("video");
+            video.className = "lunar-chat-attachment-image lunar-chat-embed-media";
+            video.src = embed.videoUrl || mediaUrl;
+            video.autoplay = true;
+            video.loop = true;
+            video.muted = true;
+            video.playsInline = true;
+            video.controls = true;
+            item.appendChild(video);
+          } else {
+            const media = document.createElement("img");
+            media.className = "lunar-chat-attachment-image lunar-chat-embed-media";
+            media.src = mediaUrl;
+            media.alt = embed.title || "Discord embedded media";
+            media.loading = "lazy";
+            media.referrerPolicy = "no-referrer";
+            item.appendChild(media);
+          }
+          if (embed.url && embed.title) {
+            const link = document.createElement("a");
+            link.className = "lunar-chat-attachment-link";
+            link.href = embed.url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = embed.title;
+            item.appendChild(link);
+          }
         }
         for (const attachment of Array.isArray(message.attachments) ? message.attachments : []) {
           if (!attachment.url) continue;
