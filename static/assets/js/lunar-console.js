@@ -151,15 +151,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         feed.appendChild(item);
       }
       feed.scrollTop = feed.scrollHeight;
-      status.textContent = "Connected · updates every 10s";
+      status.textContent = "Live · refreshes every 5s";
     } catch (error) {
-      status.textContent = "Reconnecting…";
-      if (!feed.children.length) {
-        const empty = document.createElement("div");
-        empty.className = "lunar-chat-empty lunar-chat-error";
-        empty.textContent = error.message || "Could not load messages. Retrying automatically…";
-        feed.appendChild(empty);
-      }
+      status.textContent = "Not connected";
+      feed.replaceChildren();
+      const empty = document.createElement("div");
+      empty.className = "lunar-chat-empty lunar-chat-error";
+      empty.textContent = error.message || "Could not load messages.";
+      feed.appendChild(empty);
     }
   };
 
@@ -217,6 +216,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   await loadMessages();
   await loadTyping();
-  window.setInterval(loadMessages, 10000);
+  window.setInterval(loadMessages, 5000);
   window.setInterval(loadTyping, 1500);
 });
