@@ -242,7 +242,7 @@
       return;
     }
     try{
-      const response=await fetch(url,{credentials:"same-origin"});
+      const response=await fetch(new URL(url,location.origin).href,{credentials:"same-origin",cache:"no-store"});
       if(!response.ok)throw new Error("Could not load that image for editing.");
       const blob=await response.blob();
       const file=new File([blob],"profile-image."+((blob.type||"image/jpeg").split("/")[1]||"jpg"),{type:blob.type||"image/jpeg"});
