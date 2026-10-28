@@ -62,9 +62,13 @@
         document.getElementById("avatar").innerHTML=x.avatarUrl?'<img src="'+esc(x.avatarUrl)+'" alt="">':esc(n(x.displayName));
         const publicCard=document.getElementById("public-profile-card");
         const safeImageUrl=value=>/^(?:\/uploads\/|\/assets\/|https:\/\/)/i.test(String(value||""))?String(value):"";
-        if(x.backgroundUrl){
-          const background=safeImageUrl(x.backgroundUrl);
-          if(background)publicCard.style.backgroundImage=`linear-gradient(180deg,rgba(10,12,18,.28),rgba(10,12,18,.94) 75%),url("${background}")`;
+        const background=safeImageUrl(x.backgroundUrl);
+        if(background){
+          publicCard.classList.remove("profile-default-background");
+          publicCard.style.backgroundImage=`linear-gradient(180deg,rgba(10,12,18,.14),rgba(10,12,18,.72)),url("${background}")`;
+        }else{
+          publicCard.classList.add("profile-default-background");
+          publicCard.style.backgroundImage="";
         }
         if(x.bannerUrl)document.getElementById("banner").style.backgroundImage='url("'+x.bannerUrl+'")';
         document.getElementById("owner").hidden=!x.isOwner;
