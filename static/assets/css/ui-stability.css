@@ -45,3 +45,7 @@ button, input[type="button"], input[type="submit"], select { touch-action: manip
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+html { min-height: 100%; }
+body { min-height: 100vh; min-height: 100dvh; }
+:where(.page-content, .main-content, main) { overflow-wrap: anywhere; }
