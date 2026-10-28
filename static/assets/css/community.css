@@ -1598,3 +1598,37 @@ body.profile-image-editor-open{overflow:hidden!important}
   position: relative;
   z-index: 1;
 }
+
+
+/* Ensure the uploaded background layer is not reset by the generic account-card rules. */
+.account-card.profile-card {
+  background: rgba(10, 14, 23, .22) !important;
+}
+.account-card.profile-card #profile-background.profile-background {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  opacity: .72 !important;
+  filter: none !important;
+  transform: none !important;
+  background-color: transparent !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  pointer-events: none !important;
+}
+.account-card.profile-card::before {
+  z-index: 0 !important;
+  background: linear-gradient(180deg,rgba(10,14,23,.12),rgba(10,14,23,.58)) !important;
+}
+.account-card.profile-card > *:not(#profile-background) {
+  position: relative !important;
+  z-index: 1 !important;
+}
+.profile-public-card {
+  background-color: rgba(10,14,23,.12) !important;
+}
