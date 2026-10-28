@@ -447,53 +447,142 @@ const discordTypingUsers = new Map();
 const discordMemberPresence = new Map();
 let discordGatewaySocket = null;
 let discordGatewayHeartbeat = null;
-let discordGatewaySequence = null;
 let discordGatewayReconnectTimer = null;
+let discordGatewaySequence = null;
+let discordGatewaySessionId = "";
+let discordGatewayResumeUrl = "";
 let discordGatewayReady = false;
 let discordGatewayLastError = "";
+let discordGatewayReconnectAttempts = 0;
+let discordGatewayShouldResume = false;
+let discordGatewayStopped = false;
+let discordGatewayHeartbeatAcked = true;
+
+function clearDiscordGatewayHeartbeat() {
+  if (discordGatewayHeartbeat) clearInterval(discordGatewayHeartbeat);
+  discordGatewayHeartbeat = null;
+}
+
+function scheduleDiscordGatewayReconnect() {
+  if (discordGatewayStopped || discordGatewayReconnectTimer) return;
+  const delay = Math.min(60000, 2000 * (2 ** Math.min(discordGatewayReconnectAttempts, 5))) + Math.floor(Math.random() * 1500);
+  discordGatewayReconnectAttempts += 1;
+  discordGatewayReconnectTimer = setTimeout(() => {
+    discordGatewayReconnectTimer = null;
+    connectDiscordTypingGateway();
+  }, delay);
+  console.warn("[Lunar Console] Discord Gateway reconnect scheduled in", Math.round(delay / 1000), "seconds.");
+}
 
 function connectDiscordTypingGateway() {
   const token = process.env.DISCORD_BOT_TOKEN;
   const channelId = process.env.DISCORD_CHANNEL_ID;
-  if (!token || !/^\d{17,20}$/.test(channelId || "") || typeof WebSocket === "undefined") return;
-  if (discordGatewayReconnectTimer) clearTimeout(discordGatewayReconnectTimer);
+  if (!token || !/^\\d{17,20}$/.test(channelId || "") || typeof WebSocket === "undefined" || discordGatewayStopped) return;
+  if (discordGatewaySocket && (discordGatewaySocket.readyState === WebSocket.OPEN || discordGatewaySocket.readyState === WebSocket.CONNECTING)) return;
+  clearDiscordGatewayHeartbeat();
+  discordGatewayHeartbeatAcked = true;
+  const gatewayUrl = discordGatewayShouldResume && discordGatewayResumeUrl
+    ? discordGatewayResumeUrl
+    : "wss://gateway.discord.gg/?v=10&encoding=json";
+  let socket;
   try {
-    discordGatewaySocket = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json");
-    discordGatewaySocket.addEventListener("message", event => {
+    socket = new WebSocket(gatewayUrl);
+    discordGatewaySocket = socket;
+    socket.addEventListener("message", event => {
+      if (socket !== discordGatewaySocket) return;
       let packet;
       try { packet = JSON.parse(String(event.data)); } catch { return; }
       if (packet.s !== null && packet.s !== undefined) discordGatewaySequence = packet.s;
+
       if (packet.op === 10) {
-        if (discordGatewayHeartbeat) clearInterval(discordGatewayHeartbeat);
-        discordGatewayHeartbeat = setInterval(() => {
-          if (discordGatewaySocket?.readyState === WebSocket.OPEN) discordGatewaySocket.send(JSON.stringify({ op: 1, d: discordGatewaySequence }));
-        }, packet.d.heartbeat_interval);
-        discordGatewaySocket.send(JSON.stringify({
-          op: 2,
-          d: {
-            token,
-            intents: (1 << 0) | (1 << 1) | (1 << 8) | (1 << 9) | (1 << 11) | (1 << 15),
-            properties: { os: process.platform, browser: "Lunar Console", device: "Lunar Console" }
+        clearDiscordGatewayHeartbeat();
+        const interval = Number(packet.d?.heartbeat_interval);
+        if (!Number.isFinite(interval) || interval < 1000) {
+          discordGatewayLastError = "Discord sent an invalid heartbeat interval.";
+          try { socket.close(4000, "Invalid heartbeat interval"); } catch {}
+          return;
+        }
+        const sendHeartbeat = () => {
+          if (socket !== discordGatewaySocket || socket.readyState !== WebSocket.OPEN) return;
+          if (!discordGatewayHeartbeatAcked) {
+            discordGatewayLastError = "Discord heartbeat acknowledgement timed out.";
+            try { socket.close(4000, "Heartbeat acknowledgement timeout"); } catch {}
+            return;
           }
-        }));
+          discordGatewayHeartbeatAcked = false;
+          socket.send(JSON.stringify({ op: 1, d: discordGatewaySequence }));
+        };
+        setTimeout(() => {
+          if (socket === discordGatewaySocket && socket.readyState === WebSocket.OPEN) {
+            sendHeartbeat();
+            discordGatewayHeartbeat = setInterval(sendHeartbeat, interval);
+          }
+        }, Math.floor(Math.random() * interval));
+
+        if (discordGatewayShouldResume && discordGatewaySessionId && discordGatewaySequence !== null) {
+          socket.send(JSON.stringify({
+            op: 6,
+            d: { token, session_id: discordGatewaySessionId, seq: discordGatewaySequence }
+          }));
+        } else {
+          discordGatewayShouldResume = false;
+          socket.send(JSON.stringify({
+            op: 2,
+            d: {
+              token,
+              intents: (1 << 0) | (1 << 1) | (1 << 8) | (1 << 9) | (1 << 11) | (1 << 15),
+              properties: { os: process.platform, browser: "Lunar Console", device: "Lunar Console" }
+            }
+          }));
+        }
       }
+
+      if (packet.op === 11) discordGatewayHeartbeatAcked = true;
+
       if (packet.op === 1) {
-        if (discordGatewaySocket?.readyState === WebSocket.OPEN) discordGatewaySocket.send(JSON.stringify({ op: 1, d: discordGatewaySequence }));
+        if (socket.readyState === WebSocket.OPEN) {
+          discordGatewayHeartbeatAcked = false;
+          socket.send(JSON.stringify({ op: 1, d: discordGatewaySequence }));
+        }
       }
-      if (packet.op === 7 || packet.op === 9) {
+
+      if (packet.op === 7) {
         discordGatewayReady = false;
-        discordGatewayLastError = packet.op === 9 ? "Discord rejected the Gateway session. Check bot intents and permissions." : "Discord requested a Gateway reconnect.";
-        try { discordGatewaySocket.close(); } catch {}
+        discordGatewayShouldResume = Boolean(discordGatewaySessionId && discordGatewayResumeUrl);
+        discordGatewayLastError = "Discord requested a Gateway reconnect.";
+        try { socket.close(4000, "Discord requested reconnect"); } catch {}
       }
+
+      if (packet.op === 9) {
+        discordGatewayReady = false;
+        discordGatewayShouldResume = Boolean(packet.d && discordGatewaySessionId && discordGatewayResumeUrl);
+        if (!packet.d) {
+          discordGatewaySessionId = "";
+          discordGatewayResumeUrl = "";
+          discordGatewaySequence = null;
+        }
+        discordGatewayLastError = "Discord invalidated the Gateway session.";
+        try { socket.close(4000, "Invalid Gateway session"); } catch {}
+      }
+
       if (packet.op === 0 && packet.t === "READY") {
+        discordGatewaySessionId = String(packet.d?.session_id || "");
+        discordGatewayResumeUrl = String(packet.d?.resume_gateway_url || "");
+        discordGatewayShouldResume = false;
         discordGatewayReady = true;
+        discordGatewayReconnectAttempts = 0;
         discordGatewayLastError = "";
         console.log("[Lunar Console] Discord Gateway connected.");
       }
+
       if (packet.op === 0 && packet.t === "RESUMED") {
+        discordGatewayShouldResume = true;
         discordGatewayReady = true;
+        discordGatewayReconnectAttempts = 0;
         discordGatewayLastError = "";
+        console.log("[Lunar Console] Discord Gateway session resumed.");
       }
+
       if (packet.t === "GUILD_CREATE" && Array.isArray(packet.d?.presences)) {
         for (const presence of packet.d.presences) {
           const id = String(presence.user?.id || "");
@@ -509,10 +598,7 @@ function connectDiscordTypingGateway() {
       }
       if (packet.t === "TYPING_START" && packet.d?.channel_id === channelId) {
         const userId = String(packet.d.user_id || "");
-        if (!userId || userId === packet.d.member?.user?.id) {
-          if (!userId) return;
-        }
-        discordTypingUsers.set(userId, { userId, username: packet.d.member?.user?.global_name || packet.d.member?.user?.username || "", timestamp: Date.now() });
+        if (userId) discordTypingUsers.set(userId, { userId, username: packet.d.member?.user?.global_name || packet.d.member?.user?.username || "", timestamp: Date.now() });
       }
       if (packet.t === "GUILD_CREATE" && Array.isArray(packet.d?.members)) {
         for (const member of packet.d.members) {
@@ -521,18 +607,45 @@ function connectDiscordTypingGateway() {
         }
       }
     });
-    discordGatewaySocket.addEventListener("close", () => {
-      if (discordGatewayHeartbeat) clearInterval(discordGatewayHeartbeat);
-      discordGatewayHeartbeat = null;
-      discordGatewayReconnectTimer = setTimeout(connectDiscordTypingGateway, 5000);
+
+    socket.addEventListener("close", event => {
+      if (socket !== discordGatewaySocket) return;
+      clearDiscordGatewayHeartbeat();
+      discordGatewaySocket = null;
+      discordGatewayReady = false;
+      const code = Number(event.code || 0);
+      if ([4004, 4010, 4011, 4012, 4013, 4014].includes(code)) {
+        discordGatewayStopped = true;
+        discordGatewayLastError = code === 4004
+          ? "Discord rejected the bot token. Update DISCORD_BOT_TOKEN in Railway."
+          : "Discord Gateway closed with non-reconnectable code " + code + ". Check the Gateway configuration and intents.";
+        console.error("[Lunar Console]", discordGatewayLastError);
+        return;
+      }
+      if ([4007, 4009].includes(code)) {
+        discordGatewayShouldResume = false;
+        discordGatewaySessionId = "";
+        discordGatewayResumeUrl = "";
+        discordGatewaySequence = null;
+      } else if (discordGatewaySessionId && discordGatewayResumeUrl) {
+        discordGatewayShouldResume = true;
+      }
+      if (code === 4008) discordGatewayLastError = "Discord rate-limited the Gateway connection; backing off before retrying.";
+      scheduleDiscordGatewayReconnect();
     });
-    discordGatewaySocket.addEventListener("error", () => {
-      try { discordGatewaySocket.close(); } catch {}
+
+    socket.addEventListener("error", () => {
+      if (socket !== discordGatewaySocket) return;
+      discordGatewayLastError = "Discord Gateway socket error.";
+      try { socket.close(); } catch {}
     });
-  } catch {
-    discordGatewayReconnectTimer = setTimeout(connectDiscordTypingGateway, 5000);
+  } catch (error) {
+    discordGatewayLastError = "Could not open the Discord Gateway connection.";
+    console.error("[Lunar Console] Gateway connection error:", error.message);
+    scheduleDiscordGatewayReconnect();
   }
 }
+
 connectDiscordTypingGateway();
 setInterval(() => {
   for (const [id, user] of discordTypingUsers) {
