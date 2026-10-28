@@ -191,7 +191,9 @@
     document.getElementById("profile-status").value=user.status||"";
     document.getElementById("profile-bio").value=user.bio||"";
     document.getElementById("profile-banner").style.backgroundImage=user.bannerUrl?'url("'+user.bannerUrl+'")':"";
-    document.getElementById("profile-background").style.backgroundImage=user.backgroundUrl?'url("'+user.backgroundUrl+'")':"";
+    const backgroundLayer=document.getElementById("profile-background");
+    backgroundLayer.style.backgroundImage=user.backgroundUrl?'url("'+user.backgroundUrl+'")':"";
+    backgroundLayer.classList.toggle("profile-default-background",!user.backgroundUrl);
     setProfileImagePreview("avatar",user.avatarUrl||"");
     setProfileImagePreview("banner",user.bannerUrl||"");
     setProfileImagePreview("background",user.backgroundUrl||"");
