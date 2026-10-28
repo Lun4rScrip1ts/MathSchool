@@ -14,7 +14,7 @@ Keep the same value on any service that serves uploads or performs backups. Exis
 
 Create a private S3-compatible bucket in a separate storage account. Use a dedicated access key restricted to uploading objects to this bucket. The script uses HTTPS and requests server-side AES-256 encryption.
 
-Set these variables on a separate Railway Cron service, not in source code:
+Set these variables on the website service in Railway, not in source code. Once all four required backup variables are present, the web server runs a backup shortly after startup and every 24 hours.
 
 - `LUNAR_DATA_DIR=/app/data`
 - `BACKUP_S3_ENDPOINT=https://your-s3-endpoint`
