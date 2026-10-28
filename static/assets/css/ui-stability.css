@@ -1,0 +1,47 @@
+:root {
+  --lunar-ui-radius: 16px;
+  --lunar-ui-radius-small: 10px;
+  --lunar-ui-gap: clamp(12px, 2vw, 22px);
+  --lunar-ui-page-width: 1440px;
+  --lunar-ui-focus: #8b7bff;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { min-width: 320px; width: 100%; scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { min-width: 320px; width: 100%; max-width: 100%; margin-inline: auto; overflow-x: clip; }
+img, video, canvas, iframe, svg { max-width: 100%; }
+img, video { height: auto; }
+button, input, select, textarea { max-width: 100%; font: inherit; }
+button, [role="button"], a { -webkit-tap-highlight-color: transparent; }
+button, input[type="button"], input[type="submit"], select { touch-action: manipulation; }
+:where(button, a, input, select, textarea, [tabindex]):focus-visible { outline: 2px solid var(--lunar-ui-focus); outline-offset: 3px; }
+:where(p, h1, h2, h3, h4, h5, h6, a, label, button, li, span) { overflow-wrap: anywhere; }
+:where(main, section, article, aside, header, footer, nav, form, fieldset, .container, .content, .page-content, .main-content) { min-width: 0; }
+:where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select) { min-width: 0; }
+:where(textarea) { resize: vertical; }
+:where(table) { max-width: 100%; }
+:where(pre, .code, .code-block) { max-width: 100%; overflow: auto; }
+:where(.modal, .dialog, [role="dialog"], .popup, .popover, .dropdown-menu) { max-width: min(100vw - 24px, 100%); }
+:where(.modal, .dialog, [role="dialog"]) { max-height: min(88dvh, 900px); overflow: auto; overscroll-behavior: contain; }
+:where(.card, .panel, .tile, .game-card, .app-card, .movie-card, .friend-card) { min-width: 0; }
+:where(.card img, .panel img, .tile img, .game-card img, .app-card img, .movie-card img) { max-width: 100%; object-fit: cover; }
+:where(.grid, .cards, .card-grid, .games-grid, .apps-grid, .movie-grid) { min-width: 0; }
+:where(.container, .page-container, .content-container, main) { width: min(100% - 32px, var(--lunar-ui-page-width)); margin-inline: auto; }
+:where(.mobile-menu, .sidebar, .side-panel) { min-width: 0; }
+@media (max-width: 900px) {
+  :where(.container, .page-container, .content-container, main) { width: min(100% - 24px, var(--lunar-ui-page-width)); }
+  :where(.grid, .cards, .card-grid, .games-grid, .apps-grid, .movie-grid) { grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
+  :where(.modal, .dialog, [role="dialog"]) { width: min(100% - 24px, 680px); }
+}
+@media (max-width: 600px) {
+  html { scroll-padding-top: 68px; }
+  :where(.container, .page-container, .content-container, main) { width: calc(100% - 20px); }
+  :where(.grid, .cards, .card-grid, .games-grid, .apps-grid, .movie-grid) { grid-template-columns: minmax(0, 1fr); }
+  :where(button, input[type="button"], input[type="submit"], .button, .btn) { min-height: 40px; }
+  :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) { font-size: 16px; }
+  :where(.modal, .dialog, [role="dialog"]) { width: calc(100% - 16px); max-height: calc(100dvh - 16px); border-radius: var(--lunar-ui-radius); }
+  :where(.table-wrap, .table-container) { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  :where(.page-header, .section-header, .toolbar, .header-actions) { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
