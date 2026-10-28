@@ -1632,3 +1632,70 @@ body.profile-image-editor-open{overflow:hidden!important}
 .profile-public-card {
   background-color: rgba(10,14,23,.12) !important;
 }
+
+
+/* Code-rendered Lunar Studios wallpaper used when a user has no custom background. */
+.profile-default-background {
+  background-color:#202020 !important;
+  background-image:
+    radial-gradient(ellipse at 50% 42%,rgba(106,123,154,.14),transparent 44%),
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(145deg,#242424 0%,#17191d 52%,#202020 100%) !important;
+  background-size:auto,32px 32px,32px 32px,auto !important;
+  background-position:center !important;
+}
+.profile-default-background::after {
+  content:"POWERED BY\A LUNARSTUDIOS";
+  white-space:pre;
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:24px;
+  color:#f2f3f7;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:clamp(20px,3vw,36px);
+  font-weight:800;
+  line-height:1.55;
+  letter-spacing:.12em;
+  text-shadow:0 2px 24px rgba(0,0,0,.48);
+  pointer-events:none;
+  z-index:0;
+}
+#profile-background.profile-default-background::after {
+  align-items:flex-start;
+  padding-top:clamp(120px,18vw,220px);
+  font-size:clamp(16px,2.2vw,27px);
+  letter-spacing:.16em;
+}
+#profile-background.profile-default-background {
+  opacity:1 !important;
+}
+#profile-background.profile-default-background::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(8,10,15,.08),rgba(8,10,15,.38));
+  pointer-events:none;
+}
+.profile-public-card.profile-default-background {
+  background-color:#202020!important;
+  background-image:
+    radial-gradient(ellipse at 50% 20%,rgba(106,123,154,.16),transparent 42%),
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(145deg,#242424 0%,#17191d 52%,#202020 100%) !important;
+  background-size:auto,32px 32px,32px 32px,auto!important;
+}
+.profile-public-card.profile-default-background::after {
+  position:absolute;
+  inset:0;
+  height:clamp(240px,32vw,440px);
+  align-items:center;
+  z-index:0;
+  font-size:clamp(20px,3vw,36px);
+  opacity:.92;
+}
