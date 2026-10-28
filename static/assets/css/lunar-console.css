@@ -13,3 +13,12 @@
 .lunar-chat-typing{padding:8px 3px;color:var(--text-secondary,#9ca3af);font-size:12px}
 .lunar-chat-typing[hidden]{display:none!important}
 
+
+
+.lunar-console-chat-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.lunar-console-refresh{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:8px 11px;border:1px solid rgba(165,160,255,.32);border-radius:10px;background:rgba(124,110,255,.12);color:var(--text,#e5e7eb);font:inherit;font-size:12px;cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+.lunar-console-refresh:hover{background:rgba(124,110,255,.23);border-color:rgba(165,160,255,.65);transform:translateY(-1px)}
+.lunar-console-refresh:focus-visible{outline:2px solid #a5a0ff;outline-offset:3px}
+.lunar-console-refresh i{color:#b5adff}
+.lunar-chat-embed-media{background:rgba(0,0,0,.12)}
+@media(max-width:600px){.lunar-console-chat-actions{width:100%;justify-content:space-between}.lunar-console-refresh{padding:8px 10px}}
