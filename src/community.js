@@ -630,8 +630,10 @@ function connectDiscordTypingGateway() {
       } else if (discordGatewaySessionId && discordGatewayResumeUrl) {
         discordGatewayShouldResume = true;
       }
-      if (code === 4008) discordGatewayLastError = "Discord rate-limited the Gateway connection; backing off before retrying.";
-      scheduleDiscordGatewayReconnect();
+      if (code === 4008) discordGatewayLastError = "Discord rate-limited the Gateway connection.";
+      discordGatewayStopped = true;
+      discordGatewayLastError = discordGatewayLastError || "Discord Gateway disconnected. Automatic reconnect is disabled to prevent repeated connections. Restart the service manually after checking the cause.";
+      console.error("[Lunar Console] Gateway disconnected; automatic reconnect disabled. Close code:", code, discordGatewayLastError);
     });
 
     socket.addEventListener("error", () => {
@@ -641,8 +643,8 @@ function connectDiscordTypingGateway() {
     });
   } catch (error) {
     discordGatewayLastError = "Could not open the Discord Gateway connection.";
-    console.error("[Lunar Console] Gateway connection error:", error.message);
-    scheduleDiscordGatewayReconnect();
+    discordGatewayStopped = true;
+    console.error("[Lunar Console] Gateway connection failed; automatic reconnect disabled:", error.message);
   }
 }
 
