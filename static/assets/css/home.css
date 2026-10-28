@@ -611,3 +611,65 @@ input:focus {
 @media(prefers-reduced-motion:reduce){
   .lunar-home-new-ui .title{transition:none!important}
 }
+
+
+/* Keep the New UI update log in the home layout instead of overlapping search. */
+.lunar-home-new-ui .main {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: min(980px, calc(100% - 40px)) !important;
+  max-width: 100% !important;
+  margin-inline: auto !important;
+  padding: clamp(76px, 9vh, 108px) 0 44px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+.lunar-home-new-ui .lunar-changelog {
+  position: relative !important;
+  inset: auto !important;
+  float: none !important;
+  order: 20 !important;
+  align-self: center !important;
+  display: block !important;
+  flex: 0 1 auto !important;
+  width: min(760px, 100%) !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  margin: 28px auto 0 !important;
+  transform: none !important;
+  z-index: 3 !important;
+  box-sizing: border-box !important;
+}
+.lunar-home-new-ui .lunar-changelog-list {
+  max-height: min(430px, 52vh) !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+.lunar-home-new-ui .search-container,
+.lunar-home-new-ui .lunar-home-actions,
+.lunar-home-new-ui .lunar-ui-switch {
+  position: relative !important;
+  inset: auto !important;
+  float: none !important;
+  transform: none;
+  max-width: 100%;
+}
+@media (max-width: 760px) {
+  .lunar-home-new-ui .main {
+    width: calc(100% - 24px) !important;
+    padding: 76px 0 30px !important;
+  }
+  .lunar-home-new-ui .lunar-changelog {
+    width: 100% !important;
+    margin-top: 22px !important;
+    padding: 16px !important;
+    border-radius: 18px !important;
+  }
+  .lunar-home-new-ui .lunar-changelog-list {
+    max-height: 45vh !important;
+  }
+}
