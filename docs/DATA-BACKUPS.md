@@ -24,15 +24,7 @@ Set these variables on the website service in Railway, not in source code. Once 
 - `BACKUP_S3_SECRET_ACCESS_KEY=your-secret-key`
 - `BACKUP_S3_PREFIX=lunar-backups` (optional)
 
-The Cron service must have access to the same persistent volume as the web service. Configure the Railway Cron schedule to run once per day and set its start command to:
-
-```sh
-node scripts/backup-data.js
-```
-
-If your Railway plan or service setup does not allow a volume to be shared with the Cron service, run the script as a scheduled task in the web service or use a database/object-storage architecture that the backup worker can access. Never put backup keys in GitHub. Configure bucket lifecycle rules separately to retain daily and weekly backups.
-
-## Restore
+The backup runs inside the website service, so it uses the same mounted volume as the live app. You can also run it manually with `node scripts/backup-data.js`. Never put backup keys in GitHub. Configure bucket lifecycle rules separately to retain daily and weekly backups.\n\n## Restore
 
 Download the desired `.tar.gz` backup from the bucket and put it on the machine/container where you will restore. Stop the website service first, confirm `LUNAR_DATA_DIR` points at the intended data directory, and run:
 
