@@ -250,10 +250,14 @@
       if(data){profileImageDrafts[kind]=data;applyProfileDraftPreview(kind,data);}
     }catch(error){document.getElementById("profile-error").textContent=error.message;}
   }
-  document.querySelectorAll("[data-profile-image-choose]").forEach(button=>button.addEventListener("click",()=>{
+  document.querySelectorAll("[data-profile-image-choose]").forEach(button=>button.addEventListener("click",e=>{
+    e.preventDefault();
+    e.stopPropagation();
     document.getElementById(profileImageInputMap[button.dataset.profileImageChoose])?.click();
   }));
-  document.querySelectorAll("[data-profile-image-edit]").forEach(button=>button.addEventListener("click",()=>{
+  document.querySelectorAll("[data-profile-image-edit]").forEach(button=>button.addEventListener("click",e=>{
+    e.preventDefault();
+    e.stopPropagation();
     editExistingProfileImage(button.dataset.profileImageEdit);
   }));
 
