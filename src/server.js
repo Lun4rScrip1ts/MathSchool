@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import http from "node:http";
+import { spawn } from "node:child_process";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { server as wisp } from "@mercuryworkshop/wisp-js/server";
@@ -182,3 +183,25 @@ server.on("listening", () => {
 });
 
 server.listen({ port: PORT, host: "0.0.0.0" });
+
+const backupVariables = ["BACKUP_S3_ENDPOINT", "BACKUP_S3_BUCKET", "BACKUP_S3_ACCESS_KEY_ID", "BACKUP_S3_SECRET_ACCESS_KEY"];
+const automaticBackupsEnabled = backupVariables.every(name => Boolean(process.env[name]));
+if (automaticBackupsEnabled) {
+  const runAutomaticBackup = () => {
+    const child = spawn(process.execPath, [path.join(__dirname, "scripts", "backup-data.js")], {
+      cwd: __dirname,
+      env: process.env,
+      stdio: ["ignore", "inherit", "inherit"]
+    });
+    child.on("error", error => console.error("[Lunar Backup] Could not start backup:", error.message));
+    child.on("exit", code => {
+      if (code === 0) console.log("[Lunar Backup] Scheduled backup finished.");
+      else console.error("[Lunar Backup] Scheduled backup failed with exit code", code);
+    });
+  };
+  setTimeout(runAutomaticBackup, 30000);
+  setInterval(runAutomaticBackup, 24 * 60 * 60 * 1000);
+  console.log("[Lunar Backup] Automatic external backups enabled.");
+} else {
+  console.warn("[Lunar Backup] External backups are not configured. Set BACKUP_S3_ENDPOINT, BACKUP_S3_BUCKET, BACKUP_S3_ACCESS_KEY_ID, and BACKUP_S3_SECRET_ACCESS_KEY to enable them.");
+}
