@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const send = document.getElementById("lunar-discord-send");
   const feedback = document.getElementById("lunar-discord-feedback");
   const count = document.getElementById("lunar-discord-count");
+  const refreshButton = document.getElementById("lunar-console-refresh");
+  refreshButton?.addEventListener("click", () => window.location.reload());
   const emojiSuggestions = document.createElement("div");
   emojiSuggestions.className = "lunar-emoji-suggestions";
   emojiSuggestions.hidden = true;
@@ -146,6 +148,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         content.className = "lunar-chat-message-content";
         content.textContent = message.content || (message.attachments?.length ? "" : message.isBot ? "Bot message or embed" : "No text content");
         item.append(header, content);
+        for (const embed of Array.isArray(message.embeds) ? message.embeds : []) {
+          const mediaUrl = embed.image?.url || embed.video?.url || embed.thumbnail?.url || "";
+          if (!/^https:\/\//i.test(mediaUrl)) continue;
+          const media = document.createElement("img");
+          media.className = "lunar-chat-attachment-image lunar-chat-embed-media";
+          media.src = mediaUrl;
+          media.alt = embed.title || "Discord embedded media";
+          media.loading = "lazy";
+          media.referrerPolicy = "no-referrer";
+          item.appendChild(media);
+        }
         for (const attachment of Array.isArray(message.attachments) ? message.attachments : []) {
           if (!attachment.url) continue;
           if (String(attachment.contentType || "").startsWith("image/")) {
