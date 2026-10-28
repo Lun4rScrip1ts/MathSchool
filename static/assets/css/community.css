@@ -1501,3 +1501,78 @@ body.profile-image-editor-open{overflow:hidden!important}
   .profile-card .profile-banner { height:150px; }
   .profile-image-editor-card { width:calc(100vw - 16px)!important; height:calc(100dvh - 16px)!important; }
 }
+
+
+.profile-public-card { padding:0!important; }
+.profile-public-banner {
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  height:clamp(170px,27vw,280px)!important;
+  margin:0!important;
+  flex:none!important;
+  border-radius:24px 24px 16px 16px!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+}
+.profile-public-card .profile-public-body {
+  position:relative!important;
+  display:block!important;
+  padding:0 clamp(18px,3.4vw,38px) 32px!important;
+}
+.profile-public-identity {
+  position:relative!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  gap:20px!important;
+  min-width:0!important;
+  margin-top:-1px!important;
+}
+.profile-public-card .profile-public-avatar {
+  position:relative!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 104px!important;
+  width:104px!important;
+  height:104px!important;
+  margin:-18px 0 0!important;
+  z-index:2!important;
+  overflow:hidden!important;
+  border:5px solid #151925!important;
+  border-radius:50%!important;
+  background:#080b12!important;
+  box-shadow:0 10px 30px rgba(0,0,0,.4)!important;
+}
+.profile-public-card .profile-public-avatar img { display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;border-radius:50%!important; }
+.profile-public-heading { min-width:0!important; flex:1 1 auto!important; padding:14px 0 0!important; }
+.profile-public-card .profile-public-name { display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important;margin:0!important; }
+.profile-public-card .profile-public-name h1 { margin:0!important;line-height:1.12!important;font-size:clamp(28px,4vw,42px)!important;overflow-wrap:anywhere!important; }
+.profile-public-card .profile-public-username { margin:6px 0 0!important;line-height:1.4!important; }
+.profile-public-card .profile-public-status { margin:7px 0 0!important;line-height:1.5!important;overflow-wrap:anywhere!important; }
+.profile-public-card .profile-public-bio { margin:22px 0 0!important;overflow-wrap:anywhere!important; }
+.profile-public-card .profile-role-list { display:flex;flex-wrap:wrap;gap:8px;margin-top:14px; }
+.profile-public-card .profile-discord { margin-top:16px; }
+.profile-image-current {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  padding:8px;
+  border:1px solid rgba(166,145,255,.22);
+  border-radius:11px;
+  background:rgba(130,110,230,.07);
+}
+.profile-image-current[hidden] { display:none!important; }
+.profile-image-current img { display:block;width:52px;height:42px;flex:0 0 52px;object-fit:cover;border-radius:7px;background:#0b0e15; }
+.profile-image-current span { min-width:0;color:#b7bfd0;font-size:11px;line-height:1.4;overflow-wrap:anywhere; }
+@media(max-width:700px) {
+  .profile-public-banner { height:clamp(140px,35vw,210px)!important;border-radius:18px 18px 12px 12px!important; }
+  .profile-public-card .profile-public-body { padding:0 16px 24px!important; }
+  .profile-public-identity { gap:12px!important; }
+  .profile-public-card .profile-public-avatar { flex-basis:76px!important;width:76px!important;height:76px!important;margin-top:-12px!important;border-width:4px!important; }
+  .profile-public-heading { padding-top:12px!important; }
+  .profile-public-card .profile-public-name h1 { font-size:clamp(23px,6vw,32px)!important; }
+  .profile-public-card .profile-public-username,.profile-public-card .profile-public-status { font-size:13px!important; }
+}
