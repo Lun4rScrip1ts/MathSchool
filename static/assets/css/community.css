@@ -1576,3 +1576,25 @@ body.profile-image-editor-open{overflow:hidden!important}
   .profile-public-card .profile-public-name h1 { font-size:clamp(23px,6vw,32px)!important; }
   .profile-public-card .profile-public-username,.profile-public-card .profile-public-status { font-size:13px!important; }
 }
+
+
+/* Let custom profile backgrounds remain visible beneath profile content. */
+.profile-public-card {
+  background-color: transparent !important;
+  background-blend-mode: normal !important;
+}
+.profile-public-card::before {
+  background: linear-gradient(
+    180deg,
+    rgba(10,12,18,.06) 0%,
+    rgba(10,12,18,.24) 34%,
+    rgba(10,12,18,.58) 68%,
+    rgba(10,12,18,.78) 100%
+  ) !important;
+  opacity: 1 !important;
+  z-index: 0 !important;
+}
+.profile-public-card > * {
+  position: relative;
+  z-index: 1;
+}
