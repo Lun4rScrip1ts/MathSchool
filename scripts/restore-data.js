@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { copyFile, mkdir, mkdtemp, readFile, readdir, rename, rm, stat } from "node:fs/promises";
+import { copyFile, cp, mkdir, mkdtemp, readFile, readdir, rm, stat } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -38,15 +38,22 @@ try {
 
   await mkdir(dataDir, { recursive: true });
   const liveDatabase = path.join(dataDir, "community.json");
+  const safetyDir = path.join(dataDir, "before-restore-" + Date.now());
+  await mkdir(safetyDir, { recursive: true });
   try {
     await copyFile(liveDatabase, beforePath);
-    await copyFile(beforePath, liveDatabase + ".before-restore-" + Date.now());
+    await copyFile(beforePath, path.join(safetyDir, "community.json"));
   } catch (error) {
     if (error.code !== "ENOENT") throw error;
   }
 
   const incomingUploads = path.join(extractDir, "uploads");
   const liveUploads = path.join(dataDir, "uploads");
+  try {
+    await cp(liveUploads, path.join(safetyDir, "uploads"), { recursive: true, errorOnExist: true, force: false });
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
   await rm(liveUploads, { recursive: true, force: true });
   await mkdir(liveUploads, { recursive: true });
   try {
