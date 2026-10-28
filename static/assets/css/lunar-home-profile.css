@@ -7,3 +7,48 @@
 .lunar-friends-page .home-profile-role-manager{margin-top:10px}
 .lunar-friends-page .friends-profile-stickers:empty{display:none!important}
 @media(max-width:700px){.lunar-friends-page .friends-profile-card{width:100%!important}.lunar-friends-page .home-profile-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* Refined account entry in the New UI navigation rail */
+body.lunar-home .nav-bar .lunar-account-mini,
+body.lunar-home .lunar-sidebar .lunar-account-mini,
+body.lunar-home .lunar-account-mini {
+  width:48px!important;
+  min-width:48px!important;
+  height:48px!important;
+  min-height:48px!important;
+  flex:0 0 48px!important;
+  margin:0 auto 18px!important;
+  padding:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:1px solid rgba(177,160,255,.35)!important;
+  border-radius:16px!important;
+  background:linear-gradient(145deg,rgba(145,125,255,.25),rgba(73,61,135,.22))!important;
+  color:#f6f3ff!important;
+  box-shadow:0 8px 22px rgba(83,65,190,.2),inset 0 1px 0 rgba(255,255,255,.12)!important;
+  text-decoration:none!important;
+  transition:background .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease!important;
+}
+body.lunar-home .lunar-account-mini span {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  height:100%!important;
+  color:inherit!important;
+  font-size:17px!important;
+  font-weight:850!important;
+  line-height:1!important;
+}
+body.lunar-home .lunar-account-mini:hover {
+  transform:translateY(-2px)!important;
+  border-color:rgba(198,184,255,.7)!important;
+  background:linear-gradient(145deg,rgba(159,140,255,.42),rgba(92,73,177,.35))!important;
+  box-shadow:0 12px 28px rgba(100,78,220,.3),inset 0 1px 0 rgba(255,255,255,.16)!important;
+}
+body.lunar-home .lunar-account-mini:focus-visible { outline:2px solid #b6a7ff!important; outline-offset:3px!important; }
+@media(max-width:700px) {
+  body.lunar-home .lunar-account-mini { width:44px!important; min-width:44px!important; height:44px!important; min-height:44px!important; flex-basis:44px!important; border-radius:14px!important; }
+}
