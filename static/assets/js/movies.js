@@ -1,4 +1,4 @@
-const MOVIE_KEY="lunar-movie-saved";let movies=[],activeMovie=null,activeFilter="all",currentUser=null,currentLibrary="mine",generatedPosterData="";
+const MOVIE_KEY="lunar-movie-saved";let movies=[],activeMovie=null,activeFilter="all",currentUser=null,currentLibrary="public",generatedPosterData="";
 const $=s=>document.querySelector(s);
 const saved=()=>{try{return JSON.parse(localStorage.getItem(MOVIE_KEY)||"[]")}catch{return[]}};
 const saveList=v=>localStorage.setItem(MOVIE_KEY,JSON.stringify([...new Set(v)]));
@@ -11,47 +11,42 @@ const initials=t=>String(t||"VIDEO").split(/\s+/).slice(0,3).map(x=>x[0]).join("
 function setPlayIcon(){const v=$("#movie-player"),icon=$("#movie-play i"),big=$("#movie-big-play i");if(!v)return;const playing=!v.paused;icon.className=playing?"fa-solid fa-pause":"fa-solid fa-play";big.className=playing?"fa-solid fa-pause":"fa-solid fa-play";$("#movie-big-play").classList.toggle("visible",!playing);$("#movie-play").setAttribute("aria-label",playing?"Pause":"Play")}
 function syncPlayer(){const v=$("#movie-player");if(!v)return;$("#movie-current-time").textContent=fmt(v.currentTime);$("#movie-duration").textContent=fmt(v.duration);$("#movie-progress").value=v.duration?(v.currentTime/v.duration)*100:0;setPlayIcon()}
 function togglePlayback(){const v=$("#movie-player");if(!v)return;if(v.paused){v.play().catch(()=>{$("#movie-player-error").hidden=false;$("#movie-player-error").textContent="This video cannot be played in your browser. MP4 (H.264/AAC) is recommended.";setPlayIcon()})}else v.pause()}
-function closeMovie(){const modal=$("#movie-modal"),video=$("#movie-player");if(video){video.pause();video.removeAttribute("src");video.load()}const frame=$(".movie-player-wrap iframe");if(frame){const replacement=document.createElement("video");replacement.id="movie-player";replacement.className="movie-player";replacement.playsInline=true;replacement.preload="metadata";frame.replaceWith(replacement)}if(modal){modal.hidden=true;modal.style.display="none"}document.body.classList.remove("movie-player-open")}
+function closeMovie(){const modal=$("#movie-modal"),video=$("#movie-player");if(video){video.pause();video.removeAttribute("src");video.load()}if(modal){modal.hidden=true;modal.removeAttribute("style")}document.body.classList.remove("movie-player-open")}
 function closeUpload(){const modal=$("#movie-upload-modal");if(modal)modal.hidden=true;$("#movie-upload-status").textContent=""}
 function posterMarkup(m){if(m.posterUrl)return '<img src="'+esc(m.posterUrl)+'" alt="" loading="lazy"><div class="movie-poster-shade"></div>';if(m.videoUrl)return '<video class="movie-poster-video" src="'+esc(m.videoUrl)+'" muted playsinline preload="metadata"></video><div class="movie-poster-shade"></div>';const c=colorFor(m.id);return '<div class="movie-generated-poster" style="--poster-a:'+c[0]+';--poster-b:'+c[1]+'"><strong>'+esc(initials(m.title))+'</strong></div><div class="movie-poster-shade"></div>'}
 
 function openMovie(m){
   activeMovie=m;
-  const modal=$("#movie-modal"),video=$("#movie-player");
-  modal.hidden=false;
-  modal.style.display="grid";
-  document.body.classList.add("movie-player-open");
-  $("#movie-player-title").textContent=m.title;
-  $("#movie-modal-title").textContent=m.title;
-  $("#movie-modal-description").textContent=m.description||"";
-  $("#movie-modal-year").textContent=[m.year,m.runtime].filter(Boolean).join(" • ");
-  $("#movie-modal-source").textContent=m.source?("Source: "+m.source):"";
-  $("#movie-modal-tags").innerHTML=(m.tags||m.categories||[]).map(t=>"<span>"+esc(t)+"</span>").join("");
-  $("#movie-modal-poster").style.backgroundImage=m.posterUrl?'url("'+esc(m.posterUrl)+'")':"none";
-  $("#movie-modal-poster").style.backgroundSize="cover";
-  $("#movie-modal-poster").textContent=m.posterUrl?"":m.title;
-  const playable=m.videoUrl||m.streamUrl||"";
-  const existingFrame=$(".movie-player-wrap iframe");if(existingFrame){const fresh=document.createElement("video");fresh.id="movie-player";fresh.className="movie-player";fresh.playsInline=true;fresh.preload="metadata";existingFrame.replaceWith(fresh)}
-  const player=$("#movie-player");
-  player.pause();player.removeAttribute("src");player.load();
-  $("#movie-player-error").hidden=true;
-  const embed=m.embedUrl||"";
-  if(playable){
-    player.src=playable;
-    player.load();
-  }else if(embed){
-    const frame=document.createElement("iframe");
-    frame.src=embed;frame.title=m.title;frame.allow="autoplay; fullscreen; picture-in-picture";frame.allowFullscreen=true;
-    frame.style.cssText="width:100%;height:100%;border:0;background:#000";
-    $(".movie-player-wrap").replaceChild(frame,player);
-    $("#movie-player-error").textContent="This title is hosted by its authorized streaming provider.";
-    $("#movie-player-error").hidden=true;
-  }else{
-    $("#movie-player-error").textContent="This title is a catalog preview. No authorized playable video is configured.";
-    $("#movie-player-error").hidden=false;
-  }
-  $("#movie-pin").innerHTML=isSaved(m.id)?'<i class="fa-solid fa-bookmark"></i> Saved':'<i class="fa-regular fa-bookmark"></i> Save';
-  $("#movie-pin").onclick=()=>toggleSave(m);
+  const old=document.getElementById("lunar-movie-theater");
+  if(old)old.remove();
+  const overlay=document.createElement("div");
+  overlay.id="lunar-movie-theater";
+  Object.assign(overlay.style,{position:"fixed",inset:"0",width:"100vw",height:"100vh",zIndex:"2147483647",background:"rgba(0,0,0,.96)",display:"flex",flexDirection:"column",alignItems:"center",overflow:"auto",padding:"18px",boxSizing:"border-box",fontFamily:"inherit"});
+  const top=document.createElement("div");
+  Object.assign(top.style,{width:"min(1200px,96vw)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"4px 0 12px",color:"#fff",flex:"0 0 auto"});
+  const title=document.createElement("strong");title.textContent=m.title;Object.assign(title.style,{fontSize:"18px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"80%"});
+  const close=document.createElement("button");close.type="button";close.textContent="×";Object.assign(close.style,{width:"42px",height:"42px",border:"1px solid rgba(255,255,255,.2)",borderRadius:"12px",background:"rgba(255,255,255,.1)",color:"#fff",fontSize:"28px",cursor:"pointer"});
+  top.append(title,close);
+  const wrap=document.createElement("div");
+  Object.assign(wrap.style,{position:"relative",width:"min(1200px,96vw)",height:"min(68vh,calc(96vw * .5625))",minHeight:"240px",background:"#000",borderRadius:"16px",overflow:"hidden",boxShadow:"0 30px 100px rgba(0,0,0,.7)",flex:"0 0 auto"});
+  const video=document.createElement("video");video.src=m.videoUrl;video.poster=m.posterUrl||"";video.controls=true;video.playsInline=true;video.preload="auto";video.style.cssText="width:100%;height:100%;object-fit:contain;display:block;background:#000";
+  const error=document.createElement("div");error.textContent="Unable to play this video. MP4 (H.264/AAC) is recommended.";Object.assign(error.style,{position:"absolute",inset:"0",display:"none",placeItems:"center",padding:"20px",textAlign:"center",color:"#fff",background:"rgba(0,0,0,.8)",fontSize:"15px"});
+  video.addEventListener("error",()=>{error.style.display="grid"});
+  wrap.append(video,error);
+  const info=document.createElement("div");Object.assign(info.style,{width:"min(1200px,96vw)",color:"#fff",padding:"18px 0 35px",flex:"0 0 auto"});
+  const h=document.createElement("h2");h.textContent=m.title;Object.assign(h.style,{margin:"0 0 8px",fontSize:"28px"});
+  const p=document.createElement("p");p.textContent=m.description||"Uploaded to your Lunar library.";Object.assign(p.style,{margin:"0",color:"#b8bfcc",lineHeight:"1.5"});
+  info.append(h,p);
+  overlay.append(top,wrap,info);
+  document.body.appendChild(overlay);
+  document.documentElement.style.overflow="hidden";
+  document.body.style.overflow="hidden";
+  const closeOverlay=()=>{video.pause();overlay.remove();document.documentElement.style.overflow="";document.body.style.overflow=""};
+  close.onclick=closeOverlay;
+  overlay.addEventListener("click",e=>{if(e.target===overlay)closeOverlay()});
+  document.addEventListener("keydown",function escMovie(e){if(e.key==="Escape"){closeOverlay();document.removeEventListener("keydown",escMovie)}},{once:true});
+  video.addEventListener("canplay",()=>error.style.display="none");
+  video.load();
 }
 function toggleSave(m){const list=saved(),i=list.indexOf(m.id);if(i>=0)list.splice(i,1);else list.push(m.id);saveList(list);render();if(activeMovie?.id===m.id)$("#movie-pin").innerHTML=isSaved(m.id)?'<i class="fa-solid fa-bookmark"></i> Saved':'<i class="fa-regular fa-bookmark"></i> Save'}
 async function deleteMovie(m){if(!confirm("Delete this video from your Lunar library?"))return;const r=await fetch("/api/movies/"+encodeURIComponent(m.id),{method:"DELETE"});if(!r.ok){alert((await r.json().catch(()=>({}))).error||"Could not delete video.");return}closeMovie();movies=movies.filter(x=>x.id!==m.id);render()}
@@ -60,10 +55,10 @@ function hydrateVideoPosters(){document.querySelectorAll(".movie-poster-video").
 
 function render(){
   const q=($("#movies-search")?.value||"").trim().toLowerCase();
-  const scoped=movies.filter(m=>currentUser&&m.ownerId===currentUser.id);
+  const scoped=movies.filter(m=>currentLibrary==="public"?m.visibility==="public":currentUser&&m.ownerId===currentUser.id);
   const list=scoped.filter(m=>(activeFilter==="all"||String(m.category||"other").toLowerCase()===activeFilter)&&(!q||m.title.toLowerCase().includes(q)||(m.description||"").toLowerCase().includes(q)));
   $("#movies-count").textContent=list.length+" video"+(list.length===1?"":"s");
-  document.querySelector(".movie-section-head h2").textContent="My Videos";
+  document.querySelector(".movie-section-head h2").textContent=currentLibrary==="public"?"Lunar Studios":"My Videos";
   $("#movie-grid").innerHTML=list.length?list.map(m=>{const sc=isSaved(m.id)?"saved":"",icon=isSaved(m.id)?"solid":"regular";return '<article class="movie-card" data-id="'+esc(m.id)+'"><button class="movie-save '+sc+'" data-save="'+esc(m.id)+'" aria-label="Save video"><i class="fa-'+icon+' fa-bookmark"></i></button><span class="movie-badge">'+esc(m.category||"OTHER")+'</span><div class="movie-poster">'+posterMarkup(m)+'<strong class="movie-poster-title">'+esc(m.title)+'</strong><span class="movie-play"><i class="fa-solid fa-play"></i></span></div><div class="movie-card-body"><h3>'+esc(m.title)+'</h3><div class="movie-meta"><span>'+esc(m.uploadedBy||"Lunar")+'</span><span>•</span><span>'+new Date(m.uploadedAt).toLocaleDateString()+'</span></div></div></article>'}).join(""):'<div class="movie-empty"><i class="fa-solid fa-film"></i><h3>Your library is empty</h3><p>Upload a video to start building your movie shelf.</p><button class="movies-primary" id="movies-empty-upload"><i class="fa-solid fa-cloud-arrow-up"></i> Upload video</button></div>';
   document.querySelectorAll(".movie-card").forEach(card=>card.onclick=e=>{if(e.target.closest(".movie-save"))return;const m=movies.find(x=>x.id===card.dataset.id);if(m)openMovie(m)});
   document.querySelectorAll(".movie-save").forEach(b=>b.onclick=e=>{e.stopPropagation();const m=movies.find(x=>x.id===b.dataset.save);if(m)toggleSave(m)});
@@ -107,13 +102,14 @@ async function submitUpload(){
 async function init(){
  try{
   await Promise.all([loadLibrary(),loadUser()]);
-  $("#movies-featured-watch").onclick=()=>{const list=currentLibrary==="public"?catalogMovies:movies.filter(m=>currentUser&&m.ownerId===currentUser.id);if(list.length)openMovie(list[0])};
-  $("#movies-random").onclick=()=>{const list=currentLibrary==="public"?catalogMovies:movies.filter(m=>currentUser&&m.ownerId===currentUser.id);if(list.length)openMovie(list[Math.floor(Math.random()*list.length)])};
+  $("#movies-featured-watch").onclick=()=>{const first=movies.find(m=>currentLibrary==="public"?m.visibility==="public":currentUser&&m.ownerId===currentUser.id);if(first)openMovie(first)};
+  $("#movies-random").onclick=()=>{const list=movies.filter(m=>currentLibrary==="public"?m.visibility==="public":currentUser&&m.ownerId===currentUser.id);if(list.length)openMovie(list[Math.floor(Math.random()*list.length)])};
   $("#movies-search").oninput=render;
   document.querySelectorAll(".movie-filter").forEach(b=>b.onclick=()=>{document.querySelectorAll(".movie-filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");activeFilter=b.dataset.filter;render()});
+  document.querySelectorAll(".movie-library-tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".movie-library-tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");currentLibrary=b.dataset.library;activeFilter="all";document.querySelectorAll(".movie-filter").forEach(x=>x.classList.remove("active"));document.querySelector(".movie-filter[data-filter=\"all\"]")?.classList.add("active");render()});
   document.querySelectorAll("[data-close-movie]").forEach(x=>x.onclick=closeMovie);
   document.querySelectorAll("[data-close-upload]").forEach(x=>x.onclick=closeUpload);
-  $("#movies-upload-open").onclick=()=>{openUpload()};$("#movie-upload-submit").onclick=submitUpload;
+  $("#movies-upload-open").onclick=()=>{if(!currentUser){openUpload();return}currentLibrary="mine";document.querySelector(".movie-library-tab[data-library=\"mine\"]")?.click();openUpload()};$("#movie-upload-submit").onclick=submitUpload;
   $("#movie-upload-video").onchange=async e=>{const file=e.target.files[0];$("#movie-upload-file-label").textContent=file?.name||"Choose a video";resetPosterPreview();if(file){try{generatedPosterData=await makeVideoPoster(file);showPosterPreview(generatedPosterData,"Automatic frame from video")}catch{}}};
   $("#movie-upload-poster").onchange=async e=>{const file=e.target.files[0];if(!file)return;if(file.size>8*1024*1024){$("#movie-upload-status").textContent="Poster images must be 8 MB or smaller.";e.target.value="";return}try{showPosterPreview(await readDataUrl(file),"Your uploaded poster")}catch{}};
   const video=$("#movie-player");
@@ -122,10 +118,6 @@ async function init(){
   let mediaRecoveryAttempts=0,mediaRecoveryTimer=0;const recoverMedia=()=>{if(mediaRecoveryAttempts>=3||!video.src)return;clearTimeout(mediaRecoveryTimer);mediaRecoveryTimer=setTimeout(()=>{if(video.readyState>=3||video.paused)return;const wasPlaying=!video.paused,current=video.currentTime;mediaRecoveryAttempts++;video.load();video.addEventListener("loadedmetadata",()=>{try{video.currentTime=Math.min(current,Math.max(0,(video.duration||current)-0.05))}catch{}},{once:true});if(wasPlaying)video.play().catch(()=>{})},700)};video.addEventListener("stalled",recoverMedia);video.addEventListener("waiting",recoverMedia);video.addEventListener("progress",()=>{mediaRecoveryAttempts=0});video.addEventListener("error",()=>{const code=video.error?.code;if(code===2){recoverMedia();return}$("#movie-player-error").textContent=code===4?"This video format is not supported by your browser. MP4 (H.264/AAC) is recommended.":"That video could not be loaded. Check the upload and try again.";$("#movie-player-error").hidden=false});
   $("#movie-progress").oninput=e=>{if(video.duration)video.currentTime=Number(e.target.value)/100*video.duration};
   $("#movie-mute").onclick=()=>{video.muted=!video.muted;$("#movie-mute i").className=video.muted?"fa-solid fa-volume-xmark":"fa-solid fa-volume-high"};
-  const volume=document.createElement("input");volume.type="range";volume.min="0";volume.max="1";volume.step=".01";volume.value=String(video.volume);volume.className="player-volume";volume.setAttribute("aria-label","Volume");$("#movie-mute").after(volume);volume.oninput=()=>{video.volume=Number(volume.value);video.muted=video.volume===0;$("#movie-mute i").className=video.muted?"fa-solid fa-volume-xmark":"fa-solid fa-volume-high"};
-  const speed=document.createElement("select");speed.className="player-speed";speed.setAttribute("aria-label","Playback speed");[0.5,0.75,1,1.25,1.5,1.75,2].forEach(rate=>{const o=document.createElement("option");o.value=String(rate);o.textContent=rate+"×";if(rate===1)o.selected=true;speed.append(o)});$("#movie-fullscreen").before(speed);speed.onchange=()=>{video.playbackRate=Number(speed.value)};
-  const skipBack=document.createElement("button");skipBack.type="button";skipBack.className="player-control";skipBack.innerHTML='<i class="fa-solid fa-rotate-left"></i>';skipBack.title="Back 10 seconds";skipBack.onclick=()=>video.currentTime=Math.max(0,video.currentTime-10);$("#movie-play").after(skipBack);
-  const skipForward=document.createElement("button");skipForward.type="button";skipForward.className="player-control";skipForward.innerHTML='<i class="fa-solid fa-rotate-right"></i>';skipForward.title="Forward 10 seconds";skipForward.onclick=()=>video.currentTime=Math.min(video.duration||0,video.currentTime+10);$("#movie-mute").before(skipForward);
   $("#movie-fullscreen").onclick=()=>{const wrap=$(".movie-player-wrap");if(document.fullscreenElement)document.exitFullscreen();else wrap.requestFullscreen?.()};
   document.addEventListener("keydown",e=>{if(!$("#movie-modal").hidden){if(e.key==="Escape")closeMovie();if(e.key===" "&&document.activeElement.tagName!=="INPUT"){e.preventDefault();togglePlayback()}if(e.key==="ArrowRight")video.currentTime=Math.min(video.duration||0,video.currentTime+5);if(e.key==="ArrowLeft")video.currentTime=Math.max(0,video.currentTime-5)}if(!$("#movie-upload-modal").hidden&&e.key==="Escape")closeUpload()});
   render();
