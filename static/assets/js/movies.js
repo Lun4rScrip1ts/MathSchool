@@ -1,4 +1,4 @@
-const MOVIE_KEY="lunar-movie-saved";let movies=[],catalogMovies=[],activeMovie=null,activeFilter="all",currentUser=null,currentLibrary="public",generatedPosterData="";
+const MOVIE_KEY="lunar-movie-saved";let movies=[],activeMovie=null,activeFilter="all",currentUser=null,currentLibrary="mine",generatedPosterData="";
 const $=s=>document.querySelector(s);
 const saved=()=>{try{return JSON.parse(localStorage.getItem(MOVIE_KEY)||"[]")}catch{return[]}};
 const saveList=v=>localStorage.setItem(MOVIE_KEY,JSON.stringify([...new Set(v)]));
@@ -60,17 +60,17 @@ function hydrateVideoPosters(){document.querySelectorAll(".movie-poster-video").
 
 function render(){
   const q=($("#movies-search")?.value||"").trim().toLowerCase();
-  const scoped=currentLibrary==="public"?catalogMovies:movies.filter(m=>currentUser&&m.ownerId===currentUser.id);
+  const scoped=movies.filter(m=>currentUser&&m.ownerId===currentUser.id);
   const list=scoped.filter(m=>(activeFilter==="all"||String(m.category||"other").toLowerCase()===activeFilter)&&(!q||m.title.toLowerCase().includes(q)||(m.description||"").toLowerCase().includes(q)));
   $("#movies-count").textContent=list.length+" video"+(list.length===1?"":"s");
-  document.querySelector(".movie-section-head h2").textContent=currentLibrary==="public"?"Lunar Studios":"My Videos";
+  document.querySelector(".movie-section-head h2").textContent="My Videos";
   $("#movie-grid").innerHTML=list.length?list.map(m=>{const sc=isSaved(m.id)?"saved":"",icon=isSaved(m.id)?"solid":"regular";return '<article class="movie-card" data-id="'+esc(m.id)+'"><button class="movie-save '+sc+'" data-save="'+esc(m.id)+'" aria-label="Save video"><i class="fa-'+icon+' fa-bookmark"></i></button><span class="movie-badge">'+esc(m.category||"OTHER")+'</span><div class="movie-poster">'+posterMarkup(m)+'<strong class="movie-poster-title">'+esc(m.title)+'</strong><span class="movie-play"><i class="fa-solid fa-play"></i></span></div><div class="movie-card-body"><h3>'+esc(m.title)+'</h3><div class="movie-meta"><span>'+esc(m.uploadedBy||"Lunar")+'</span><span>•</span><span>'+new Date(m.uploadedAt).toLocaleDateString()+'</span></div></div></article>'}).join(""):'<div class="movie-empty"><i class="fa-solid fa-film"></i><h3>Your library is empty</h3><p>Upload a video to start building your movie shelf.</p><button class="movies-primary" id="movies-empty-upload"><i class="fa-solid fa-cloud-arrow-up"></i> Upload video</button></div>';
-  document.querySelectorAll(".movie-card").forEach(card=>card.onclick=e=>{if(e.target.closest(".movie-save"))return;const m=(currentLibrary==="public"?catalogMovies:movies).find(x=>x.id===card.dataset.id);if(m)openMovie(m)});
-  document.querySelectorAll(".movie-save").forEach(b=>b.onclick=e=>{e.stopPropagation();const m=(currentLibrary==="public"?catalogMovies:movies).find(x=>x.id===b.dataset.save);if(m)toggleSave(m)});
+  document.querySelectorAll(".movie-card").forEach(card=>card.onclick=e=>{if(e.target.closest(".movie-save"))return;const m=movies.find(x=>x.id===card.dataset.id);if(m)openMovie(m)});
+  document.querySelectorAll(".movie-save").forEach(b=>b.onclick=e=>{e.stopPropagation();const m=movies.find(x=>x.id===b.dataset.save);if(m)toggleSave(m)});
   $("#movies-empty-upload")?.addEventListener("click",openUpload);hydrateVideoPosters();
 }
 
-async function loadLibrary(){const [r,c]=await Promise.all([fetch("/api/movies",{cache:"no-store"}),fetch("/assets/data/movies.json",{cache:"no-store"})]);if(!r.ok)throw new Error("Library request failed");const data=await r.json();movies=Array.isArray(data.movies)?data.movies:[];if(c.ok){const items=await c.json();catalogMovies=Array.isArray(items)?items:[]}}
+async function loadLibrary(){const r=await fetch("/api/movies",{cache:"no-store"});if(!r.ok)throw new Error("Library request failed");const data=await r.json();movies=Array.isArray(data.movies)?data.movies:[]}
 async function loadUser(){const r=await fetch("/api/auth/me",{cache:"no-store"});if(r.ok){const data=await r.json();currentUser=data.user||null}}
 
 function openUpload(){const modal=$("#movie-upload-modal");modal.hidden=false;$("#movie-upload-title").focus()}
@@ -111,10 +111,9 @@ async function init(){
   $("#movies-random").onclick=()=>{const list=currentLibrary==="public"?catalogMovies:movies.filter(m=>currentUser&&m.ownerId===currentUser.id);if(list.length)openMovie(list[Math.floor(Math.random()*list.length)])};
   $("#movies-search").oninput=render;
   document.querySelectorAll(".movie-filter").forEach(b=>b.onclick=()=>{document.querySelectorAll(".movie-filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");activeFilter=b.dataset.filter;render()});
-  document.querySelectorAll(".movie-library-tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".movie-library-tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");currentLibrary=b.dataset.library;activeFilter="all";document.querySelectorAll(".movie-filter").forEach(x=>x.classList.remove("active"));document.querySelector(".movie-filter[data-filter=\"all\"]")?.classList.add("active");render()});
   document.querySelectorAll("[data-close-movie]").forEach(x=>x.onclick=closeMovie);
   document.querySelectorAll("[data-close-upload]").forEach(x=>x.onclick=closeUpload);
-  $("#movies-upload-open").onclick=()=>{if(!currentUser){openUpload();return}currentLibrary="mine";document.querySelector(".movie-library-tab[data-library=\"mine\"]")?.click();openUpload()};$("#movie-upload-submit").onclick=submitUpload;
+  $("#movies-upload-open").onclick=()=>{openUpload()};$("#movie-upload-submit").onclick=submitUpload;
   $("#movie-upload-video").onchange=async e=>{const file=e.target.files[0];$("#movie-upload-file-label").textContent=file?.name||"Choose a video";resetPosterPreview();if(file){try{generatedPosterData=await makeVideoPoster(file);showPosterPreview(generatedPosterData,"Automatic frame from video")}catch{}}};
   $("#movie-upload-poster").onchange=async e=>{const file=e.target.files[0];if(!file)return;if(file.size>8*1024*1024){$("#movie-upload-status").textContent="Poster images must be 8 MB or smaller.";e.target.value="";return}try{showPosterPreview(await readDataUrl(file),"Your uploaded poster")}catch{}};
   const video=$("#movie-player");
