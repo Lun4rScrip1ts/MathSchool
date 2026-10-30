@@ -31,18 +31,19 @@ function openMovie(m){
   $("#movie-modal-poster").style.backgroundSize="cover";
   $("#movie-modal-poster").textContent=m.posterUrl?"":m.title;
   const playable=m.videoUrl||m.streamUrl||"";
-  video.pause();video.removeAttribute("src");video.load();
+  const existingFrame=$(".movie-player-wrap iframe");if(existingFrame){const fresh=document.createElement("video");fresh.id="movie-player";fresh.className="movie-player";fresh.playsInline=true;fresh.preload="metadata";existingFrame.replaceWith(fresh)}
+  const player=$("#movie-player");
+  player.pause();player.removeAttribute("src");player.load();
   $("#movie-player-error").hidden=true;
   const embed=m.embedUrl||"";
   if(playable){
-    video.src=playable;
-    video.load();
-    video.play().catch(()=>{});
+    player.src=playable;
+    player.load();
   }else if(embed){
     const frame=document.createElement("iframe");
     frame.src=embed;frame.title=m.title;frame.allow="autoplay; fullscreen; picture-in-picture";frame.allowFullscreen=true;
     frame.style.cssText="width:100%;height:100%;border:0;background:#000";
-    $(".movie-player-wrap").replaceChild(frame,video);
+    $(".movie-player-wrap").replaceChild(frame,player);
     $("#movie-player-error").textContent="This title is hosted by its authorized streaming provider.";
     $("#movie-player-error").hidden=true;
   }else{
@@ -64,8 +65,8 @@ function render(){
   $("#movies-count").textContent=list.length+" video"+(list.length===1?"":"s");
   document.querySelector(".movie-section-head h2").textContent=currentLibrary==="public"?"Lunar Studios":"My Videos";
   $("#movie-grid").innerHTML=list.length?list.map(m=>{const sc=isSaved(m.id)?"saved":"",icon=isSaved(m.id)?"solid":"regular";return '<article class="movie-card" data-id="'+esc(m.id)+'"><button class="movie-save '+sc+'" data-save="'+esc(m.id)+'" aria-label="Save video"><i class="fa-'+icon+' fa-bookmark"></i></button><span class="movie-badge">'+esc(m.category||"OTHER")+'</span><div class="movie-poster">'+posterMarkup(m)+'<strong class="movie-poster-title">'+esc(m.title)+'</strong><span class="movie-play"><i class="fa-solid fa-play"></i></span></div><div class="movie-card-body"><h3>'+esc(m.title)+'</h3><div class="movie-meta"><span>'+esc(m.uploadedBy||"Lunar")+'</span><span>•</span><span>'+new Date(m.uploadedAt).toLocaleDateString()+'</span></div></div></article>'}).join(""):'<div class="movie-empty"><i class="fa-solid fa-film"></i><h3>Your library is empty</h3><p>Upload a video to start building your movie shelf.</p><button class="movies-primary" id="movies-empty-upload"><i class="fa-solid fa-cloud-arrow-up"></i> Upload video</button></div>';
-  document.querySelectorAll(".movie-card").forEach(card=>card.onclick=e=>{if(e.target.closest(".movie-save"))return;const m=movies.find(x=>x.id===card.dataset.id);if(m)openMovie(m)});
-  document.querySelectorAll(".movie-save").forEach(b=>b.onclick=e=>{e.stopPropagation();const m=movies.find(x=>x.id===b.dataset.save);if(m)toggleSave(m)});
+  document.querySelectorAll(".movie-card").forEach(card=>card.onclick=e=>{if(e.target.closest(".movie-save"))return;const m=(currentLibrary==="public"?catalogMovies:movies).find(x=>x.id===card.dataset.id);if(m)openMovie(m)});
+  document.querySelectorAll(".movie-save").forEach(b=>b.onclick=e=>{e.stopPropagation();const m=(currentLibrary==="public"?catalogMovies:movies).find(x=>x.id===b.dataset.save);if(m)toggleSave(m)});
   $("#movies-empty-upload")?.addEventListener("click",openUpload);hydrateVideoPosters();
 }
 
