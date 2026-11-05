@@ -54,3 +54,12 @@
 .sound-cut-empty,.sound-editor-help{font-size:11px;opacity:.55}
 .sound-editor-help{line-height:1.5;margin:12px 0 0}
 @media(max-width:560px){.sound-editor-timeline{grid-template-columns:1fr}.sound-editor-actions{display:grid;grid-template-columns:1fr 1fr}.sound-editor-actions .soundboard-tab{min-height:40px}}
+
+/* Simplified audio trimmer */
+.sound-editor-intro{margin:7px 0 12px;font-size:12px;line-height:1.5;opacity:.68}
+.sound-editor-timeline label>span{font-size:11px;font-weight:800;letter-spacing:.04em;color:#c8beff}
+.sound-editor-timeline input{width:100%;accent-color:#a293ff;cursor:ew-resize}
+.sound-editor-boundaries{padding:11px 12px;border:1px solid rgba(162,146,255,.18);border-radius:11px;background:rgba(0,0,0,.15)}
+.sound-editor-boundaries strong{font-variant-numeric:tabular-nums}
+.sound-editor-preview-button{border-color:rgba(162,146,255,.48);background:rgba(140,122,255,.19);color:#d2caff}
+.sound-editor-help{margin-top:10px}
