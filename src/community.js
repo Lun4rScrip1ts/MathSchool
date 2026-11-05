@@ -343,7 +343,7 @@ router.get("/sounds", (_req, res) => {
   res.set("Cache-Control", "no-store");
   res.json({ sounds: state.sounds.slice().reverse().map(publicSound) });
 });
-router.post("/sounds/upload", requireUser, express.raw({ type: req => /^audio\\//i.test(String(req.headers["content-type"] || "")), limit: MAX_SOUND_BYTES }), async (req, res) => {
+router.post("/sounds/upload", requireUser, express.raw({ type: req => /^audio\//i.test(String(req.headers["content-type"] || "")), limit: MAX_SOUND_BYTES }), async (req, res) => {
   const contentType = String(req.headers["content-type"] || "").split(";")[0].toLowerCase();
   const extension = AUDIO_TYPES[contentType];
   const buffer = Buffer.isBuffer(req.body) ? req.body : null;
