@@ -346,6 +346,36 @@ router.get("/sounds", (_req, res) => {
   res.json({ sounds: state.sounds.slice().reverse().map(publicSound) });
 });
 
+// Retrieve a saved catalog sound by ID so favorites survive a new visit.
+router.get("/sounds/lots/:id", async (req, res) => {
+  const apiKey = process.env.LOTS_OF_SOUNDS_API_KEY;
+  if (!apiKey) return res.status(404).json({ error: "Only free sample sounds are available until LOTS_OF_SOUNDS_API_KEY is configured." });
+  const id = cleanText(req.params.id, 160);
+  if (!id) return res.status(400).json({ error: "Invalid sound ID." });
+  try {
+    const response = await fetch("https://api.lotsofsounds.com/api/v1/sounds/" + encodeURIComponent(id), {
+      headers: { "Accept": "application/json", "x-api-key": apiKey, "User-Agent": "LunarSoundboard/1.0" },
+      signal: AbortSignal.timeout(12000)
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) return res.status(response.status === 404 ? 404 : 502).json({ error: "Could not retrieve this saved sound." });
+    const item = payload.data || payload.sound || payload;
+    const sound = {
+      id: cleanText(String(item.id || id), 160),
+      name: cleanText(String(item.name || item.title || "Sound effect"), 140),
+      duration: Number(item.duration) || 0,
+      license: cleanText(String(item.license || "CC0"), 30),
+      stream_url: item.stream_url || item.audio_url || "",
+      download_url: item.download_url || item.stream_url || "",
+      source_url: "https://www.lotsofsounds.com/sounds"
+    };
+    if (!/^https:\/\//i.test(sound.stream_url)) return res.status(404).json({ error: "Sound preview is unavailable." });
+    res.json({ sound });
+  } catch {
+    res.status(502).json({ error: "Could not connect to Lots of Sounds." });
+  }
+});
+
 // Lots of Sounds free sample catalog and optional full-catalog API proxy.
 router.get("/sounds/lots", async (req, res) => {
   const apiKey = process.env.LOTS_OF_SOUNDS_API_KEY;
