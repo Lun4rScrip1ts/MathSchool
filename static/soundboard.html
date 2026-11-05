@@ -36,13 +36,13 @@
           </div>
           <div class="sound-editor-actions">
             <button type="button" class="soundboard-tab" id="sound-set-clip"><i class="fa-solid fa-crop-simple"></i> Set clip boundaries</button>
-            <button type="button" class="soundboard-tab" id="sound-add-cut"><i class="fa-solid fa-scissors"></i> Cut selected section</button>
+            <button type="button" class="soundboard-tab" id="sound-add-cut"><i class="fa-solid fa-scissors"></i> Split selected section</button>
             <button type="button" class="soundboard-tab" id="sound-preview-edited"><i class="fa-solid fa-play"></i> Preview edited clip</button>
             <button type="button" class="soundboard-tab" id="sound-reset-edits"><i class="fa-solid fa-rotate-left"></i> Reset edits</button>
           </div>
           <div class="sound-editor-boundaries"><span>Clip: <strong id="sound-clip-range">0:00 – 0:00</strong></span><span>Removed: <strong id="sound-cut-duration">0:00</strong></span></div>
-          <div class="sound-editor-cuts"><strong>Cut sections <small>Click a cut section to select it, then press Delete or Backspace to restore it.</small></strong><div id="sound-cut-list" class="sound-cut-list"><span class="sound-cut-empty">No cuts yet.</span></div></div>
-          <p class="sound-editor-help">Use the sliders to select a range. Set clip boundaries to trim the beginning or end, or cut the selected section out. Only selected cut sections can be restored with Delete.</p>
+          <div class="sound-editor-cuts"><strong>Cut sections <small>Click a split section to select it, then press Delete or Backspace to remove it from the final audio.</small></strong><div id="sound-cut-list" class="sound-cut-list"><span class="sound-cut-empty">No cuts yet.</span></div></div>
+          <p class="sound-editor-help">Use the sliders to select a range. Set clip boundaries to trim the beginning or end, or cut the selected section out. Only a selected split section can be removed with Delete.</p>
           <audio id="sound-edited-preview" controls preload="metadata" hidden></audio>
         </div>
         <div id="sound-upload-status" class="soundboard-status" role="status"></div>

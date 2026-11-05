@@ -20,7 +20,7 @@
   const selectionEnd = document.getElementById("sound-selection-end");
   const cutList = document.getElementById("sound-cut-list");
   let decodedUpload = null, uploadObjectUrl = "", editedObjectUrl = "";
-  let clipStart = 0, clipEnd = 0, cutRanges = [], selectedCutIndex = null;
+  let clipStart = 0, clipEnd = 0, segments = [], selectedSegmentIndex = null;
   const status = document.getElementById("sound-upload-status");
   if (!list || !form) return;
 
@@ -364,23 +364,22 @@
 
   function updateEditor() {
     if (!decodedUpload) return;
-    const duration = decodedUpload.duration;
     const start = Number(selectionStart.value), end = Number(selectionEnd.value);
     document.getElementById("sound-selection-start-label").textContent = formatTime(start);
     document.getElementById("sound-selection-end-label").textContent = formatTime(end);
     document.getElementById("sound-clip-range").textContent = formatTime(clipStart) + " – " + formatTime(clipEnd);
-    const removed = cutRanges.reduce((sum, r) => sum + Math.max(0, Math.min(r.end, clipEnd) - Math.max(r.start, clipStart)), 0);
-    document.getElementById("sound-cut-duration").textContent = formatTime(removed);
-    cutList.innerHTML = cutRanges.length ? cutRanges.map((r, i) =>
-      '<button type="button" class="sound-cut-chip ' + (selectedCutIndex === i ? 'selected' : '') + '" data-cut-index="' + i + '" aria-pressed="' + (selectedCutIndex === i) + '"><i class="fa-solid fa-scissors"></i> ' + formatTime(r.start) + ' – ' + formatTime(r.end) + ' <span>Removed</span></button>'
-    ).join("") : '<span class="sound-cut-empty">No cuts yet.</span>';
-    cutList.querySelectorAll("[data-cut-index]").forEach(button => button.addEventListener("click", () => {
-      selectedCutIndex = Number(button.dataset.cutIndex);
+    const kept = segments.reduce((sum,segment)=>sum+Math.max(0,segment.end-segment.start),0);
+    document.getElementById("sound-cut-duration").textContent = formatTime(Math.max(0,clipEnd-clipStart-kept));
+    cutList.innerHTML = segments.length > 1 ? segments.map((segment,index)=>
+      '<button type="button" class="sound-cut-chip '+(selectedSegmentIndex===index?'selected':'')+'" data-segment-index="'+index+'" aria-pressed="'+(selectedSegmentIndex===index)+'"><i class="fa-solid fa-film"></i> Section '+(index+1)+' · '+formatTime(segment.start)+' – '+formatTime(segment.end)+(selectedSegmentIndex===index?' <span>Selected</span>':'')+'</button>'
+    ).join("") : '<span class="sound-cut-empty">No split sections yet. Select a range and split it to create editable sections.</span>';
+    cutList.querySelectorAll("[data-segment-index]").forEach(button=>button.addEventListener("click",()=>{
+      selectedSegmentIndex=Number(button.dataset.segmentIndex);
       updateEditor();
     }));
   }
   function resetEditor() {
-    decodedUpload = null; cutRanges = []; selectedCutIndex = null; clipStart = 0; clipEnd = 0;
+    decodedUpload = null; segments = []; selectedSegmentIndex = null; clipStart = 0; clipEnd = 0;
     if (uploadObjectUrl) URL.revokeObjectURL(uploadObjectUrl);
     if (editedObjectUrl) URL.revokeObjectURL(editedObjectUrl);
     uploadObjectUrl = ""; editedObjectUrl = "";
@@ -402,7 +401,7 @@
       const buffer = await context.decodeAudioData(await file.arrayBuffer());
       await context.close();
       if (!Number.isFinite(buffer.duration) || buffer.duration <= 0) throw new Error("This audio file could not be decoded.");
-      decodedUpload = buffer; clipStart = 0; clipEnd = buffer.duration;
+      decodedUpload = buffer; clipStart = 0; clipEnd = buffer.duration; segments = [{start:0,end:buffer.duration}]; selectedSegmentIndex = null;
       selectionStart.max = String(buffer.duration); selectionEnd.max = String(buffer.duration);
       selectionStart.value = "0"; selectionEnd.value = String(buffer.duration);
       document.getElementById("sound-editor-duration").textContent = formatTime(buffer.duration);
@@ -419,58 +418,49 @@
     if (Number(selectionEnd.value) < Number(selectionStart.value)) selectionStart.value = selectionEnd.value;
     updateEditor();
   });
-  document.getElementById("sound-set-clip")?.addEventListener("click", () => {
-    if (!decodedUpload) return;
-    const start = Number(selectionStart.value), end = Number(selectionEnd.value);
-    if (end - start < 0.05) { setStatus("Choose a clip range longer than 0.05 seconds.", "error"); return; }
-    clipStart = start; clipEnd = end;
-    cutRanges = cutRanges.map(r => ({start:Math.max(start,r.start),end:Math.min(end,r.end)})).filter(r => r.end-r.start > 0.02);
-    selectedCutIndex = null; updateEditor(); setStatus("Clip boundaries updated.", "success");
+  document.getElementById("sound-set-clip")?.addEventListener("click",()=>{
+    if(!decodedUpload)return;
+    const start=Number(selectionStart.value),end=Number(selectionEnd.value);
+    if(end-start<0.05){setStatus("Choose a clip range longer than 0.05 seconds.","error");return;}
+    clipStart=start;clipEnd=end;segments=[{start,end}];selectedSegmentIndex=null;
+    updateEditor();setStatus("Clip boundaries updated. Split the clip to create separate sections.","success");
   });
-  document.getElementById("sound-add-cut")?.addEventListener("click", () => {
-    if (!decodedUpload) return;
-    const start = Math.max(clipStart, Number(selectionStart.value));
-    const end = Math.min(clipEnd, Number(selectionEnd.value));
-    if (end - start < 0.05) { setStatus("Choose a section inside your clip to cut.", "error"); return; }
-    const ranges = [...cutRanges, {start,end}].sort((a,b) => a.start-b.start);
-    cutRanges = [];
-    for (const range of ranges) {
-      const last = cutRanges[cutRanges.length-1];
-      if (last && range.start <= last.end) last.end = Math.max(last.end,range.end);
-      else cutRanges.push({...range});
-    }
-    selectedCutIndex = cutRanges.findIndex(r => r.start <= start && r.end >= end);
-    updateEditor(); setStatus("Section cut. Select its chip and press Delete to restore it.", "success");
+  document.getElementById("sound-add-cut")?.addEventListener("click",()=>{
+    if(!decodedUpload)return;
+    const start=Number(selectionStart.value),end=Number(selectionEnd.value);
+    if(end-start<0.05){setStatus("Choose a section longer than 0.05 seconds to split.","error");return;}
+    const index=segments.findIndex(segment=>start>=segment.start-0.001&&end<=segment.end+0.001);
+    if(index<0){setStatus("The selected range must fit inside one existing section. Select a smaller range.","error");return;}
+    const current=segments[index],replacement=[];
+    if(start-current.start>0.02)replacement.push({start:current.start,end:start});
+    replacement.push({start,end});
+    if(current.end-end>0.02)replacement.push({start:end,end:current.end});
+    segments.splice(index,1,...replacement);
+    selectedSegmentIndex=index+(replacement.length===3?1:replacement.length===2&&start-current.start>0.02?1:0);
+    updateEditor();setStatus("Clip split into separate sections. Click a section and press Delete to remove it from the final audio.","success");
   });
-  document.getElementById("sound-reset-edits")?.addEventListener("click", () => {
-    if (!decodedUpload) return;
-    clipStart = 0; clipEnd = decodedUpload.duration; cutRanges = []; selectedCutIndex = null;
-    selectionStart.value = "0"; selectionEnd.value = String(decodedUpload.duration);
-    editedPreview.hidden = true; updateEditor(); setStatus("All edits reset.", "success");
+  document.getElementById("sound-reset-edits")?.addEventListener("click",()=>{
+    if(!decodedUpload)return;
+    clipStart=0;clipEnd=decodedUpload.duration;segments=[{start:0,end:decodedUpload.duration}];selectedSegmentIndex=null;
+    selectionStart.value="0";selectionEnd.value=String(decodedUpload.duration);
+    editedPreview.hidden=true;updateEditor();setStatus("All edits reset.","success");
   });
-  function makeEditedWav() {
-    const buffer = decodedUpload, rate = buffer.sampleRate, segments = [];
-    let cursor = clipStart;
-    for (const cut of cutRanges) {
-      const start = Math.max(clipStart,cut.start), end = Math.min(clipEnd,cut.end);
-      if (start > cursor) segments.push([cursor,start]);
-      cursor = Math.max(cursor,end);
-    }
-    if (cursor < clipEnd) segments.push([cursor,clipEnd]);
-    const frames = segments.reduce((sum,range) => sum + Math.max(0,Math.floor((range[1]-range[0])*rate)),0);
-    if (!frames) throw new Error("Your edits remove the entire clip.");
-    const channels = Math.min(2,buffer.numberOfChannels), bytes = new ArrayBuffer(44+frames*channels*2), view = new DataView(bytes);
-    const write = (offset,value) => { for(let i=0;i<value.length;i++) view.setUint8(offset+i,value.charCodeAt(i)); };
-    write(0,"RIFF"); view.setUint32(4,36+frames*channels*2,true); write(8,"WAVE"); write(12,"fmt ");
-    view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,channels,true);
-    view.setUint32(24,rate,true); view.setUint32(28,rate*channels*2,true); view.setUint16(32,channels*2,true); view.setUint16(34,16,true);
-    write(36,"data"); view.setUint32(40,frames*channels*2,true);
-    let out = 0;
-    for (const [a,b] of segments) {
-      const from = Math.floor(a*rate), to = Math.floor(b*rate);
-      for (let frame=from; frame<to; frame++) {
-        for (let channel=0; channel<channels; channel++) {
-          const sample = buffer.getChannelData(channel)[frame] || 0;
+  function makeEditedWav(){
+    const buffer=decodedUpload,rate=buffer.sampleRate;
+    const frames=segments.reduce((sum,segment)=>sum+Math.max(0,Math.floor((segment.end-segment.start)*rate)),0);
+    if(!frames)throw new Error("Your edits remove the entire clip.");
+    const channels=Math.min(2,buffer.numberOfChannels),bytes=new ArrayBuffer(44+frames*channels*2),view=new DataView(bytes);
+    const write=(offset,value)=>{for(let i=0;i<value.length;i++)view.setUint8(offset+i,value.charCodeAt(i));};
+    write(0,"RIFF");view.setUint32(4,36+frames*channels*2,true);write(8,"WAVE");write(12,"fmt ");
+    view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,channels,true);
+    view.setUint32(24,rate,true);view.setUint32(28,rate*channels*2,true);view.setUint16(32,channels*2,true);view.setUint16(34,16,true);
+    write(36,"data");view.setUint32(40,frames*channels*2,true);
+    let out=0;
+    for(const segment of segments){
+      const from=Math.floor(segment.start*rate),to=Math.floor(segment.end*rate);
+      for(let frame=from;frame<to;frame++){
+        for(let channel=0;channel<channels;channel++){
+          const sample=buffer.getChannelData(channel)[frame]||0;
           view.setInt16(44+(out*channels+channel)*2,Math.max(-1,Math.min(1,sample))*32767,true);
         }
         out++;
@@ -488,12 +478,16 @@
       setStatus("Previewing your edited clip.", "success");
     } catch (error) { setStatus(error.message, "error"); }
   });
-  document.addEventListener("keydown", event => {
-    if (!decodedUpload || selectedCutIndex === null || !["Delete","Backspace"].includes(event.key) || editor.hidden) return;
-    const target = event.target;
-    if (target && (/INPUT|TEXTAREA|SELECT/.test(target.tagName) || target.isContentEditable)) return;
-    event.preventDefault(); cutRanges.splice(selectedCutIndex,1); selectedCutIndex = null;
-    updateEditor(); setStatus("Selected cut section restored to the clip.", "success");
+  document.addEventListener("keydown",event=>{
+    if(!decodedUpload||selectedSegmentIndex===null||!["Delete","Backspace"].includes(event.key)||editor.hidden)return;
+    const target=event.target;
+    if(target&&(/INPUT|TEXTAREA|SELECT/.test(target.tagName)||target.isContentEditable))return;
+    if(segments.length<=1){setStatus("Split the audio into sections before deleting a section.","error");selectedSegmentIndex=null;updateEditor();return;}
+    event.preventDefault();
+    segments.splice(selectedSegmentIndex,1);
+    selectedSegmentIndex=null;
+    updateEditor();
+    setStatus("Selected audio section removed from the final clip.","success");
   });
   form.addEventListener("submit", async event => {
     event.preventDefault();
