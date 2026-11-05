@@ -44,6 +44,7 @@ let state = {
   passwordResets: {},
   aiChats: {},
   sounds: [],
+  soundFavorites: {},
 };
 let writeQueue = Promise.resolve();
 
@@ -66,6 +67,7 @@ async function loadState() {
         passwordResets: parsed.passwordResets && typeof parsed.passwordResets === "object" ? parsed.passwordResets : {},
         aiChats: parsed.aiChats && typeof parsed.aiChats === "object" ? parsed.aiChats : {},
         sounds: Array.isArray(parsed.sounds) ? parsed.sounds.slice(-2000) : [],
+        soundFavorites: parsed.soundFavorites && typeof parsed.soundFavorites === "object" ? parsed.soundFavorites : {},
       };
       state.friendships = normalizeFriendshipEntries(state.friendships, state.friendRequests);
       for (const user of Object.values(state.users)) {
@@ -342,6 +344,55 @@ function publicSound(sound) {
 router.get("/sounds", (_req, res) => {
   res.set("Cache-Control", "no-store");
   res.json({ sounds: state.sounds.slice().reverse().map(publicSound) });
+});
+
+// MyInstants catalog proxy. Keep the upstream MP3 links external instead of copying
+// third-party audio into Lunar's upload storage.
+const MYINSTANTS_API_BASE = process.env.MYINSTANTS_API_BASE || "https://myinstants-api.page.gd";
+const MYINSTANTS_ENDPOINTS = new Set(["trending", "search", "recent", "best"]);
+router.get("/sounds/browse", async (req, res) => {
+  const endpoint = String(req.query.type || "trending").toLowerCase();
+  if (!MYINSTANTS_ENDPOINTS.has(endpoint)) return res.status(400).json({ error: "Choose trending, search, recent, or best." });
+  const query = cleanText(String(req.query.q || ""), 80);
+  if (endpoint === "search" && !query) return res.status(400).json({ error: "Enter a search term." });
+  const page = Math.max(1, Math.min(500, Number.parseInt(req.query.page || "1", 10) || 1));
+  try {
+    const url = new URL("/" + endpoint, MYINSTANTS_API_BASE);
+    if (query) url.searchParams.set("q", query);
+    url.searchParams.set("page", String(page));
+    const response = await fetch(url.toString(), { timeout: 12000, headers: { "Accept": "application/json", "User-Agent": "LunarSoundboard/1.0 (MyInstants API attribution)" } });
+    if (!response.ok) return res.status(502).json({ error: "The MyInstants catalog is temporarily unavailable." });
+    const payload = await response.json();
+    const entries = Array.isArray(payload.data) ? payload.data : [];
+    const catalog = entries.map(item => ({
+      id: cleanText(String(item.id || ""), 140),
+      title: cleanText(String(item.title || "Untitled sound"), 120),
+      sourceUrl: typeof item.url === "string" && /^https:\/\/www\.myinstants\.com\//i.test(item.url) ? item.url : "",
+      audioUrl: typeof item.mp3 === "string" && /^https:\/\/www\.myinstants\.com\/media\/sounds\/[a-z0-9_./%-]+$/i.test(item.mp3) ? item.mp3 : "",
+      duration: Number.isFinite(Number(item.duration)) ? Number(item.duration) : null,
+      source: "MyInstants",
+    })).filter(item => item.id && item.audioUrl);
+    res.set("Cache-Control", "public, max-age=300");
+    res.json({ sounds: catalog, page, totalPages: Number(payload.total_pages) || null, hasNext: Boolean(payload.has_next), source: "MyInstants", attribution: "MyInstants API by abdipr · MyInstants.com" });
+  } catch (error) {
+    console.warn("[Lunar Soundboard] MyInstants browse failed:", error.message);
+    res.status(502).json({ error: "Could not connect to the MyInstants catalog. Try again shortly." });
+  }
+});
+
+router.get("/sounds/favorites", requireUser, (req, res) => {
+  const ids = Array.isArray(state.soundFavorites[req.user.id]) ? state.soundFavorites[req.user.id] : [];
+  res.set("Cache-Control", "no-store");
+  res.json({ favorites: ids });
+});
+router.post("/sounds/favorites/:id", requireUser, async (req, res) => {
+  const id = cleanText(req.params.id, 160);
+  if (!id) return res.status(400).json({ error: "Invalid sound ID." });
+  const favorites = new Set(Array.isArray(state.soundFavorites[req.user.id]) ? state.soundFavorites[req.user.id] : []);
+  if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
+  state.soundFavorites[req.user.id] = [...favorites].slice(-1000);
+  await persist();
+  res.json({ favorited: favorites.has(id), favorites: state.soundFavorites[req.user.id] });
 });
 router.post("/sounds/upload", requireUser, express.raw({ type: req => /^audio\//i.test(String(req.headers["content-type"] || "")), limit: MAX_SOUND_BYTES }), async (req, res) => {
   const contentType = String(req.headers["content-type"] || "").split(";")[0].toLowerCase();
