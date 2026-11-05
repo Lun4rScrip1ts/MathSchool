@@ -394,6 +394,8 @@ router.get("/sounds/lots", async (req, res) => {
     } else {
       if (page > 1) return res.json({ sounds: [], page, hasMore: false, sampleOnly: true, message: "Add LOTS_OF_SOUNDS_API_KEY to enable the full catalog." });
       url = new URL("/api/v1/sounds/sample", "https://api.lotsofsounds.com");
+      url.searchParams.set("limit", "12");
+      if (query) url.searchParams.set("q", query);
     }
     const response = await fetch(url.toString(), { headers, signal: AbortSignal.timeout(15000) });
     const payload = await response.json().catch(() => ({}));
