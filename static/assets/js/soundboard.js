@@ -2,10 +2,10 @@
   const list = document.getElementById("soundboard-list");
   const viewTitle = document.getElementById("soundboard-view-title");
   const browseTools = document.getElementById("soundboard-browse-tools");
-  const pagination = document.getElementById("soundboard-pagination");
-  const pageLabel = document.getElementById("soundboard-page-label");
-  const previousPage = document.getElementById("soundboard-prev");
-  const nextPage = document.getElementById("soundboard-next");
+  const loadStatus = document.getElementById("soundboard-load-status");
+  const randomizeButton = document.getElementById("soundboard-randomize");
+  const shopPanel = document.getElementById("soundboard-shop-panel");
+  const sourceNote = document.getElementById("soundboard-source-note");
   const searchForm = document.getElementById("soundboard-search-form");
   const searchInput = document.getElementById("soundboard-search");
   const count = document.getElementById("soundboard-count");
@@ -21,11 +21,14 @@
   let sounds = [];
   let currentUser = null;
   let currentView = "community";
-  let catalogType = "trending";
   let catalogPage = 1;
-  let catalogTotalPages = null;
+  let catalogHasMore = false;
+  let catalogLoading = false;
+  let activeProvider = "lots";
+  let catalogExhausted = false;
   let favorites = new Set();
   let externalSounds = [];
+  let catalogSeen = new Set();
 
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
   const formatTime = value => {
@@ -69,14 +72,14 @@
       const favorite = favorites.has(sound.favoriteKey || sound.id);
       const favButton = currentUser ? '<button type="button" class="soundboard-favorite ' + (favorite ? 'active' : '') + '" data-favorite="' + escapeHtml(sound.favoriteKey || sound.id) + '" aria-label="' + (favorite ? 'Remove from favorites' : 'Add to favorites') + '" aria-pressed="' + favorite + '"><i class="fa-solid fa-heart"></i></button>' : '';
       return '<article class="soundboard-card" data-sound-id="' + escapeHtml(sound.id) + '">' +
-        '<div class="soundboard-card-top"><span class="soundboard-card-icon"><i class="fa-solid fa-wave-square"></i></span><div class="soundboard-card-info"><strong title="' + escapeHtml(sound.title) + '">' + escapeHtml(sound.title) + '</strong><small>by ' + escapeHtml(sound.author) + '</small></div><span class="soundboard-card-duration">' + formatTime(sound.duration) + '</span>' + favButton +
+        '<div class="soundboard-card-top"><span class="soundboard-card-icon"><i class="fa-solid fa-wave-square"></i></span><div class="soundboard-card-info"><strong title="' + escapeHtml(sound.title) + '">' + escapeHtml(sound.title) + '</strong><small>by ' + escapeHtml(sound.author) + (sound.license ? ' · ' + escapeHtml(sound.license) : '') + '</small></div><span class="soundboard-card-duration">' + formatTime(sound.duration) + '</span>' + favButton +
         '<div class="soundboard-play-controls"><button class="soundboard-play" type="button" data-play="' + escapeHtml(sound.id) + '" aria-label="Play ' + escapeHtml(sound.title) + '" title="Play sound"><i class="fa-solid fa-play"></i></button><button class="soundboard-pause" type="button" data-pause="' + escapeHtml(sound.id) + '" aria-label="Pause ' + escapeHtml(sound.title) + '" title="Pause sound"><i class="fa-solid fa-pause"></i></button></div></div>' +
         '<div class="soundboard-audio-controls"><input class="soundboard-timeline" data-seek="' + escapeHtml(sound.id) + '" type="range" min="0" max="' + Math.max(0.1, Number(sound.duration) || 0.1) + '" step="0.1" value="0" aria-label="Audio timeline">' +
         '<div class="soundboard-control-row"><span class="soundboard-time" data-time="' + escapeHtml(sound.id) + '">0:00 / ' + formatTime(sound.duration) + '</span>' +
         '<label class="soundboard-time">Volume <input class="soundboard-volume" data-volume="' + escapeHtml(sound.id) + '" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume"></label>' +
         '<button type="button" class="soundboard-loop" data-loop="' + escapeHtml(sound.id) + '" aria-pressed="false"><i class="fa-solid fa-repeat"></i> Loop</button>' +
-        (canDelete ? '<button type="button" class="soundboard-delete" data-delete="' + escapeHtml(sound.id) + '" title="Delete your sound"><i class="fa-solid fa-trash"></i></button>' : '') +
-        '</div></div>' + (sound.sourceUrl ? '<a class="soundboard-external" href="' + escapeHtml(sound.sourceUrl) + '" target="_blank" rel="noopener noreferrer">View on MyInstants <i class="fa-solid fa-arrow-up-right-from-square"></i></a>' : '') + '</article>';
+        (sound.downloadUrl ? '<a class="soundboard-download" href="' + escapeHtml(sound.downloadUrl) + '" download="' + escapeHtml((sound.title || 'sound').replace(/[^a-z0-9_-]+/gi,'-').toLowerCase()) + '.mp3" target="_blank" rel="noopener noreferrer" title="Download sound"><i class="fa-solid fa-download"></i> Download</a>' : '') + (canDelete ? '<button type="button" class="soundboard-delete" data-delete="' + escapeHtml(sound.id) + '" title="Delete your sound"><i class="fa-solid fa-trash"></i></button>' : '') +
+        '</div></div>' + (sound.sourceUrl ? '<a class="soundboard-external" href="' + escapeHtml(sound.sourceUrl) + '" target="_blank" rel="noopener noreferrer">View source <i class="fa-solid fa-arrow-up-right-from-square"></i></a>' : '') + '</article>';
     }).join("");
     list.querySelectorAll("[data-play]").forEach(button => button.addEventListener("click", () => play(button.dataset.play)));
     list.querySelectorAll("[data-pause]").forEach(button => button.addEventListener("click", () => {
@@ -185,35 +188,72 @@
   }
 
   function normalizeCatalog(item) {
-    return {id:"myinstants:" + item.id, favoriteKey:"myinstants:" + item.id, title:item.title || "Untitled sound", author:"MyInstants", duration:Number(item.duration) || 0, audioUrl:item.audioUrl, sourceUrl:item.sourceUrl || ""};
+    const id = String(item.id || "");
+    return {id:"lots:" + id, favoriteKey:"lots:" + id, title:item.name || item.title || "Untitled sound", author:"Lots of Sounds", duration:Number(item.duration) || 0, audioUrl:item.audioUrl || item.stream_url || item.preview_url || "", downloadUrl:item.downloadUrl || item.download_url || item.audioUrl || item.stream_url || "", sourceUrl:item.sourceUrl || "https://www.lotsofsounds.com/sounds", license:item.license || "CC0"};
   }
 
-  async function loadBrowse() {
-    list.innerHTML = '<div class="soundboard-empty"><i class="fa-solid fa-spinner fa-spin"></i><strong>Loading MyInstants…</strong></div>';
-    pagination.hidden = true;
-    const params = new URLSearchParams({type:catalogType, page:String(catalogPage)});
-    if (catalogType === "search") params.set("q", searchInput.value.trim());
+  function shuffle(items) {
+    const result = [...items];
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+  }
+
+  async function fetchBrowsePage(page) {
+    const params = new URLSearchParams({page:String(page), limit:"8"});
+    if (searchInput.value.trim()) params.set("q", searchInput.value.trim());
+    const response = await fetch("/api/sounds/lots?" + params.toString(), {credentials:"same-origin", cache:"no-store"});
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Lots of Sounds is unavailable.");
+    return data;
+  }
+
+  async function loadBrowse(reset = true) {
+    if (activeProvider === "shop") {
+      shopPanel.hidden = false;
+      list.innerHTML = '<div class="soundboard-empty"><strong>SoundBoardShop opens externally</strong><span>Use the link above to browse its full sound collection.</span></div>';
+      count.textContent = "SoundBoardShop · external catalog";
+      if (loadStatus) loadStatus.hidden = true;
+      return;
+    }
+    shopPanel.hidden = true;
+    if (catalogLoading) return;
+    if (reset) {
+      catalogPage = 1; catalogHasMore = false; catalogExhausted = false;
+      catalogSeen.clear(); sounds = [];
+      list.innerHTML = '<div class="soundboard-empty"><i class="fa-solid fa-spinner fa-spin"></i><strong>Loading a few sounds…</strong></div>';
+    }
+    if (catalogExhausted) return;
+    catalogLoading = true;
+    if (loadStatus) { loadStatus.hidden = false; loadStatus.textContent = "Loading more sounds…"; }
     try {
-      const response = await fetch("/api/sounds/browse?" + params.toString(), {credentials:"same-origin", cache:"no-store"});
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || "Browse is unavailable.");
-      const items = (data.sounds || []).map(normalizeCatalog);
+      const data = await fetchBrowsePage(catalogPage);
+      let items = (data.sounds || []).map(normalizeCatalog).filter(item => item.id && item.audioUrl && !catalogSeen.has(item.id));
+      items.forEach(item => catalogSeen.add(item.id));
+      if (reset) items = shuffle(items);
       externalSounds = [...externalSounds.filter(existing => !items.some(item => item.id === existing.id)), ...items];
-      catalogTotalPages = data.totalPages || null;
-      count.textContent = items.length + " catalog sounds · MyInstants";
-      if (items.length) renderSounds(items);
-      else list.innerHTML = '<div class="soundboard-empty"><strong>No sounds found</strong><span>Try another search or category.</span></div>';
-      pagination.hidden = false;
-      pageLabel.textContent = "Page " + catalogPage + (catalogTotalPages ? " of " + catalogTotalPages : "");
-      previousPage.disabled = catalogPage <= 1;
-      nextPage.disabled = !data.hasNext && catalogTotalPages !== null;
+      sounds = [...sounds, ...items];
+      catalogHasMore = Boolean(data.hasMore);
+      catalogExhausted = !catalogHasMore || !items.length;
+      render();
+      count.textContent = sounds.length + (data.total ? " of " + data.total : "") + " sounds · Lots of Sounds";
+      if (loadStatus) { loadStatus.hidden = catalogExhausted; loadStatus.textContent = "Scroll for more sounds…"; }
+      catalogPage += 1;
+      if (!sounds.length) list.innerHTML = '<div class="soundboard-empty"><strong>No sounds found</strong><span>Try a shorter search, or open SoundBoardShop for more choices.</span></div>';
     } catch (error) {
       list.innerHTML = '<div class="soundboard-empty"><i class="fa-solid fa-circle-exclamation"></i><strong>Browse unavailable</strong><span>' + escapeHtml(error.message) + '</span></div>';
-      count.textContent = "MyInstants catalog unavailable";
-    }
+      count.textContent = "Lots of Sounds unavailable";
+      if (loadStatus) loadStatus.hidden = true;
+    } finally { catalogLoading = false; }
   }
 
   function renderSounds(items) { sounds = items; render(); }
+
+  async function loadMoreBrowse() {
+    if (currentView === "browse" && activeProvider === "lots" && catalogHasMore && !catalogLoading && !catalogExhausted) await loadBrowse(false);
+  }
 
   async function loadFavoritesView() {
     if (!currentUser) {
@@ -228,15 +268,28 @@
       if (!response.ok) throw new Error(data.error || "Could not load community sounds.");
       const community = (data.sounds || []).map(sound => ({...sound, favoriteKey:"community:" + sound.id}));
       const local = community.filter(item => favorites.has(item.favoriteKey));
-      const externalIds = [...favorites].filter(id => id.startsWith("myinstants:"));
-      const external = externalIds.map(id => externalSounds.find(item => item.favoriteKey === id)).filter(Boolean);
-      const missing = externalIds.filter(id => !external.some(item => item.favoriteKey === id));
-      for (const favoriteId of missing) {
+      const externalIds = [...favorites].filter(id => id.startsWith("lots:"));
+      let external = externalIds.map(id => externalSounds.find(item => item.favoriteKey === id)).filter(Boolean);
+      if (external.length !== externalIds.length) {
         try {
-          const detailResponse = await fetch("/api/sounds/browse?type=detail&id=" + encodeURIComponent(favoriteId.slice(10)), {cache:"no-store"});
-          if (!detailResponse.ok) continue;
-          const detailData = await detailResponse.json();
-          if (detailData.sound) external.push(normalizeCatalog(detailData.sound));
+          const sampleResponse = await fetch("/api/sounds/lots", {credentials:"same-origin", cache:"no-store"});
+          const sampleData = await sampleResponse.json();
+          const sampleItems = (sampleData.sounds || []).map(normalizeCatalog);
+          externalSounds = [...externalSounds, ...sampleItems];
+          external = externalIds.map(id => externalSounds.find(item => item.favoriteKey === id)).filter(Boolean);
+          const unresolved = externalIds.filter(id => !external.some(item => item.favoriteKey === id));
+          for (const favoriteId of unresolved) {
+            try {
+              const detailResponse = await fetch("/api/sounds/lots/" + encodeURIComponent(favoriteId.slice(5)), {credentials:"same-origin", cache:"no-store"});
+              if (!detailResponse.ok) continue;
+              const detailData = await detailResponse.json();
+              if (detailData.sound) {
+                const saved = normalizeCatalog(detailData.sound);
+                externalSounds.push(saved);
+                external.push(saved);
+              }
+            } catch {}
+          }
         } catch {}
       }
       const combined = [...local, ...external];
@@ -256,9 +309,9 @@
       button.setAttribute("aria-selected", String(active));
     });
     browseTools.hidden = view !== "browse";
-    pagination.hidden = view !== "browse";
+    if (loadStatus) loadStatus.hidden = view !== "browse";
     document.getElementById("soundboard-refresh").hidden = view === "favorites";
-    viewTitle.textContent = view === "community" ? "Community sounds" : view === "browse" ? "Browse MyInstants" : "Favorite sounds";
+    viewTitle.textContent = view === "community" ? "Community sounds" : view === "browse" ? "Browse sound libraries" : "Favorite sounds";
     if (view === "community") await loadSounds();
     else if (view === "browse") await loadBrowse();
     else await loadFavoritesView();
@@ -309,9 +362,22 @@
   });
   document.getElementById("soundboard-refresh")?.addEventListener("click", () => switchView(currentView));
   document.querySelectorAll("[data-view]").forEach(button => button.addEventListener("click", () => switchView(button.dataset.view)));
-  searchForm?.addEventListener("submit", event => { event.preventDefault(); if (!searchInput.value.trim()) return; catalogType = "search"; catalogPage = 1; document.querySelectorAll("[data-catalog]").forEach(button => button.classList.remove("active")); loadBrowse(); });
-  document.querySelectorAll("[data-catalog]").forEach(button => button.addEventListener("click", () => { catalogType = button.dataset.catalog; catalogPage = 1; document.querySelectorAll("[data-catalog]").forEach(item => item.classList.toggle("active", item === button)); searchInput.value = ""; loadBrowse(); }));
-  previousPage?.addEventListener("click", () => { if (catalogPage > 1) { catalogPage--; loadBrowse(); } });
-  nextPage?.addEventListener("click", () => { if (catalogPage < 500 && (catalogTotalPages === null || catalogPage < catalogTotalPages)) { catalogPage++; loadBrowse(); } });
+  searchForm?.addEventListener("submit", event => { event.preventDefault(); loadBrowse(true); });
+  document.querySelectorAll("[data-provider]").forEach(button => button.addEventListener("click", () => {
+    activeProvider = button.dataset.provider;
+    document.querySelectorAll("[data-provider]").forEach(item => item.classList.toggle("active", item === button));
+    searchForm.hidden = activeProvider !== "lots";
+    if (sourceNote) sourceNote.hidden = activeProvider !== "lots";
+    if (randomizeButton) randomizeButton.hidden = activeProvider !== "lots";
+    loadBrowse(true);
+  }));
+  randomizeButton?.addEventListener("click", () => {
+    if (sounds.length > 1) { sounds = shuffle(sounds); render(); setStatus("Sound order randomized.", "success"); }
+    else loadBrowse(true);
+  });
+  const browseObserver = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting)) loadMoreBrowse();
+  }, {rootMargin:"700px"});
+  if (loadStatus) browseObserver.observe(loadStatus);
   loadUser().then(async () => { await loadFavorites(); await loadSounds(); });
 })();

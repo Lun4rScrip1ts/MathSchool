@@ -22,3 +22,12 @@
 @media(max-width:520px){.soundboard-search-form{flex-direction:column}.soundboard-search-form .soundboard-primary{min-height:42px}.soundboard-control-row{flex-wrap:wrap}}
 
 .soundboard-play-controls{display:flex;align-items:center;gap:6px;flex:0 0 auto}.soundboard-play,.soundboard-pause{width:34px;height:34px;border:1px solid rgba(150,133,255,.24);border-radius:50%;background:rgba(140,122,255,.16);color:#c5baff;cursor:pointer;display:grid;place-items:center}.soundboard-pause{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.13);color:inherit}.soundboard-play:hover,.soundboard-pause:hover{background:rgba(140,122,255,.28)}
+.soundboard-provider-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.soundboard-provider,.soundboard-randomize{border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 13px;background:rgba(255,255,255,.045);color:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.soundboard-provider.active{border-color:rgba(162,146,255,.55);background:rgba(140,122,255,.17);color:#c8beff}
+.soundboard-randomize{margin-left:auto;background:rgba(140,122,255,.16);border-color:rgba(162,146,255,.3);color:#c8beff}
+.soundboard-shop-panel{margin-top:12px;padding:15px;border:1px solid rgba(255,255,255,.1);border-radius:13px;background:rgba(255,255,255,.035);font-size:12px}
+.soundboard-shop-panel p{opacity:.7;line-height:1.5}.soundboard-shop-panel a{color:#c8beff;text-decoration:none}.soundboard-shop-panel small{display:block;margin-top:8px;opacity:.5}
+.soundboard-load-status{text-align:center;padding:18px;font-size:11px;opacity:.6}
+.soundboard-download{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:6px 9px;color:#c8beff;text-decoration:none;font-size:11px;background:rgba(140,122,255,.08)}
+.soundboard-control-row{flex-wrap:wrap}
