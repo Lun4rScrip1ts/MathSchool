@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/assets/css/global.css">
   <link rel="stylesheet" href="/assets/css/nav.css?v=lunar14">
   <link rel="stylesheet" href="/assets/css/lunar.css?v=lunar9">
-  <link rel="stylesheet" href="/assets/css/soundboard.css?v=3">
+  <link rel="stylesheet" href="/assets/css/soundboard.css?v=4">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="/assets/js/storage.js?v=lunar7"></script>
   <script src="/assets/js/main.js?v=lunar17"></script>
@@ -38,20 +38,21 @@
       </div>
       <div class="soundboard-section-heading"><div><span id="soundboard-view-title">Community sounds</span><small id="soundboard-count">Loading sounds…</small></div><button type="button" id="soundboard-refresh" class="soundboard-refresh" title="Refresh sounds"><i class="fa-solid fa-rotate"></i></button></div>
       <div id="soundboard-browse-tools" class="soundboard-browse-tools" hidden>
-        <form id="soundboard-search-form" class="soundboard-search-form"><input id="soundboard-search" type="search" maxlength="80" placeholder="Search MyInstants sounds" aria-label="Search MyInstants sounds"><button type="submit" class="soundboard-primary"><i class="fa-solid fa-magnifying-glass"></i> Search</button></form>
-        <div class="soundboard-browse-categories">
-          <button type="button" data-catalog="trending" class="active">Trending</button>
-          <button type="button" data-catalog="recent">Recent</button>
-          <button type="button" data-catalog="best">Popular</button>
+        <div class="soundboard-provider-row">
+          <button type="button" class="soundboard-provider active" data-provider="lots">Lots of Sounds</button>
+          <button type="button" class="soundboard-provider" data-provider="shop">SoundBoardShop</button>
+          <button type="button" id="soundboard-randomize" class="soundboard-randomize"><i class="fa-solid fa-shuffle"></i> Randomize</button>
         </div>
-        <p class="soundboard-source-note">Browse catalog powered by <a href="https://github.com/abdipr/myinstants-api" target="_blank" rel="noopener noreferrer">MyInstants API by abdipr</a>. Audio remains hosted by <a href="https://www.myinstants.com" target="_blank" rel="noopener noreferrer">MyInstants.com</a>.</p>
+        <form id="soundboard-search-form" class="soundboard-search-form"><input id="soundboard-search" type="search" maxlength="80" placeholder="Search sounds (full catalog needs API access)" aria-label="Search sounds"><button type="submit" class="soundboard-primary"><i class="fa-solid fa-magnifying-glass"></i> Search</button></form>
+        <p class="soundboard-source-note" id="soundboard-source-note">Lots of Sounds provides free CC0 sample audio. Full catalog search requires an API key configured on the server. <a href="https://www.lotsofsounds.com/sounds" target="_blank" rel="noopener noreferrer">Open full library</a>.</p>
+        <div id="soundboard-shop-panel" class="soundboard-shop-panel" hidden><strong>SoundBoardShop</strong><p>Browse its meme, reaction, and gaming sound collection. It does not provide a documented public catalog API, so sounds open on its website rather than being copied into Lunar.</p><a href="https://www.soundboardshop.com/en/soundboard" target="_blank" rel="noopener noreferrer">Open SoundBoardShop <i class="fa-solid fa-arrow-up-right-from-square"></i></a><small>Check each sound’s usage terms before downloading or reusing it.</small></div>
       </div>
       <div id="soundboard-list" class="soundboard-list"><div class="soundboard-empty"><i class="fa-solid fa-spinner fa-spin"></i><strong>Loading sounds…</strong></div></div>
-      <div class="soundboard-pagination" id="soundboard-pagination" hidden><button type="button" id="soundboard-prev" disabled>Previous</button><span id="soundboard-page-label">Page 1</span><button type="button" id="soundboard-next">Next</button></div>
+      <div id="soundboard-load-status" class="soundboard-load-status" hidden>Scroll for more sounds…</div>
     </section>
     <p class="soundboard-footnote"><i class="fa-solid fa-headphones"></i> Every Play button starts its own audio player. Multiple sounds can play at the same time; use each card’s controls to manage it.</p>
   </main>
-  <script src="/assets/js/soundboard.js?v=3"></script>
+  <script src="/assets/js/soundboard.js?v=4"></script>
   <script src="/assets/js/lunar.js"></script>
 </body>
 </html>
