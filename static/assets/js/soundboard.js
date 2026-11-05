@@ -202,7 +202,7 @@
   }
 
   async function fetchBrowsePage(page) {
-    const params = new URLSearchParams({page:String(page), limit:"20"});
+    const params = new URLSearchParams({page:String(page), limit:"8"});
     if (searchInput.value.trim()) params.set("q", searchInput.value.trim());
     const response = await fetch("/api/sounds/lots?" + params.toString(), {credentials:"same-origin", cache:"no-store"});
     const data = await response.json().catch(() => ({}));
