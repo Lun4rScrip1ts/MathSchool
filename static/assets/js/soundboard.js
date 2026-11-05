@@ -70,7 +70,7 @@
       const favButton = currentUser ? '<button type="button" class="soundboard-favorite ' + (favorite ? 'active' : '') + '" data-favorite="' + escapeHtml(sound.favoriteKey || sound.id) + '" aria-label="' + (favorite ? 'Remove from favorites' : 'Add to favorites') + '" aria-pressed="' + favorite + '"><i class="fa-solid fa-heart"></i></button>' : '';
       return '<article class="soundboard-card" data-sound-id="' + escapeHtml(sound.id) + '">' +
         '<div class="soundboard-card-top"><span class="soundboard-card-icon"><i class="fa-solid fa-wave-square"></i></span><div class="soundboard-card-info"><strong title="' + escapeHtml(sound.title) + '">' + escapeHtml(sound.title) + '</strong><small>by ' + escapeHtml(sound.author) + '</small></div><span class="soundboard-card-duration">' + formatTime(sound.duration) + '</span>' + favButton +
-        '<button class="soundboard-play" type="button" data-play="' + escapeHtml(sound.id) + '" aria-label="Play ' + escapeHtml(sound.title) + '" title="Play sound"><i class="fa-solid fa-play"></i></button></div>' +
+        '<div class="soundboard-play-controls"><button class="soundboard-play" type="button" data-play="' + escapeHtml(sound.id) + '" aria-label="Play ' + escapeHtml(sound.title) + '" title="Play sound"><i class="fa-solid fa-play"></i></button><button class="soundboard-pause" type="button" data-pause="' + escapeHtml(sound.id) + '" aria-label="Pause ' + escapeHtml(sound.title) + '" title="Pause sound"><i class="fa-solid fa-pause"></i></button></div></div>' +
         '<div class="soundboard-audio-controls"><input class="soundboard-timeline" data-seek="' + escapeHtml(sound.id) + '" type="range" min="0" max="' + Math.max(0.1, Number(sound.duration) || 0.1) + '" step="0.1" value="0" aria-label="Audio timeline">' +
         '<div class="soundboard-control-row"><span class="soundboard-time" data-time="' + escapeHtml(sound.id) + '">0:00 / ' + formatTime(sound.duration) + '</span>' +
         '<label class="soundboard-time">Volume <input class="soundboard-volume" data-volume="' + escapeHtml(sound.id) + '" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume"></label>' +
@@ -79,6 +79,10 @@
         '</div></div>' + (sound.sourceUrl ? '<a class="soundboard-external" href="' + escapeHtml(sound.sourceUrl) + '" target="_blank" rel="noopener noreferrer">View on MyInstants <i class="fa-solid fa-arrow-up-right-from-square"></i></a>' : '') + '</article>';
     }).join("");
     list.querySelectorAll("[data-play]").forEach(button => button.addEventListener("click", () => play(button.dataset.play)));
+    list.querySelectorAll("[data-pause]").forEach(button => button.addEventListener("click", () => {
+      const audio = players.get(button.dataset.pause);
+      if (audio) audio.pause();
+    }));
     list.querySelectorAll("[data-seek]").forEach(input => input.addEventListener("input", () => {
       const audio = players.get(input.dataset.seek);
       if (audio && Number.isFinite(audio.duration)) audio.currentTime = Number(input.value);
@@ -94,7 +98,6 @@
       button.setAttribute("aria-pressed", String(audio.loop));
     }));
     list.querySelectorAll("[data-delete]").forEach(button => button.addEventListener("click", () => removeSound(button.dataset.delete)));
-    list.querySelectorAll("[data-favorite]").forEach(button => button.addEventListener("click", () => toggleFavorite(button.dataset.favorite)));
     list.querySelectorAll("[data-favorite]").forEach(button => button.addEventListener("click", () => toggleFavorite(button.dataset.favorite)));
   }
 
@@ -112,6 +115,14 @@
       if (seek && !seek.matches(":active")) seek.value = String(audio.currentTime);
       if (time) time.textContent = formatTime(audio.currentTime) + " / " + formatTime(audio.duration || sound.duration);
     });
+    audio.addEventListener("play", () => {
+      const button = list.querySelector('[data-play="' + CSS.escape(id) + '"]');
+      if (button) button.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+    });
+    audio.addEventListener("pause", () => {
+      const button = list.querySelector('[data-play="' + CSS.escape(id) + '"]');
+      if (button) button.innerHTML = '<i class="fa-solid fa-play"></i>';
+    });
     audio.addEventListener("ended", () => {
       if (!audio.loop) {
         const button = list.querySelector('[data-play="' + CSS.escape(id) + '"]');
@@ -125,7 +136,6 @@
   async function play(id) {
     const audio = makePlayer(id);
     if (!audio) return;
-    // Play-only button: clicking again restarts the clip instead of pausing it.
     try {
       audio.currentTime = 0;
       await audio.play();
@@ -152,38 +162,30 @@
     }
   }
 
+
   async function loadFavorites() {
     if (!currentUser) { favorites = new Set(); return; }
-    try {
-      const response = await fetch("/api/sounds/favorites", {credentials:"same-origin", cache:"no-store"});
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not load favorites.");
-      favorites = new Set(data.favorites || []);
-    } catch { favorites = new Set(); }
+    const response = await fetch("/api/sounds/favorites", {credentials:"same-origin", cache:"no-store"});
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not load favorites.");
+    favorites = new Set(data.favorites || []);
   }
 
   async function toggleFavorite(id) {
     if (!currentUser) { setStatus("Log in to save favorites.", "error"); return; }
     try {
-      const response = await fetch("/api/sounds/favorites/" + encodeURIComponent(id), {method:"POST", credentials:"same-origin"});
+      const response = await fetch("/api/sounds/favorites/" + encodeURIComponent(id), {method:"POST", credentials:"same-origin", cache:"no-store"});
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Could not update favorite.");
       favorites = new Set(data.favorites || []);
       if (currentView === "favorites") await loadFavoritesView();
       else render();
+      setStatus(data.favorited ? "Added to favorites." : "Removed from favorites.", "success");
     } catch (error) { setStatus(error.message, "error"); }
   }
 
   function normalizeCatalog(item) {
-    return {
-      id: "myinstants:" + item.id,
-      favoriteKey: "myinstants:" + item.id,
-      title: item.title,
-      author: "MyInstants",
-      duration: item.duration || 0,
-      audioUrl: item.audioUrl,
-      sourceUrl: item.sourceUrl,
-    };
+    return {id:"myinstants:" + item.id, favoriteKey:"myinstants:" + item.id, title:item.title || "Untitled sound", author:"MyInstants", duration:Number(item.duration) || 0, audioUrl:item.audioUrl, sourceUrl:item.sourceUrl || ""};
   }
 
   async function loadBrowse() {
@@ -192,15 +194,15 @@
     const params = new URLSearchParams({type:catalogType, page:String(catalogPage)});
     if (catalogType === "search") params.set("q", searchInput.value.trim());
     try {
-      const response = await fetch("/api/sounds/browse?" + params.toString(), {cache:"no-store"});
-      const data = await response.json();
+      const response = await fetch("/api/sounds/browse?" + params.toString(), {credentials:"same-origin", cache:"no-store"});
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Browse is unavailable.");
-      externalSounds = (data.sounds || []).map(normalizeCatalog);
+      const items = (data.sounds || []).map(normalizeCatalog);
+      externalSounds = [...externalSounds.filter(existing => !items.some(item => item.id === existing.id)), ...items];
       catalogTotalPages = data.totalPages || null;
-      count.textContent = externalSounds.length + " catalog sounds · MyInstants";
-      if (!externalSounds.length) {
-        list.innerHTML = '<div class="soundboard-empty"><strong>No sounds found</strong><span>Try another search or category.</span></div>';
-      } else renderSounds(externalSounds);
+      count.textContent = items.length + " catalog sounds · MyInstants";
+      if (items.length) renderSounds(items);
+      else list.innerHTML = '<div class="soundboard-empty"><strong>No sounds found</strong><span>Try another search or category.</span></div>';
       pagination.hidden = false;
       pageLabel.textContent = "Page " + catalogPage + (catalogTotalPages ? " of " + catalogTotalPages : "");
       previousPage.disabled = catalogPage <= 1;
@@ -211,12 +213,7 @@
     }
   }
 
-  function renderSounds(items) {
-    const oldSounds = sounds;
-    sounds = items;
-    render();
-    sounds = oldSounds;
-  }
+  function renderSounds(items) { sounds = items; render(); }
 
   async function loadFavoritesView() {
     if (!currentUser) {
@@ -224,101 +221,33 @@
       count.textContent = "Login required";
       return;
     }
-    await loadFavorites();
-    const communityFavs = sounds.filter(sound => favorites.has("community:" + sound.id));
-    const catalogIds = [...favorites].filter(id => id.startsWith("myinstants:"));
-    const catalogFavs = catalogIds.map(id => externalSounds.find(item => item.favoriteKey === id)).filter(Boolean);
-    const missing = catalogIds.filter(id => !externalSounds.some(item => item.favoriteKey === id));
-    for (const favoriteId of missing) {
-      const id = favoriteId.slice("myinstants:".length);
-      try {
-        const response = await fetch("/api/sounds/browse?type=search&q=" + encodeURIComponent(id), {cache:"no-store"});
-        if (!response.ok) continue;
-        const data = await response.json();
-        const entry = (data.sounds || []).find(item => item.id === id);
-        if (entry) catalogFavs.push(normalizeCatalog(entry));
-      } catch {}
-    }
-    const combined = [...communityFavs, ...catalogFavs];
-    count.textContent = combined.length + " saved sounds";
-    renderSounds(combined);
-  }
-
-  async function switchView(view) {
-    currentView = view;
-    document.querySelectorAll("[data-view]").forEach(button => {
-      const active = button.dataset.view === view;
-      button.classList.toggle("active", active);
-      button.setAttribute("aria-selected", String(active));
-    });
-    browseTools.hidden = view !== "browse";
-    pagination.hidden = view !== "browse";
-    document.getElementById("soundboard-refresh").hidden = view === "favorites";
-    viewTitle.textContent = view === "community" ? "Community sounds" : view === "browse" ? "Browse MyInstants" : "Favorite sounds";
-    if (view === "community") await loadSounds();
-    else if (view === "browse") await loadBrowse();
-    else await loadFavoritesView();
-  }
-
-  async function loadFavorites() {
-    if (!currentUser) { favorites = new Set(); return; }
-    const response = await fetch("/api/sounds/favorites", {credentials:"same-origin", cache:"no-store"});
-    const data = await response.json();
-    if (response.ok) favorites = new Set(data.favorites || []);
-  }
-  async function toggleFavorite(id) {
-    if (!currentUser) { setStatus("Log in to save favorites.", "error"); return; }
     try {
-      const response = await fetch("/api/sounds/favorites/" + encodeURIComponent(id), {method:"POST", credentials:"same-origin"});
+      await loadFavorites();
+      const response = await fetch("/api/sounds", {credentials:"same-origin", cache:"no-store"});
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not update favorite.");
-      favorites = new Set(data.favorites || []);
-      if (currentView === "favorites") await loadFavoritesView();
-      else render();
-    } catch (error) { setStatus(error.message, "error"); }
-  }
-  function normalizeCatalog(item) {
-    return {id:"myinstants:" + item.id, favoriteKey:"myinstants:" + item.id, title:item.title, author:"MyInstants", duration:item.duration || 0, audioUrl:item.audioUrl, sourceUrl:item.sourceUrl};
-  }
-  async function loadBrowse() {
-    list.innerHTML = '<div class="soundboard-empty"><i class="fa-solid fa-spinner fa-spin"></i><strong>Loading MyInstants…</strong></div>';
-    const params = new URLSearchParams({type:catalogType, page:String(catalogPage)});
-    if (catalogType === "search") params.set("q", searchInput.value.trim());
-    try {
-      const response = await fetch("/api/sounds/browse?" + params.toString(), {cache:"no-store"});
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Browse unavailable.");
-      const items = (data.sounds || []).map(normalizeCatalog);
-      externalSounds = [...externalSounds.filter(existing => !items.some(item => item.id === existing.id)), ...items];
-      catalogTotalPages = data.totalPages || null;
-      count.textContent = items.length + " catalog sounds · MyInstants";
-      renderSounds(items);
-      pagination.hidden = false;
-      pageLabel.textContent = "Page " + catalogPage + (catalogTotalPages ? " of " + catalogTotalPages : "");
-      previousPage.disabled = catalogPage <= 1;
-      nextPage.disabled = !data.hasNext && catalogTotalPages !== null;
+      if (!response.ok) throw new Error(data.error || "Could not load community sounds.");
+      const community = (data.sounds || []).map(sound => ({...sound, favoriteKey:"community:" + sound.id}));
+      const local = community.filter(item => favorites.has(item.favoriteKey));
+      const externalIds = [...favorites].filter(id => id.startsWith("myinstants:"));
+      const external = externalIds.map(id => externalSounds.find(item => item.favoriteKey === id)).filter(Boolean);
+      const missing = externalIds.filter(id => !external.some(item => item.favoriteKey === id));
+      for (const favoriteId of missing) {
+        try {
+          const detailResponse = await fetch("/api/sounds/browse?type=detail&id=" + encodeURIComponent(favoriteId.slice(10)), {cache:"no-store"});
+          if (!detailResponse.ok) continue;
+          const detailData = await detailResponse.json();
+          if (detailData.sound) external.push(normalizeCatalog(detailData.sound));
+        } catch {}
+      }
+      const combined = [...local, ...external];
+      count.textContent = combined.length + " saved sounds";
+      if (combined.length) renderSounds(combined);
+      else list.innerHTML = '<div class="soundboard-empty"><strong>No favorites yet</strong><span>Tap the heart on a sound to save it here.</span></div>';
     } catch (error) {
-      list.innerHTML = '<div class="soundboard-empty"><strong>Browse unavailable</strong><span>' + escapeHtml(error.message) + '</span></div>';
+      list.innerHTML = '<div class="soundboard-empty"><strong>Favorites unavailable</strong><span>' + escapeHtml(error.message) + '</span></div>';
     }
   }
-  function renderSounds(items) {
-    const previous = sounds;
-    sounds = items;
-    render();
-    sounds = previous;
-  }
-  async function loadFavoritesView() {
-    if (!currentUser) {
-      list.innerHTML = '<div class="soundboard-empty"><strong>Log in to use Favorites</strong><span>Saved sounds are linked to your Lunar account.</span></div>';
-      return;
-    }
-    await loadFavorites();
-    const local = sounds.filter(item => favorites.has("community:" + item.id));
-    const externalIds = [...favorites].filter(id => id.startsWith("myinstants:"));
-    const external = externalIds.map(id => externalSounds.find(item => item.favoriteKey === id)).filter(Boolean);
-    count.textContent = (local.length + external.length) + " saved sounds";
-    renderSounds([...local, ...external]);
-  }
+
   async function switchView(view) {
     currentView = view;
     document.querySelectorAll("[data-view]").forEach(button => {
