@@ -228,6 +228,17 @@
     const communityFavs = sounds.filter(sound => favorites.has("community:" + sound.id));
     const catalogIds = [...favorites].filter(id => id.startsWith("myinstants:"));
     const catalogFavs = catalogIds.map(id => externalSounds.find(item => item.favoriteKey === id)).filter(Boolean);
+    const missing = catalogIds.filter(id => !externalSounds.some(item => item.favoriteKey === id));
+    for (const favoriteId of missing) {
+      const id = favoriteId.slice("myinstants:".length);
+      try {
+        const response = await fetch("/api/sounds/browse?type=search&q=" + encodeURIComponent(id), {cache:"no-store"});
+        if (!response.ok) continue;
+        const data = await response.json();
+        const entry = (data.sounds || []).find(item => item.id === id);
+        if (entry) catalogFavs.push(normalizeCatalog(entry));
+      } catch {}
+    }
     const combined = [...communityFavs, ...catalogFavs];
     count.textContent = combined.length + " saved sounds";
     renderSounds(combined);
