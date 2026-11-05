@@ -39,13 +39,12 @@
       <div class="soundboard-section-heading"><div><span id="soundboard-view-title">Community sounds</span><small id="soundboard-count">Loading sounds…</small></div><button type="button" id="soundboard-refresh" class="soundboard-refresh" title="Refresh sounds"><i class="fa-solid fa-rotate"></i></button></div>
       <div id="soundboard-browse-tools" class="soundboard-browse-tools" hidden>
         <div class="soundboard-provider-row">
-          <button type="button" class="soundboard-provider active" data-provider="lots">Lots of Sounds</button>
-          <button type="button" class="soundboard-provider" data-provider="shop">SoundBoardShop</button>
+          <span class="soundboard-library-label">Lunar Sound Library</span>
           <button type="button" id="soundboard-randomize" class="soundboard-randomize"><i class="fa-solid fa-shuffle"></i> Randomize</button>
         </div>
-        <form id="soundboard-search-form" class="soundboard-search-form"><input id="soundboard-search" type="search" maxlength="80" placeholder="Search sounds (full catalog needs API access)" aria-label="Search sounds"><button type="submit" class="soundboard-primary"><i class="fa-solid fa-magnifying-glass"></i> Search</button></form>
-        <p class="soundboard-source-note" id="soundboard-source-note">Lots of Sounds provides free CC0 sample audio. Full catalog search requires an API key configured on the server. <a href="https://www.lotsofsounds.com/sounds" target="_blank" rel="noopener noreferrer">Open full library</a>.</p>
-        <div id="soundboard-shop-panel" class="soundboard-shop-panel" hidden><strong>SoundBoardShop</strong><p>Browse its meme, reaction, and gaming sound collection. It does not provide a documented public catalog API, so sounds open on its website rather than being copied into Lunar.</p><a href="https://www.soundboardshop.com/en/soundboard" target="_blank" rel="noopener noreferrer">Open SoundBoardShop <i class="fa-solid fa-arrow-up-right-from-square"></i></a><small>Check each sound’s usage terms before downloading or reusing it.</small></div>
+        <form id="soundboard-search-form" class="soundboard-search-form"><input id="soundboard-search" type="search" maxlength="80" placeholder="Search the Lunar sound library…" aria-label="Search sounds"><button type="submit" class="soundboard-primary"><i class="fa-solid fa-magnifying-glass"></i> Search</button></form>
+        <div id="soundboard-browse-categories" class="soundboard-browse-categories" aria-label="Sound categories"></div>
+        <p class="soundboard-source-note" id="soundboard-source-note">Original sounds built into Lunar. Play, favorite, and download without leaving the website.</p>
       </div>
       <div id="soundboard-list" class="soundboard-list"><div class="soundboard-empty"><i class="fa-solid fa-spinner fa-spin"></i><strong>Loading sounds…</strong></div></div>
       <div id="soundboard-load-status" class="soundboard-load-status" hidden>Scroll for more sounds…</div>
