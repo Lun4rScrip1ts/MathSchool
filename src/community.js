@@ -43,6 +43,7 @@ let state = {
   movies: [],
   passwordResets: {},
   aiChats: {},
+  sounds: [],
 };
 let writeQueue = Promise.resolve();
 
@@ -64,6 +65,7 @@ async function loadState() {
         movies: Array.isArray(parsed.movies) ? parsed.movies.slice(-500) : [],
         passwordResets: parsed.passwordResets && typeof parsed.passwordResets === "object" ? parsed.passwordResets : {},
         aiChats: parsed.aiChats && typeof parsed.aiChats === "object" ? parsed.aiChats : {},
+        sounds: Array.isArray(parsed.sounds) ? parsed.sounds.slice(-2000) : [],
       };
       state.friendships = normalizeFriendshipEntries(state.friendships, state.friendRequests);
       for (const user of Object.values(state.users)) {
@@ -327,6 +329,63 @@ function isPublicMovie(movie) {
 function publicMovie(movie) {
   return { id: movie.id, title: movie.title, description: movie.description || "", category: movie.category || "Other", videoUrl: movie.videoUrl, posterUrl: movie.posterUrl || "", uploadedBy: movie.username || "Lunar", uploadedAt: movie.uploadedAt, size: movie.size, contentType: movie.contentType, ownerId: movie.ownerId, visibility: isPublicMovie(movie) ? "public" : "private" };
 }
+
+const MAX_SOUND_BYTES = 12 * 1024 * 1024;
+const AUDIO_TYPES = {
+  "audio/mpeg": "mp3", "audio/mp3": "mp3", "audio/wav": "wav", "audio/x-wav": "wav",
+  "audio/ogg": "ogg", "audio/webm": "webm", "audio/mp4": "m4a", "audio/x-m4a": "m4a",
+  "audio/aac": "aac", "audio/flac": "flac", "audio/mp4a-latm": "m4a",
+};
+function publicSound(sound) {
+  return { id: sound.id, title: sound.title, author: sound.username, duration: sound.duration, audioUrl: sound.audioUrl, uploadedAt: sound.uploadedAt, ownerId: sound.ownerId };
+}
+router.get("/sounds", (_req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({ sounds: state.sounds.slice().reverse().map(publicSound) });
+});
+router.post("/sounds/upload", requireUser, express.raw({ type: req => /^audio\\//i.test(String(req.headers["content-type"] || "")), limit: MAX_SOUND_BYTES }), async (req, res) => {
+  const contentType = String(req.headers["content-type"] || "").split(";")[0].toLowerCase();
+  const extension = AUDIO_TYPES[contentType];
+  const buffer = Buffer.isBuffer(req.body) ? req.body : null;
+  const title = cleanText(req.headers["x-sound-title"], 80);
+  const duration = Number(req.headers["x-sound-duration"]);
+  if (!extension) return res.status(415).json({ error: "Use audio MP3, WAV, OGG, WebM, M4A, AAC, or FLAC. MP4 uploads must be audio/mp4, not video/mp4." });
+  if (!buffer?.length) return res.status(400).json({ error: "Choose an audio file first." });
+  if (buffer.length > MAX_SOUND_BYTES) return res.status(413).json({ error: "Audio files must be 12 MB or smaller." });
+  if (!title) return res.status(400).json({ error: "Give the sound a title." });
+  if (!Number.isFinite(duration) || duration <= 0 || duration > 60) return res.status(400).json({ error: "Sounds must be longer than 0 and no longer than 60 seconds." });
+  const signatureOk =
+    (extension === "mp3" && (buffer.subarray(0,3).toString() === "ID3" || (buffer[0] === 0xff && (buffer[1] & 0xe0) === 0xe0))) ||
+    (extension === "wav" && buffer.subarray(0,4).toString() === "RIFF" && buffer.subarray(8,12).toString() === "WAVE") ||
+    (extension === "ogg" && buffer.subarray(0,4).toString() === "OggS") ||
+    (extension === "webm" && buffer.subarray(0,4).equals(Buffer.from([0x1a,0x45,0xdf,0xa3]))) ||
+    (["m4a","aac"].includes(extension) && (buffer.includes(Buffer.from("ftyp")) || buffer[0] === 0xff)) ||
+    (extension === "flac" && buffer.subarray(0,4).toString() === "fLaC");
+  if (!signatureOk) return res.status(415).json({ error: "The file does not appear to contain audio in the selected format." });
+  try {
+    const id = randomUUID();
+    const filename = "sound-" + id + "." + extension;
+    await fs.writeFile(path.join(UPLOAD_DIR, filename), buffer, { flag: "wx", mode: 0o644 });
+    const sound = { id, ownerId: req.user.id, username: req.user.username, title, duration: Math.round(duration * 10) / 10, audioUrl: "/uploads/" + filename, uploadedAt: new Date().toISOString(), size: buffer.length, contentType };
+    state.sounds.push(sound);
+    if (state.sounds.length > 2000) state.sounds.splice(0, state.sounds.length - 2000);
+    await persist();
+    res.status(201).json({ sound: publicSound(sound) });
+  } catch (error) {
+    console.error("[Lunar Soundboard] Upload failed:", error.message);
+    res.status(500).json({ error: "The sound could not be saved." });
+  }
+});
+router.delete("/sounds/:id", requireUser, async (req, res) => {
+  const sound = state.sounds.find(item => item.id === req.params.id);
+  if (!sound) return res.status(404).json({ error: "Sound not found." });
+  if (sound.ownerId !== req.user.id && !["lunar","lunarstudios"].includes(req.user.username.toLowerCase())) return res.status(403).json({ error: "You can only delete your own sounds." });
+  state.sounds = state.sounds.filter(item => item.id !== sound.id);
+  try { await fs.unlink(path.join(UPLOAD_DIR, path.basename(sound.audioUrl))); } catch {}
+  await persist();
+  res.json({ ok: true });
+});
+
 router.get("/movies", (req, res) => { const user = getSessionUser(req); res.set("Cache-Control", "no-store"); const visible = state.movies.filter(movie => isPublicMovie(movie) || (user && movie.ownerId === user.id)); res.json({ movies: visible.slice().reverse().map(publicMovie) }); });
 router.post("/movies/upload", requireUser, express.raw({ type: req => /^video\//i.test(String(req.headers["content-type"] || "")), limit: "500mb" }), async (req, res) => {
   const contentType = String(req.headers["content-type"] || "").split(";")[0].toLowerCase();
