@@ -13,6 +13,14 @@
   const fileLabel = document.getElementById("sound-file-label");
   const titleInput = document.getElementById("sound-title");
   const uploadButton = document.getElementById("sound-upload-button");
+  const editor = document.getElementById("sound-editor");
+  const originalPreview = document.getElementById("sound-original-preview");
+  const editedPreview = document.getElementById("sound-edited-preview");
+  const selectionStart = document.getElementById("sound-selection-start");
+  const selectionEnd = document.getElementById("sound-selection-end");
+  const cutList = document.getElementById("sound-cut-list");
+  let decodedUpload = null, uploadObjectUrl = "", editedObjectUrl = "";
+  let clipStart = 0, clipEnd = 0, cutRanges = [], selectedCutIndex = null;
   const status = document.getElementById("sound-upload-status");
   if (!list || !form) return;
 
@@ -354,7 +362,139 @@
     } catch (error) { setStatus(error.message, "error"); }
   }
 
-  fileInput.addEventListener("change", () => { fileLabel.textContent = fileInput.files?.[0]?.name || "Choose an audio file"; });
+  function updateEditor() {
+    if (!decodedUpload) return;
+    const duration = decodedUpload.duration;
+    const start = Number(selectionStart.value), end = Number(selectionEnd.value);
+    document.getElementById("sound-selection-start-label").textContent = formatTime(start);
+    document.getElementById("sound-selection-end-label").textContent = formatTime(end);
+    document.getElementById("sound-clip-range").textContent = formatTime(clipStart) + " – " + formatTime(clipEnd);
+    const removed = cutRanges.reduce((sum, r) => sum + Math.max(0, Math.min(r.end, clipEnd) - Math.max(r.start, clipStart)), 0);
+    document.getElementById("sound-cut-duration").textContent = formatTime(removed);
+    cutList.innerHTML = cutRanges.length ? cutRanges.map((r, i) =>
+      '<button type="button" class="sound-cut-chip ' + (selectedCutIndex === i ? 'selected' : '') + '" data-cut-index="' + i + '" aria-pressed="' + (selectedCutIndex === i) + '"><i class="fa-solid fa-scissors"></i> ' + formatTime(r.start) + ' – ' + formatTime(r.end) + ' <span>Removed</span></button>'
+    ).join("") : '<span class="sound-cut-empty">No cuts yet.</span>';
+    cutList.querySelectorAll("[data-cut-index]").forEach(button => button.addEventListener("click", () => {
+      selectedCutIndex = Number(button.dataset.cutIndex);
+      updateEditor();
+    }));
+  }
+  function resetEditor() {
+    decodedUpload = null; cutRanges = []; selectedCutIndex = null; clipStart = 0; clipEnd = 0;
+    if (uploadObjectUrl) URL.revokeObjectURL(uploadObjectUrl);
+    if (editedObjectUrl) URL.revokeObjectURL(editedObjectUrl);
+    uploadObjectUrl = ""; editedObjectUrl = "";
+    originalPreview.removeAttribute("src"); originalPreview.load();
+    editedPreview.hidden = true; editedPreview.removeAttribute("src"); editedPreview.load();
+    editor.hidden = true;
+  }
+  fileInput.addEventListener("change", async () => {
+    fileLabel.textContent = fileInput.files?.[0]?.name || "Choose an audio file";
+    resetEditor();
+    const file = fileInput.files?.[0];
+    if (!file) return;
+    if (!audioMime(file)) { setStatus("Choose a supported audio file. MP4 videos are not supported.", "error"); return; }
+    try {
+      setStatus("Preparing audio preview…");
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) throw new Error("Audio editing is not supported by this browser.");
+      const context = new AudioContextClass();
+      const buffer = await context.decodeAudioData(await file.arrayBuffer());
+      await context.close();
+      if (!Number.isFinite(buffer.duration) || buffer.duration <= 0) throw new Error("This audio file could not be decoded.");
+      decodedUpload = buffer; clipStart = 0; clipEnd = buffer.duration;
+      selectionStart.max = String(buffer.duration); selectionEnd.max = String(buffer.duration);
+      selectionStart.value = "0"; selectionEnd.value = String(buffer.duration);
+      document.getElementById("sound-editor-duration").textContent = formatTime(buffer.duration);
+      uploadObjectUrl = URL.createObjectURL(file); originalPreview.src = uploadObjectUrl;
+      editor.hidden = false; updateEditor();
+      setStatus("Audio ready. Preview and edit your clip before uploading.", "success");
+    } catch (error) { resetEditor(); setStatus(error.message || "Could not prepare this audio file.", "error"); }
+  });
+  selectionStart?.addEventListener("input", () => {
+    if (Number(selectionStart.value) > Number(selectionEnd.value)) selectionEnd.value = selectionStart.value;
+    updateEditor();
+  });
+  selectionEnd?.addEventListener("input", () => {
+    if (Number(selectionEnd.value) < Number(selectionStart.value)) selectionStart.value = selectionEnd.value;
+    updateEditor();
+  });
+  document.getElementById("sound-set-clip")?.addEventListener("click", () => {
+    if (!decodedUpload) return;
+    const start = Number(selectionStart.value), end = Number(selectionEnd.value);
+    if (end - start < 0.05) { setStatus("Choose a clip range longer than 0.05 seconds.", "error"); return; }
+    clipStart = start; clipEnd = end;
+    cutRanges = cutRanges.map(r => ({start:Math.max(start,r.start),end:Math.min(end,r.end)})).filter(r => r.end-r.start > 0.02);
+    selectedCutIndex = null; updateEditor(); setStatus("Clip boundaries updated.", "success");
+  });
+  document.getElementById("sound-add-cut")?.addEventListener("click", () => {
+    if (!decodedUpload) return;
+    const start = Math.max(clipStart, Number(selectionStart.value));
+    const end = Math.min(clipEnd, Number(selectionEnd.value));
+    if (end - start < 0.05) { setStatus("Choose a section inside your clip to cut.", "error"); return; }
+    const ranges = [...cutRanges, {start,end}].sort((a,b) => a.start-b.start);
+    cutRanges = [];
+    for (const range of ranges) {
+      const last = cutRanges[cutRanges.length-1];
+      if (last && range.start <= last.end) last.end = Math.max(last.end,range.end);
+      else cutRanges.push({...range});
+    }
+    selectedCutIndex = cutRanges.findIndex(r => r.start <= start && r.end >= end);
+    updateEditor(); setStatus("Section cut. Select its chip and press Delete to restore it.", "success");
+  });
+  document.getElementById("sound-reset-edits")?.addEventListener("click", () => {
+    if (!decodedUpload) return;
+    clipStart = 0; clipEnd = decodedUpload.duration; cutRanges = []; selectedCutIndex = null;
+    selectionStart.value = "0"; selectionEnd.value = String(decodedUpload.duration);
+    editedPreview.hidden = true; updateEditor(); setStatus("All edits reset.", "success");
+  });
+  function makeEditedWav() {
+    const buffer = decodedUpload, rate = buffer.sampleRate, segments = [];
+    let cursor = clipStart;
+    for (const cut of cutRanges) {
+      const start = Math.max(clipStart,cut.start), end = Math.min(clipEnd,cut.end);
+      if (start > cursor) segments.push([cursor,start]);
+      cursor = Math.max(cursor,end);
+    }
+    if (cursor < clipEnd) segments.push([cursor,clipEnd]);
+    const frames = segments.reduce((sum,range) => sum + Math.max(0,Math.floor((range[1]-range[0])*rate)),0);
+    if (!frames) throw new Error("Your edits remove the entire clip.");
+    const channels = Math.min(2,buffer.numberOfChannels), bytes = new ArrayBuffer(44+frames*channels*2), view = new DataView(bytes);
+    const write = (offset,value) => { for(let i=0;i<value.length;i++) view.setUint8(offset+i,value.charCodeAt(i)); };
+    write(0,"RIFF"); view.setUint32(4,36+frames*channels*2,true); write(8,"WAVE"); write(12,"fmt ");
+    view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,channels,true);
+    view.setUint32(24,rate,true); view.setUint32(28,rate*channels*2,true); view.setUint16(32,channels*2,true); view.setUint16(34,16,true);
+    write(36,"data"); view.setUint32(40,frames*channels*2,true);
+    let out = 0;
+    for (const [a,b] of segments) {
+      const from = Math.floor(a*rate), to = Math.floor(b*rate);
+      for (let frame=from; frame<to; frame++) {
+        for (let channel=0; channel<channels; channel++) {
+          const sample = buffer.getChannelData(channel)[frame] || 0;
+          view.setInt16(44+(out*channels+channel)*2,Math.max(-1,Math.min(1,sample))*32767,true);
+        }
+        out++;
+      }
+    }
+    return {blob:new Blob([bytes],{type:"audio/wav"}),duration:frames/rate};
+  }
+  document.getElementById("sound-preview-edited")?.addEventListener("click", () => {
+    try {
+      const result = makeEditedWav();
+      if (editedObjectUrl) URL.revokeObjectURL(editedObjectUrl);
+      editedObjectUrl = URL.createObjectURL(result.blob);
+      editedPreview.src = editedObjectUrl; editedPreview.hidden = false; editedPreview.load();
+      editedPreview.play().catch(() => {});
+      setStatus("Previewing your edited clip.", "success");
+    } catch (error) { setStatus(error.message, "error"); }
+  });
+  document.addEventListener("keydown", event => {
+    if (!decodedUpload || selectedCutIndex === null || !["Delete","Backspace"].includes(event.key) || editor.hidden) return;
+    const target = event.target;
+    if (target && (/INPUT|TEXTAREA|SELECT/.test(target.tagName) || target.isContentEditable)) return;
+    event.preventDefault(); cutRanges.splice(selectedCutIndex,1); selectedCutIndex = null;
+    updateEditor(); setStatus("Selected cut section restored to the clip.", "success");
+  });
   form.addEventListener("submit", async event => {
     event.preventDefault();
     const file = fileInput.files?.[0];
@@ -363,22 +503,24 @@
     const contentType = audioMime(file);
     if (!contentType) { setStatus("Choose an audio file. MP4 videos are not supported.", "error"); return; }
     if (file.size > 12 * 1024 * 1024) { setStatus("Audio files must be 12 MB or smaller.", "error"); return; }
+    if (!decodedUpload) { setStatus("Wait for the audio preview and editor to finish loading.", "error"); return; }
     uploadButton.disabled = true;
     setStatus("Checking audio duration…");
     try {
-      const duration = await readDuration(file);
-      if (!Number.isFinite(duration) || duration <= 0 || duration > 60) throw new Error("Sounds must be no longer than 1 minute.");
-      setStatus("Uploading sound…");
+      const edited = makeEditedWav();
+      if (!Number.isFinite(edited.duration) || edited.duration <= 0 || edited.duration > 60) throw new Error("The final edited clip must be no longer than 1 minute.");
+      if (edited.blob.size > 12 * 1024 * 1024) throw new Error("The edited audio is larger than 12 MB. Shorten the clip and try again.");
+      setStatus("Uploading edited clip…");
       const response = await fetch("/api/sounds/upload", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "Content-Type": contentType, "X-Sound-Title": title, "X-Sound-Duration": String(duration) },
-        body: file,
+        method: "POST", credentials: "same-origin",
+        headers: { "Content-Type": "audio/wav", "X-Sound-Title": title, "X-Sound-Duration": String(edited.duration) },
+        body: edited.blob,
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Upload failed.");
       form.reset();
       fileLabel.textContent = "Choose an audio file";
+      resetEditor();
       await loadSounds();
       setStatus("Your sound was uploaded and added to the community soundboard.", "success");
     } catch (error) { setStatus(error.message, "error"); }
