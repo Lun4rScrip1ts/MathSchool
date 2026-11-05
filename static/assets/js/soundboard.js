@@ -277,6 +277,19 @@
           const sampleItems = (sampleData.sounds || []).map(normalizeCatalog);
           externalSounds = [...externalSounds, ...sampleItems];
           external = externalIds.map(id => externalSounds.find(item => item.favoriteKey === id)).filter(Boolean);
+          const unresolved = externalIds.filter(id => !external.some(item => item.favoriteKey === id));
+          for (const favoriteId of unresolved) {
+            try {
+              const detailResponse = await fetch("/api/sounds/lots/" + encodeURIComponent(favoriteId.slice(5)), {credentials:"same-origin", cache:"no-store"});
+              if (!detailResponse.ok) continue;
+              const detailData = await detailResponse.json();
+              if (detailData.sound) {
+                const saved = normalizeCatalog(detailData.sound);
+                externalSounds.push(saved);
+                external.push(saved);
+              }
+            } catch {}
+          }
         } catch {}
       }
       const combined = [...local, ...external];
