@@ -352,6 +352,20 @@ const MYINSTANTS_API_BASE = process.env.MYINSTANTS_API_BASE || "https://myinstan
 const MYINSTANTS_ENDPOINTS = new Set(["trending", "search", "recent", "best"]);
 router.get("/sounds/browse", async (req, res) => {
   const endpoint = String(req.query.type || "trending").toLowerCase();
+  if (endpoint === "detail") {
+    const id = cleanText(String(req.query.id || ""), 140);
+    if (!id) return res.status(400).json({ error: "A sound ID is required." });
+    try {
+      const url = new URL("/detail", MYINSTANTS_API_BASE);
+      url.searchParams.set("id", id);
+      const response = await fetch(url.toString(), { timeout: 12000, headers: { "Accept": "application/json", "User-Agent": "LunarSoundboard/1.0" } });
+      if (!response.ok) return res.status(502).json({ error: "Could not retrieve that saved sound." });
+      const payload = await response.json();
+      const item = payload.data && !Array.isArray(payload.data) ? payload.data : null;
+      if (!item || !item.id || !item.mp3) return res.status(404).json({ error: "Saved sound was not found." });
+      return res.json({ sound: { id: String(item.id), title: String(item.title || "Untitled sound"), audioUrl: String(item.mp3), sourceUrl: String(item.url || ""), duration: Number(item.duration) || 0 } });
+    } catch { return res.status(502).json({ error: "Could not retrieve that saved sound." }); }
+  }
   if (!MYINSTANTS_ENDPOINTS.has(endpoint)) return res.status(400).json({ error: "Choose trending, search, recent, or best." });
   const query = cleanText(String(req.query.q || ""), 80);
   if (endpoint === "search" && !query) return res.status(400).json({ error: "Enter a search term." });
@@ -360,26 +374,25 @@ router.get("/sounds/browse", async (req, res) => {
     const url = new URL("/" + endpoint, MYINSTANTS_API_BASE);
     if (query) url.searchParams.set("q", query);
     url.searchParams.set("page", String(page));
-    const response = await fetch(url.toString(), { timeout: 12000, headers: { "Accept": "application/json", "User-Agent": "LunarSoundboard/1.0 (MyInstants API attribution)" } });
-    if (!response.ok) return res.status(502).json({ error: "The MyInstants catalog is temporarily unavailable." });
+    const response = await fetch(url.toString(), { timeout: 15000, headers: { "Accept": "application/json", "User-Agent": "LunarSoundboard/1.0" } });
+    if (!response.ok) return res.status(502).json({ error: "The MyInstants catalog returned HTTP " + response.status + "." });
     const payload = await response.json();
-    const entries = Array.isArray(payload.data) ? payload.data : [];
+    const entries = Array.isArray(payload.data) ? payload.data : Array.isArray(payload.sounds) ? payload.sounds : [];
     const catalog = entries.map(item => ({
       id: cleanText(String(item.id || ""), 140),
       title: cleanText(String(item.title || "Untitled sound"), 120),
-      sourceUrl: typeof item.url === "string" && /^https:\/\/www\.myinstants\.com\//i.test(item.url) ? item.url : "",
-      audioUrl: typeof item.mp3 === "string" && /^https:\/\/www\.myinstants\.com\/media\/sounds\/[a-z0-9_./%-]+$/i.test(item.mp3) ? item.mp3 : "",
-      duration: Number.isFinite(Number(item.duration)) ? Number(item.duration) : null,
+      sourceUrl: typeof item.url === "string" && item.url.startsWith("https://www.myinstants.com/") ? item.url : "",
+      audioUrl: typeof item.mp3 === "string" && item.mp3.startsWith("https://www.myinstants.com/media/sounds/") ? item.mp3 : "",
+      duration: Number.isFinite(Number(item.duration)) ? Number(item.duration) : 0,
       source: "MyInstants",
     })).filter(item => item.id && item.audioUrl);
     res.set("Cache-Control", "public, max-age=300");
-    res.json({ sounds: catalog, page, totalPages: Number(payload.total_pages) || null, hasNext: Boolean(payload.has_next), source: "MyInstants", attribution: "MyInstants API by abdipr · MyInstants.com" });
+    res.json({ sounds: catalog, page, totalPages: Number(payload.total_pages || payload.totalPages) || null, hasNext: Boolean(payload.has_next ?? payload.hasNext), source: "MyInstants", attribution: "MyInstants API by abdipr · MyInstants.com" });
   } catch (error) {
     console.warn("[Lunar Soundboard] MyInstants browse failed:", error.message);
-    res.status(502).json({ error: "Could not connect to the MyInstants catalog. Try again shortly." });
+    res.status(502).json({ error: "Could not connect to the MyInstants catalog. Check the API host and try again." });
   }
 });
-
 router.get("/sounds/favorites", requireUser, (req, res) => {
   const ids = Array.isArray(state.soundFavorites[req.user.id]) ? state.soundFavorites[req.user.id] : [];
   res.set("Cache-Control", "no-store");
