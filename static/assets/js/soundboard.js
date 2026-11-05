@@ -99,7 +99,7 @@
   }
 
   function makePlayer(id) {
-    const sound = sounds.find(item => item.id === id);
+    const sound = sounds.find(item => item.id === id) || externalSounds.find(item => item.id === id);
     if (!sound) return null;
     let audio = players.get(id);
     if (audio) return audio;
@@ -226,17 +226,8 @@
     }
     await loadFavorites();
     const communityFavs = sounds.filter(sound => favorites.has("community:" + sound.id));
-    const catalogIds = [...favorites].filter(id => id.startsWith("myinstants:")).map(id => id.slice("myinstants:".length));
-    const catalogFavs = [];
-    for (const id of catalogIds) {
-      try {
-        const response = await fetch("/api/sounds/browse?type=search&q=" + encodeURIComponent(id), {cache:"no-store"});
-        if (!response.ok) continue;
-        const data = await response.json();
-        const found = (data.sounds || []).find(item => item.id === id);
-        if (found) catalogFavs.push(normalizeCatalog(found));
-      } catch {}
-    }
+    const catalogIds = [...favorites].filter(id => id.startsWith("myinstants:"));
+    const catalogFavs = catalogIds.map(id => externalSounds.find(item => item.favoriteKey === id)).filter(Boolean);
     const combined = [...communityFavs, ...catalogFavs];
     count.textContent = combined.length + " saved sounds";
     renderSounds(combined);
@@ -287,6 +278,7 @@
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Browse unavailable.");
       const items = (data.sounds || []).map(normalizeCatalog);
+      externalSounds = [...externalSounds.filter(existing => !items.some(item => item.id === existing.id)), ...items];
       catalogTotalPages = data.totalPages || null;
       count.textContent = items.length + " catalog sounds · MyInstants";
       renderSounds(items);
