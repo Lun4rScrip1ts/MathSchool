@@ -346,6 +346,48 @@ router.get("/sounds", (_req, res) => {
   res.json({ sounds: state.sounds.slice().reverse().map(publicSound) });
 });
 
+// Lots of Sounds free sample catalog and optional full-catalog API proxy.
+router.get("/sounds/lots", async (req, res) => {
+  const apiKey = process.env.LOTS_OF_SOUNDS_API_KEY;
+  const page = Math.max(1, Math.min(500, Number.parseInt(req.query.page || "1", 10) || 1));
+  const limit = Math.max(4, Math.min(30, Number.parseInt(req.query.limit || "20", 10) || 20));
+  const query = cleanText(String(req.query.q || ""), 80);
+  try {
+    const headers = { "Accept": "application/json", "User-Agent": "LunarSoundboard/1.0" };
+    let url;
+    if (apiKey) {
+      url = new URL("/api/v1/sounds", "https://api.lotsofsounds.com");
+      url.searchParams.set("page", String(page));
+      url.searchParams.set("limit", String(limit));
+      if (query) url.searchParams.set("q", query);
+      headers["x-api-key"] = apiKey;
+    } else {
+      if (page > 1) return res.json({ sounds: [], page, hasMore: false, sampleOnly: true, message: "Add LOTS_OF_SOUNDS_API_KEY to enable the full catalog." });
+      url = new URL("/api/v1/sounds/sample", "https://api.lotsofsounds.com");
+    }
+    const response = await fetch(url.toString(), { headers, signal: AbortSignal.timeout(15000) });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) return res.status(response.status === 401 || response.status === 403 ? 503 : 502).json({ error: apiKey ? "Lots of Sounds API access failed. Check LOTS_OF_SOUNDS_API_KEY and its plan." : "Could not load the free Lots of Sounds samples." });
+    const entries = Array.isArray(payload.data) ? payload.data : Array.isArray(payload.sounds) ? payload.sounds : [];
+    const sounds = entries.map(item => ({
+      id: cleanText(String(item.id || ""), 160),
+      name: cleanText(String(item.name || item.title || "Sound effect"), 140),
+      duration: Number(item.duration) || 0,
+      license: cleanText(String(item.license || "CC0"), 30),
+      stream_url: typeof item.stream_url === "string" ? item.stream_url : (typeof item.audio_url === "string" ? item.audio_url : (typeof item.preview_url === "string" ? item.preview_url : "")),
+      download_url: typeof item.download_url === "string" ? item.download_url : (typeof item.stream_url === "string" ? item.stream_url : ""),
+      source_url: typeof item.url === "string" && item.url.startsWith("https://") ? item.url : "https://www.lotsofsounds.com/sounds",
+      tags: Array.isArray(item.tags) ? item.tags.slice(0, 12).map(tag => cleanText(String(tag), 30)) : []
+    })).filter(item => item.id && /^https:\/\//i.test(item.stream_url));
+    const pagination = payload.pagination || {};
+    res.set("Cache-Control", "public, max-age=120");
+    res.json({ sounds, page, total: Number(pagination.total) || sounds.length, hasMore: apiKey ? page < (Number(pagination.totalPages) || page) : false, sampleOnly: !apiKey });
+  } catch (error) {
+    console.warn("[Lunar Soundboard] Lots of Sounds request failed:", error.message);
+    res.status(502).json({ error: "Could not connect to Lots of Sounds. Please try again." });
+  }
+});
+
 // MyInstants catalog proxy. Keep the upstream MP3 links external instead of copying
 // third-party audio into Lunar's upload storage.
 const MYINSTANTS_API_BASE = process.env.MYINSTANTS_API_BASE || "https://myinstants-api.page.gd";
