@@ -195,59 +195,66 @@
   }
 
   const BUILTIN_CATALOG = [
-    {id:"builtin:soft-pop",title:"Soft Pop",category:"Reactions",duration:0.7,wave:"sine",start:520,end:180,decay:7},
-    {id:"builtin:bubble-pop",title:"Bubble Pop",category:"Reactions",duration:0.55,wave:"sine",start:760,end:260,decay:9},
-    {id:"builtin:digital-blip",title:"Digital Blip",category:"Gaming",duration:0.32,wave:"square",start:880,end:440,decay:12},
-    {id:"builtin:power-up",title:"Power Up",category:"Gaming",duration:1.25,wave:"saw",start:240,end:1100,decay:2.5},
-    {id:"builtin:retro-coin",title:"Retro Coin",category:"Gaming",duration:0.8,wave:"square",start:660,end:1320,decay:5},
-    {id:"builtin:magic-sparkle",title:"Magic Sparkle",category:"Music",duration:1.6,wave:"sine",start:1200,end:620,decay:2.2},
-    {id:"builtin:happy-chime",title:"Happy Chime",category:"Music",duration:1.4,wave:"sine",start:660,end:990,decay:1.8},
-    {id:"builtin:cartoon-boing",title:"Cartoon Boing",category:"Memes & Fun",duration:1.1,wave:"triangle",start:180,end:620,decay:2.7},
-    {id:"builtin:comedy-slide",title:"Comedy Slide",category:"Memes & Fun",duration:1.3,wave:"saw",start:680,end:130,decay:2.4},
-    {id:"builtin:notification",title:"Notification",category:"UI",duration:0.65,wave:"sine",start:740,end:920,decay:4},
-    {id:"builtin:soft-whoosh",title:"Soft Whoosh",category:"Sound Effects",duration:1.2,wave:"noise",start:0,end:0,decay:2.2},
-    {id:"builtin:tiny-drumroll",title:"Tiny Drumroll",category:"Sound Effects",duration:1.35,wave:"noise",start:0,end:0,decay:1.2}
+    {
+      id:"commons:doorbell", title:"Doorbell", category:"Everyday", duration:3.7,
+      audioUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/Sound_Effect_-_Door_Bell.ogg",
+      downloadUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/Sound_Effect_-_Door_Bell.ogg",
+      sourceUrl:"https://commons.wikimedia.org/wiki/File:Sound_Effect_-_Door_Bell.ogg",
+      author:"Amada44", license:"CC0 1.0"
+    },
+    {
+      id:"commons:door-creak", title:"Door Creak", category:"Everyday", duration:1,
+      audioUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/LL-Q1860_%28eng%29-Knites-Sound_recording._Door_creaks.wav",
+      downloadUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/LL-Q1860_%28eng%29-Knites-Sound_recording._Door_creaks.wav",
+      sourceUrl:"https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Knites-Sound_recording._Door_creaks.wav",
+      author:"Knites", license:"CC0 1.0"
+    },
+    {
+      id:"commons:door-handle", title:"Door Handle Creaking", category:"Everyday", duration:5.1,
+      audioUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/Door_handle_creaking.ogg",
+      downloadUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/Door_handle_creaking.ogg",
+      sourceUrl:"https://commons.wikimedia.org/wiki/File:Door_handle_creaking.ogg",
+      author:"stephan", license:"Public Domain"
+    },
+    {
+      id:"commons:keyboard", title:"Mechanical Keyboard Typing", category:"Technology", duration:4.3,
+      audioUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/IBM_M2_sound.ogg",
+      downloadUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/IBM_M2_sound.ogg",
+      sourceUrl:"https://commons.wikimedia.org/wiki/File:IBM_M2_sound.ogg",
+      author:"Anonimski", license:"CC0 1.0"
+    },
+    {
+      id:"commons:typing", title:"Typing — Hunt and Peck", category:"Technology", duration:59.6,
+      audioUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/Typing_hunt_and_peck.ogg",
+      downloadUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/Typing_hunt_and_peck.ogg",
+      sourceUrl:"https://commons.wikimedia.org/wiki/File:Typing_hunt_and_peck.ogg",
+      author:"Kathleen Gatliffe", license:"Public Domain"
+    },
+    {
+      id:"commons:rain-birds", title:"Rain, Thunder and Birds", category:"Nature", duration:134.3,
+      audioUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/Rain_thunder_and_birds.ogg",
+      downloadUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/Rain_thunder_and_birds.ogg",
+      sourceUrl:"https://commons.wikimedia.org/wiki/File:Rain_thunder_and_birds.ogg",
+      author:"ezwa", license:"Public Domain"
+    },
+    {
+      id:"commons:rain-steps", title:"Rain, Thunder and Footsteps", category:"Nature", duration:90,
+      audioUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/Rain_thunder_steps.ogg",
+      downloadUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/Rain_thunder_steps.ogg",
+      sourceUrl:"https://commons.wikimedia.org/wiki/File:Rain_thunder_steps.ogg",
+      author:"ezwa", license:"Public Domain"
+    },
+    {
+      id:"commons:applause", title:"Concert Applause", category:"Crowds", duration:58.8,
+      audioUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/Sound_Effects_-_Applause_after_a_concert.ogg",
+      downloadUrl:"https://commons.wikimedia.org/wiki/Special:FilePath/Sound_Effects_-_Applause_after_a_concert.ogg",
+      sourceUrl:"https://commons.wikimedia.org/wiki/File:Sound_Effects_-_Applause_after_a_concert.ogg",
+      author:"Amada44", license:"CC0 1.0"
+    }
   ];
 
-  function makeSoundWav(sound) {
-    const sampleRate = 22050;
-    const length = Math.max(1, Math.floor(sampleRate * sound.duration));
-    const bytes = new ArrayBuffer(44 + length * 2);
-    const view = new DataView(bytes);
-    const write = (offset, value) => { for (let i=0;i<value.length;i++) view.setUint8(offset+i,value.charCodeAt(i)); };
-    write(0,"RIFF"); view.setUint32(4,36+length*2,true); write(8,"WAVE"); write(12,"fmt ");
-    view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,1,true);
-    view.setUint32(24,sampleRate,true); view.setUint32(28,sampleRate*2,true);
-    view.setUint16(32,2,true); view.setUint16(34,16,true); write(36,"data"); view.setUint32(40,length*2,true);
-    let phase=0, noise=0;
-    for(let i=0;i<length;i++){
-      const t=i/sampleRate, p=t/sound.duration;
-      const attack=Math.min(1,t/0.018);
-      const envelope=attack*Math.pow(Math.max(0,1-p),sound.decay);
-      let sample=0;
-      if(sound.wave==="noise"){
-        noise=noise*0.72+(Math.random()*2-1)*0.28;
-        sample=noise*(sound.id.endsWith("drumroll") ? (0.45+0.35*Math.sin(t*34)) : 1);
-      } else {
-        const freq=sound.start+(sound.end-sound.start)*p;
-        phase+=2*Math.PI*freq/sampleRate;
-        const s=Math.sin(phase);
-        if(sound.wave==="square") sample=Math.sign(s)*0.62;
-        else if(sound.wave==="saw") sample=2*((phase/(2*Math.PI))%1)-1;
-        else if(sound.wave==="triangle") sample=(2/Math.PI)*Math.asin(s);
-        else sample=s;
-        if(sound.id.endsWith("magic-sparkle")) sample*=0.72+0.28*Math.sin(t*31);
-      }
-      const value=Math.max(-1,Math.min(1,sample*envelope*0.72));
-      view.setInt16(44+i*2,Math.round(value*32767),true);
-    }
-    return URL.createObjectURL(new Blob([bytes],{type:"audio/wav"}));
-  }
-
   function prepareBuiltin(item) {
-    if(item.audioUrl) return item;
-    const audioUrl=makeSoundWav(item);
-    return {...item,audioUrl,downloadUrl:audioUrl,author:"Lunar",license:"Original · Lunar"};
+    return {...item, favoriteKey:item.id};
   }
 
   function shuffle(items) {
