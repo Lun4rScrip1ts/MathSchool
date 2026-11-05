@@ -189,7 +189,7 @@
 
   function normalizeCatalog(item) {
     const id = String(item.id || "");
-    return {id:"lots:" + id, favoriteKey:"lots:" + id, title:item.name || item.title || "Untitled sound", author:"Lots of Sounds", duration:Number(item.duration) || 0, audioUrl:item.audioUrl || item.stream_url || item.preview_url || "", downloadUrl:item.downloadUrl || item.download_url || item.audioUrl || item.stream_url || "", sourceUrl:item.sourceUrl || "https://www.lotsofsounds.com/sounds", license:item.license || "CC0"};
+    return {id:"lots:" + id, favoriteKey:"lots:" + id, title:item.name || item.title || "Untitled sound", author:"Lots of Sounds", duration:Number(item.duration) || 0, audioUrl:item.audioUrl || item.stream_url || item.preview_url || "", downloadUrl:"/api/sounds/lots/" + encodeURIComponent(id) + "/download", sourceUrl:item.sourceUrl || "https://www.lotsofsounds.com/sounds", license:item.license || "CC0"};
   }
 
   function shuffle(items) {
