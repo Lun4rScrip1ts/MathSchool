@@ -99,14 +99,6 @@
         if (button) button.innerHTML = '<i class="fa-solid fa-play"></i>';
       }
     });
-    audio.addEventListener("play", () => {
-      const button = list.querySelector('[data-play="' + CSS.escape(id) + '"]');
-      if (button) button.innerHTML = '<i class="fa-solid fa-pause"></i>';
-    });
-    audio.addEventListener("pause", () => {
-      const button = list.querySelector('[data-play="' + CSS.escape(id) + '"]');
-      if (button) button.innerHTML = '<i class="fa-solid fa-play"></i>';
-    });
     players.set(id, audio);
     return audio;
   }
@@ -114,8 +106,11 @@
   async function play(id) {
     const audio = makePlayer(id);
     if (!audio) return;
-    if (!audio.paused) { audio.pause(); return; }
-    try { await audio.play(); }
+    // Play-only button: clicking again restarts the clip instead of pausing it.
+    try {
+      audio.currentTime = 0;
+      await audio.play();
+    }
     catch { setStatus("The browser blocked playback. Press Play again to allow audio.", "error"); }
   }
 
