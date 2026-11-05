@@ -20,3 +20,5 @@
 .soundboard-card-top .soundboard-favorite{margin-left:0}
 [hidden]{display:none!important}
 @media(max-width:520px){.soundboard-search-form{flex-direction:column}.soundboard-search-form .soundboard-primary{min-height:42px}.soundboard-control-row{flex-wrap:wrap}}
+
+.soundboard-play-controls{display:flex;align-items:center;gap:6px;flex:0 0 auto}.soundboard-play,.soundboard-pause{width:34px;height:34px;border:1px solid rgba(150,133,255,.24);border-radius:50%;background:rgba(140,122,255,.16);color:#c5baff;cursor:pointer;display:grid;place-items:center}.soundboard-pause{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.13);color:inherit}.soundboard-play:hover,.soundboard-pause:hover{background:rgba(140,122,255,.28)}
