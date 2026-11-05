@@ -95,6 +95,7 @@
     }));
     list.querySelectorAll("[data-delete]").forEach(button => button.addEventListener("click", () => removeSound(button.dataset.delete)));
     list.querySelectorAll("[data-favorite]").forEach(button => button.addEventListener("click", () => toggleFavorite(button.dataset.favorite)));
+    list.querySelectorAll("[data-favorite]").forEach(button => button.addEventListener("click", () => toggleFavorite(button.dataset.favorite)));
   }
 
   function makePlayer(id) {
@@ -241,6 +242,80 @@
     renderSounds(combined);
   }
 
+  async function switchView(view) {
+    currentView = view;
+    document.querySelectorAll("[data-view]").forEach(button => {
+      const active = button.dataset.view === view;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", String(active));
+    });
+    browseTools.hidden = view !== "browse";
+    pagination.hidden = view !== "browse";
+    document.getElementById("soundboard-refresh").hidden = view === "favorites";
+    viewTitle.textContent = view === "community" ? "Community sounds" : view === "browse" ? "Browse MyInstants" : "Favorite sounds";
+    if (view === "community") await loadSounds();
+    else if (view === "browse") await loadBrowse();
+    else await loadFavoritesView();
+  }
+
+  async function loadFavorites() {
+    if (!currentUser) { favorites = new Set(); return; }
+    const response = await fetch("/api/sounds/favorites", {credentials:"same-origin", cache:"no-store"});
+    const data = await response.json();
+    if (response.ok) favorites = new Set(data.favorites || []);
+  }
+  async function toggleFavorite(id) {
+    if (!currentUser) { setStatus("Log in to save favorites.", "error"); return; }
+    try {
+      const response = await fetch("/api/sounds/favorites/" + encodeURIComponent(id), {method:"POST", credentials:"same-origin"});
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Could not update favorite.");
+      favorites = new Set(data.favorites || []);
+      if (currentView === "favorites") await loadFavoritesView();
+      else render();
+    } catch (error) { setStatus(error.message, "error"); }
+  }
+  function normalizeCatalog(item) {
+    return {id:"myinstants:" + item.id, favoriteKey:"myinstants:" + item.id, title:item.title, author:"MyInstants", duration:item.duration || 0, audioUrl:item.audioUrl, sourceUrl:item.sourceUrl};
+  }
+  async function loadBrowse() {
+    list.innerHTML = '<div class="soundboard-empty"><i class="fa-solid fa-spinner fa-spin"></i><strong>Loading MyInstants…</strong></div>';
+    const params = new URLSearchParams({type:catalogType, page:String(catalogPage)});
+    if (catalogType === "search") params.set("q", searchInput.value.trim());
+    try {
+      const response = await fetch("/api/sounds/browse?" + params.toString(), {cache:"no-store"});
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Browse unavailable.");
+      const items = (data.sounds || []).map(normalizeCatalog);
+      catalogTotalPages = data.totalPages || null;
+      count.textContent = items.length + " catalog sounds · MyInstants";
+      renderSounds(items);
+      pagination.hidden = false;
+      pageLabel.textContent = "Page " + catalogPage + (catalogTotalPages ? " of " + catalogTotalPages : "");
+      previousPage.disabled = catalogPage <= 1;
+      nextPage.disabled = !data.hasNext && catalogTotalPages !== null;
+    } catch (error) {
+      list.innerHTML = '<div class="soundboard-empty"><strong>Browse unavailable</strong><span>' + escapeHtml(error.message) + '</span></div>';
+    }
+  }
+  function renderSounds(items) {
+    const previous = sounds;
+    sounds = items;
+    render();
+    sounds = previous;
+  }
+  async function loadFavoritesView() {
+    if (!currentUser) {
+      list.innerHTML = '<div class="soundboard-empty"><strong>Log in to use Favorites</strong><span>Saved sounds are linked to your Lunar account.</span></div>';
+      return;
+    }
+    await loadFavorites();
+    const local = sounds.filter(item => favorites.has("community:" + item.id));
+    const externalIds = [...favorites].filter(id => id.startsWith("myinstants:"));
+    const external = externalIds.map(id => externalSounds.find(item => item.favoriteKey === id)).filter(Boolean);
+    count.textContent = (local.length + external.length) + " saved sounds";
+    renderSounds([...local, ...external]);
+  }
   async function switchView(view) {
     currentView = view;
     document.querySelectorAll("[data-view]").forEach(button => {
