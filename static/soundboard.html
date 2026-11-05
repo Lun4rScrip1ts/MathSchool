@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/assets/css/global.css">
   <link rel="stylesheet" href="/assets/css/nav.css?v=lunar14">
   <link rel="stylesheet" href="/assets/css/lunar.css?v=lunar9">
-  <link rel="stylesheet" href="/assets/css/soundboard.css?v=4">
+  <link rel="stylesheet" href="/assets/css/soundboard.css?v=5">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="/assets/js/storage.js?v=lunar7"></script>
   <script src="/assets/js/main.js?v=lunar17"></script>
@@ -28,21 +28,19 @@
         <div class="soundboard-file-row"><label class="soundboard-file-picker"><input id="sound-file" type="file" accept="audio/*,.mp3,.wav,.ogg,.webm,.m4a,.aac,.flac,.mp4" required><i class="fa-solid fa-file-audio"></i><span id="sound-file-label">Choose an audio file</span><small>MP3, WAV, OGG, WebM audio, M4A, AAC, FLAC, or audio-only MP4</small></label><button id="sound-upload-button" class="soundboard-primary" type="submit"><i class="fa-solid fa-cloud-arrow-up"></i> Upload sound</button></div>
 
         <div id="sound-editor" class="sound-editor" hidden>
-          <div class="sound-editor-heading"><strong><i class="fa-solid fa-scissors"></i> Audio clip editor</strong><span id="sound-editor-duration">0:00</span></div>
+          <div class="sound-editor-heading"><strong><i class="fa-solid fa-scissors"></i> Trim your audio</strong><span id="sound-editor-duration">0:00 total</span></div>
+          <p class="sound-editor-intro">Choose the part you want to keep. Move the start and end sliders, then preview your selection.</p>
           <audio id="sound-original-preview" controls preload="metadata"></audio>
           <div class="sound-editor-timeline">
-            <label>Selection start <output id="sound-selection-start-label">0:00</output><input id="sound-selection-start" type="range" min="0" max="1" step="0.01" value="0"></label>
-            <label>Selection end <output id="sound-selection-end-label">0:00</output><input id="sound-selection-end" type="range" min="0" max="1" step="0.01" value="1"></label>
+            <label><span>START — <output id="sound-selection-start-label">0:00</output></span><input id="sound-selection-start" type="range" min="0" max="1" step="0.01" value="0"></label>
+            <label><span>END — <output id="sound-selection-end-label">0:00</output></span><input id="sound-selection-end" type="range" min="0" max="1" step="0.01" value="1"></label>
           </div>
+          <div class="sound-editor-boundaries"><span>Selected clip: <strong id="sound-clip-range">0:00 – 0:00</strong></span><span>Length: <strong id="sound-cut-duration">0:00</strong></span></div>
           <div class="sound-editor-actions">
-            <button type="button" class="soundboard-tab" id="sound-set-clip"><i class="fa-solid fa-crop-simple"></i> Set clip boundaries</button>
-            <button type="button" class="soundboard-tab" id="sound-add-cut"><i class="fa-solid fa-scissors"></i> Split selected section</button>
-            <button type="button" class="soundboard-tab" id="sound-preview-edited"><i class="fa-solid fa-play"></i> Preview edited clip</button>
-            <button type="button" class="soundboard-tab" id="sound-reset-edits"><i class="fa-solid fa-rotate-left"></i> Reset edits</button>
+            <button type="button" class="soundboard-tab sound-editor-preview-button" id="sound-preview-edited"><i class="fa-solid fa-play"></i> Preview selection</button>
+            <button type="button" class="soundboard-tab" id="sound-reset-edits"><i class="fa-solid fa-rotate-left"></i> Reset selection</button>
           </div>
-          <div class="sound-editor-boundaries"><span>Clip: <strong id="sound-clip-range">0:00 – 0:00</strong></span><span>Removed: <strong id="sound-cut-duration">0:00</strong></span></div>
-          <div class="sound-editor-cuts"><strong>Cut sections <small>Click a split section to select it, then press Delete or Backspace to remove it from the final audio.</small></strong><div id="sound-cut-list" class="sound-cut-list"><span class="sound-cut-empty">No cuts yet.</span></div></div>
-          <p class="sound-editor-help">Use the sliders to select a range. Set clip boundaries to trim the beginning or end, or cut the selected section out. Only a selected split section can be removed with Delete.</p>
+          <p class="sound-editor-help">Anything before START or after END will be left out. Your original file stays unchanged.</p>
           <audio id="sound-edited-preview" controls preload="metadata" hidden></audio>
         </div>
         <div id="sound-upload-status" class="soundboard-status" role="status"></div>
@@ -70,7 +68,7 @@
     </section>
     <p class="soundboard-footnote"><i class="fa-solid fa-headphones"></i> Every Play button starts its own audio player. Multiple sounds can play at the same time; use each card’s controls to manage it.</p>
   </main>
-  <script src="/assets/js/soundboard.js?v=4"></script>
+  <script src="/assets/js/soundboard.js?v=5"></script>
   <script src="/assets/js/lunar.js"></script>
 </body>
 </html>
