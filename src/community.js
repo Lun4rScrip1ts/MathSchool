@@ -346,6 +346,50 @@ router.get("/sounds", (_req, res) => {
   res.json({ sounds: state.sounds.slice().reverse().map(publicSound) });
 });
 
+// Stream a catalog sound as an attachment so browsers download it reliably.
+router.get("/sounds/lots/:id/download", async (req, res) => {
+  const id = cleanText(req.params.id, 160);
+  if (!id) return res.status(400).json({ error: "Invalid sound ID." });
+  try {
+    let downloadUrl = "";
+    const apiKey = process.env.LOTS_OF_SOUNDS_API_KEY;
+    if (apiKey) {
+      const response = await fetch("https://api.lotsofsounds.com/api/v1/sounds/" + encodeURIComponent(id) + "/download", {
+        headers: { "Accept": "application/json", "x-api-key": apiKey, "User-Agent": "LunarSoundboard/1.0" },
+        signal: AbortSignal.timeout(12000)
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) return res.status(502).json({ error: "Could not prepare this download." });
+      downloadUrl = payload.data?.download_url || payload.download_url || "";
+    } else {
+      const response = await fetch("https://api.lotsofsounds.com/api/v1/sounds/sample?limit=12", {
+        headers: { "Accept": "application/json", "User-Agent": "LunarSoundboard/1.0" },
+        signal: AbortSignal.timeout(12000)
+      });
+      const payload = await response.json().catch(() => ({}));
+      const item = (payload.data || []).find(sound => String(sound.id) === id);
+      downloadUrl = item?.download_url || "";
+    }
+    if (!/^https:\/\//i.test(downloadUrl)) return res.status(404).json({ error: "A downloadable file is not available for this sound." });
+    const audioResponse = await fetch(downloadUrl, { signal: AbortSignal.timeout(20000) });
+    if (!audioResponse.ok) return res.status(502).json({ error: "The sound file could not be downloaded." });
+    const contentType = audioResponse.headers.get("content-type") || "audio/mpeg";
+    if (!contentType.toLowerCase().startsWith("audio/") && !contentType.toLowerCase().includes("octet-stream")) {
+      return res.status(415).json({ error: "The source did not return an audio file." });
+    }
+    const buffer = Buffer.from(await audioResponse.arrayBuffer());
+    if (!buffer.length || buffer.length > 30 * 1024 * 1024) return res.status(413).json({ error: "The sound file is empty or too large." });
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Length", String(buffer.length));
+    res.setHeader("Content-Disposition", 'attachment; filename="lunar-sound-' + id.replace(/[^a-z0-9_-]/gi, "") + '.mp3"');
+    res.setHeader("Cache-Control", "private, no-store");
+    res.send(buffer);
+  } catch (error) {
+    console.warn("[Lunar Soundboard] Download failed:", error.message);
+    res.status(502).json({ error: "Could not download this sound right now." });
+  }
+});
+
 // Retrieve a saved catalog sound by ID so favorites survive a new visit.
 router.get("/sounds/lots/:id", async (req, res) => {
   const apiKey = process.env.LOTS_OF_SOUNDS_API_KEY;
