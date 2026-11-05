@@ -143,6 +143,7 @@ const routes = [
   { path: "/games", file: "games.html" },
   { path: "/movies", file: "movies.html" },
   { path: "/spotify", file: "spotify.html" },
+  { path: "/soundboard", file: "soundboard.html" },
   { path: "/play.html", file: "games.html" },
   { path: "/settings", file: "settings.html" },
   { path: "/lunar-console", file: "lunar-console.html" },

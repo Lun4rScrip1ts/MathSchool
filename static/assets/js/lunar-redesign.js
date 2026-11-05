@@ -41,6 +41,7 @@
       ['/apps','fa-table-cells','Apps'],
       ['/games','fa-gamepad','Games'],
       ['/spotify','fa-spotify','Spotify'],
+      ['/soundboard','fa-volume-high','Soundboard'],
       ['/settings','fa-gear','Settings']
     ];
     const normalize = p => p.replace(/\/$/, '') || '/';
