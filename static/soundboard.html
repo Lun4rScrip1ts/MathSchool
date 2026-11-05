@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/assets/css/global.css">
   <link rel="stylesheet" href="/assets/css/nav.css?v=lunar14">
   <link rel="stylesheet" href="/assets/css/lunar.css?v=lunar9">
-  <link rel="stylesheet" href="/assets/css/soundboard.css?v=1">
+  <link rel="stylesheet" href="/assets/css/soundboard.css?v=2">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="/assets/js/storage.js?v=lunar7"></script>
   <script src="/assets/js/main.js?v=lunar17"></script>
@@ -31,12 +31,27 @@
       </form>
     </section>
     <section class="soundboard-library">
-      <div class="soundboard-section-heading"><div><span>Community sounds</span><small id="soundboard-count">Loading sounds…</small></div><button type="button" id="soundboard-refresh" class="soundboard-refresh" title="Refresh sounds"><i class="fa-solid fa-rotate"></i></button></div>
+      <div class="soundboard-library-tabs" role="tablist" aria-label="Sound collections">
+        <button type="button" class="soundboard-tab active" data-view="community" role="tab" aria-selected="true"><i class="fa-solid fa-users"></i> Community</button>
+        <button type="button" class="soundboard-tab" data-view="browse" role="tab" aria-selected="false"><i class="fa-solid fa-compass"></i> Browse</button>
+        <button type="button" class="soundboard-tab" data-view="favorites" role="tab" aria-selected="false"><i class="fa-solid fa-heart"></i> Favorites</button>
+      </div>
+      <div class="soundboard-section-heading"><div><span id="soundboard-view-title">Community sounds</span><small id="soundboard-count">Loading sounds…</small></div><button type="button" id="soundboard-refresh" class="soundboard-refresh" title="Refresh sounds"><i class="fa-solid fa-rotate"></i></button></div>
+      <div id="soundboard-browse-tools" class="soundboard-browse-tools" hidden>
+        <form id="soundboard-search-form" class="soundboard-search-form"><input id="soundboard-search" type="search" maxlength="80" placeholder="Search MyInstants sounds" aria-label="Search MyInstants sounds"><button type="submit" class="soundboard-primary"><i class="fa-solid fa-magnifying-glass"></i> Search</button></form>
+        <div class="soundboard-browse-categories">
+          <button type="button" data-catalog="trending" class="active">Trending</button>
+          <button type="button" data-catalog="recent">Recent</button>
+          <button type="button" data-catalog="best">Popular</button>
+        </div>
+        <p class="soundboard-source-note">Browse catalog powered by <a href="https://github.com/abdipr/myinstants-api" target="_blank" rel="noopener noreferrer">MyInstants API by abdipr</a>. Audio remains hosted by <a href="https://www.myinstants.com" target="_blank" rel="noopener noreferrer">MyInstants.com</a>.</p>
+      </div>
       <div id="soundboard-list" class="soundboard-list"><div class="soundboard-empty"><i class="fa-solid fa-spinner fa-spin"></i><strong>Loading sounds…</strong></div></div>
+      <div class="soundboard-pagination" id="soundboard-pagination" hidden><button type="button" id="soundboard-prev" disabled>Previous</button><span id="soundboard-page-label">Page 1</span><button type="button" id="soundboard-next">Next</button></div>
     </section>
     <p class="soundboard-footnote"><i class="fa-solid fa-headphones"></i> Every Play button starts its own audio player. Multiple sounds can play at the same time; use each card’s controls to manage it.</p>
   </main>
-  <script src="/assets/js/soundboard.js?v=1"></script>
+  <script src="/assets/js/soundboard.js?v=2"></script>
   <script src="/assets/js/lunar.js"></script>
 </body>
 </html>
