@@ -419,7 +419,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Cursor Effects
   const pointerDropdown = document.getElementById("pointer-dropdown");
-  pointerDropdown.value = store.get("pointer") || "default";
+  pointerDropdown.value = store.get("pointer") || "triangular-pointer";
   pointerDropdown.addEventListener("change", async function () {
     const val = this.value;
     if (val === "default") {
