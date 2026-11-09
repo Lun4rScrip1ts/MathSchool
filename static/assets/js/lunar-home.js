@@ -193,7 +193,7 @@
       list.innerHTML = '<div class="lunar-changelog-loading"><i class="fa-solid fa-cloud"></i><span>Update log is temporarily unavailable.</span></div>';
     }
   };
-  loadChangelog();
+  // Changelog UI has been removed; keep the loader dormant for safe rollback.
 })();
 
 (() => {
