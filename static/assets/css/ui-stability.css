@@ -49,3 +49,275 @@ button, input[type="button"], input[type="submit"], select { touch-action: manip
 html { min-height: 100%; }
 body { min-height: 100vh; min-height: 100dvh; }
 :where(.page-content, .main-content, main) { overflow-wrap: anywhere; }
+
+
+/* --------------------------------------------------------------------------
+   Lunar UI refinement — shared quality pass
+   Restrained surfaces, consistent rhythm, readable controls and safe motion.
+   -------------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+  --lunar-ui-bg: #090b12;
+  --lunar-ui-panel: rgba(20, 23, 33, .88);
+  --lunar-ui-panel-soft: rgba(255, 255, 255, .045);
+  --lunar-ui-panel-hover: rgba(255, 255, 255, .075);
+  --lunar-ui-line: rgba(255, 255, 255, .10);
+  --lunar-ui-line-strong: rgba(255, 255, 255, .17);
+  --lunar-ui-ink: #f3f4f8;
+  --lunar-ui-muted: #a3a8b6;
+  --lunar-ui-subtle: #777e8e;
+  --lunar-ui-accent: #a497ff;
+  --lunar-ui-accent-wash: rgba(164, 151, 255, .12);
+  --lunar-ui-shadow: 0 16px 42px rgba(0, 0, 0, .24);
+  --lunar-ui-ease: cubic-bezier(.2, .75, .25, 1);
+}
+html { color-scheme: dark; }
+body {
+  color: var(--lunar-ui-ink);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+::selection { color: #fff; background: rgba(133, 117, 255, .42); }
+
+/* Keep scrollbars visually quiet without removing the affordance in scrollable panes. */
+html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.20) transparent; }
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: initial !important;
+  width: 8px !important;
+  height: 8px !important;
+  background: transparent !important;
+}
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(255,255,255,.18);
+  background-clip: padding-box;
+}
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,.30);
+  background-clip: padding-box;
+}
+html, body, * { scrollbar-width: thin; }
+
+/* More consistent defaults across the older pages and newer panels. */
+:where(button, input, select, textarea) {
+  font-family: inherit;
+}
+:where(button, input, select, textarea):disabled {
+  cursor: not-allowed;
+  opacity: .56;
+}
+:where(button, a, input, select, textarea, [role="button"]):focus-visible {
+  outline: 2px solid var(--lunar-ui-focus);
+  outline-offset: 3px;
+}
+:where(a) { text-underline-offset: 3px; }
+:where(button) { transition-timing-function: var(--lunar-ui-ease); }
+:where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  border-radius: 12px;
+}
+:where(input:not([type="checkbox"]):not([type="radio"]), select, textarea):focus {
+  border-color: rgba(164,151,255,.62);
+  box-shadow: 0 0 0 3px rgba(164,151,255,.10);
+}
+:where(.nav-bar, .navbar, .lunar-ai-window, .lunar-report-panel) {
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+}
+:where(.nav-bar) {
+  border-color: var(--lunar-ui-line);
+}
+:where(.navbar-link, .nav-bar a) {
+  transition: color .18s var(--lunar-ui-ease), background .18s var(--lunar-ui-ease), transform .18s var(--lunar-ui-ease);
+}
+:where(.navbar-link:hover, .nav-bar a:hover) {
+  text-decoration: none;
+}
+:where(.navbar-link:active, button:active) {
+  transform: translateY(1px);
+}
+
+/* Home page: quieter hierarchy and better search ergonomics. */
+.lunar-home .main {
+  width: min(960px, calc(100% - 40px));
+}
+.lunar-home .title {
+  color: #f4f3ff;
+  font-weight: 750;
+  letter-spacing: -.055em;
+  line-height: 1;
+  text-wrap: balance;
+  text-shadow: 0 12px 42px rgba(0,0,0,.24);
+}
+.lunar-home #splash {
+  color: rgba(226,229,240,.68);
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
+}
+.lunar-home .search-container form {
+  max-width: 760px;
+}
+.lunar-home .truncate {
+  width: 100%;
+  min-height: 58px;
+  padding: 0 76px 0 22px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 16px;
+  background: rgba(18,21,31,.78);
+  color: #f5f5fa;
+  text-align: left;
+  box-shadow: 0 12px 34px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.035);
+  transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.lunar-home .truncate:hover {
+  background: rgba(22,25,37,.92);
+  border-color: rgba(255,255,255,.20);
+}
+.lunar-home .truncate:focus {
+  background: rgba(22,25,37,.96);
+  border-color: rgba(164,151,255,.62);
+  box-shadow: 0 0 0 4px rgba(164,151,255,.10), 0 14px 38px rgba(0,0,0,.2);
+}
+.lunar-home .lunar-home-go {
+  min-width: 54px;
+  min-height: 42px;
+  right: 8px;
+  border-radius: 11px;
+  background: #e9e7ff;
+  color: #171426;
+  font-weight: 750;
+  box-shadow: none;
+}
+.lunar-home .lunar-home-go:hover {
+  background: #fff;
+  transform: translateY(-1px);
+}
+.lunar-home .lunar-quick { gap: 10px; }
+.lunar-home .lunar-quick a {
+  border-color: rgba(255,255,255,.095);
+  border-radius: 14px;
+  background: rgba(20,23,33,.68);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+  font-size: 13px;
+  font-weight: 650;
+}
+.lunar-home .lunar-quick a:hover {
+  border-color: rgba(164,151,255,.32);
+  background: rgba(37,34,57,.78);
+  box-shadow: 0 12px 28px rgba(0,0,0,.20);
+}
+.lunar-home .lunar-member-status {
+  border-color: var(--lunar-ui-line);
+  background: rgba(16,19,28,.68);
+  color: var(--lunar-ui-muted);
+}
+.lunar-home .lunar-url-warning {
+  color: #c8b98f;
+  border-color: rgba(222,183,101,.20);
+  background: rgba(107,79,30,.12);
+  text-shadow: none;
+}
+.lunar-home .lunar-url-warning a { color: #ead39a; }
+.lunar-home .lunar-changelog {
+  border-color: var(--lunar-ui-line);
+  border-radius: 19px;
+  background: rgba(16,19,28,.78);
+  box-shadow: var(--lunar-ui-shadow), inset 0 1px 0 rgba(255,255,255,.04);
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+  backdrop-filter: blur(18px) saturate(125%);
+}
+.lunar-home .lunar-changelog-entry {
+  border-color: rgba(255,255,255,.075);
+  border-radius: 13px;
+  background: rgba(255,255,255,.027);
+}
+.lunar-home .lunar-changelog-entry:hover {
+  border-color: rgba(164,151,255,.24);
+  background: rgba(164,151,255,.055);
+  transform: translateY(-1px);
+}
+
+/* Modal and drawer content should remain usable at laptop and phone sizes. */
+.lunar-ai-window,
+.lunar-report-panel {
+  max-height: min(88dvh, 900px);
+  overscroll-behavior: contain;
+}
+.lunar-ai-messages,
+.lunar-ai-history,
+.lunar-changelog-list,
+.lunar-member-dropdown {
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.lunar-ai-composer textarea {
+  min-height: 44px;
+  max-height: 180px;
+  resize: vertical;
+}
+.lunar-report-options button {
+  text-align: left;
+}
+.lunar-report-options button:focus-visible,
+.lunar-ai-icon-button:focus-visible,
+.lunar-ai-send-button:focus-visible {
+  outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+  .lunar-home .main {
+    width: min(100% - 28px, 620px);
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .lunar-home .title {
+    max-width: 100%;
+    font-size: clamp(42px, 12vw, 66px);
+    letter-spacing: -.06em;
+  }
+  .lunar-home .search-container { width: 100%; }
+  .lunar-home .truncate {
+    min-height: 56px;
+    height: 56px !important;
+    padding-left: 16px;
+    font-size: 15px;
+  }
+  .lunar-home .lunar-quick a {
+    min-height: 54px;
+    border-radius: 12px;
+  }
+  .lunar-home .lunar-member-status {
+    width: fit-content !important;
+    flex-wrap: wrap;
+    line-height: 1.5 !important;
+    padding: 8px 11px !important;
+  }
+  .lunar-home .lunar-url-warning {
+    width: 100%;
+    font-size: 10px;
+    overflow-wrap: anywhere;
+  }
+  .lunar-home .lunar-changelog { margin-top: 22px; }
+}
+@media (max-width: 380px) {
+  .lunar-home .lunar-quick { gap: 8px; }
+  .lunar-home .lunar-quick a { padding-inline: 8px; font-size: 12px; }
+  .lunar-home .lunar-member-status { font-size: 10px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
