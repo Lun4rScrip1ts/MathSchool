@@ -173,27 +173,6 @@
   window.addEventListener("focus", updateMemberStatus);
 
   const escapeHtml = (value) => String(value ?? "").replace(/[&<>\"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[char]);
-  const loadChangelog = async () => {
-    const list = document.getElementById("lunar-changelog-list"); if (!list) return;
-    try {
-      const [baseResult, recentResult] = await Promise.allSettled([
-        fetch("/assets/data/changelog.json?v=lunar2", { cache: "no-store" }).then(r => r.ok ? r.json() : {entries:[]}),
-        fetch("/assets/data/changelog-recent.json?v=lunar1", { cache: "no-store" }).then(r => r.ok ? r.json() : {entries:[]})
-      ]);
-      const base = baseResult.status === "fulfilled" && Array.isArray(baseResult.value.entries) ? baseResult.value.entries : [];
-      const recent = recentResult.status === "fulfilled" && Array.isArray(recentResult.value.entries) ? recentResult.value.entries : [];
-      const entries = [...recent, ...base].sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-      list.innerHTML = entries.map((entry, index) => {
-        const date = new Date(entry.timestamp);
-        const formatted = Number.isNaN(date.getTime()) ? escapeHtml(entry.timestamp) : date.toLocaleString([], { month:"short", day:"numeric", year:"numeric", hour:"numeric", minute:"2-digit" });
-        const items = Array.isArray(entry.items) ? entry.items : [];
-        return '<article class="lunar-changelog-entry ' + (index === 0 ? "latest" : "") + '"><div class="lunar-changelog-entry-head"><div class="lunar-changelog-entry-title"><i class="fa-solid fa-satellite-dish"></i><span>' + escapeHtml(entry.title || "Lunar Update") + '</span></div><span class="lunar-changelog-tag">' + escapeHtml(entry.tag || "Update") + '</span></div><div class="lunar-changelog-time">' + formatted + '</div><ul class="lunar-changelog-items">' + items.map(item => '<li>' + escapeHtml(item) + '</li>').join("") + '</ul></article>';
-      }).join("") || '<div class="lunar-changelog-loading">No updates have been posted yet.</div>';
-    } catch {
-      list.innerHTML = '<div class="lunar-changelog-loading"><i class="fa-solid fa-cloud"></i><span>Update log is temporarily unavailable.</span></div>';
-    }
-  };
-  loadChangelog();
 })();
 
 (() => {
