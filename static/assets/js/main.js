@@ -343,7 +343,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   if (activePointer === "triangular-pointer") {
     const triangularCursorScript = document.createElement("script");
-    triangularCursorScript.src = "/assets/js/triangular-cursor.js?v=1";
+    triangularCursorScript.src = "/assets/js/triangular-cursor.js?v=2";
+    triangularCursorScript.onerror = () => document.documentElement.classList.remove("lunar-triangular-cursor-active");
     document.head.appendChild(triangularCursorScript);
   }
 
@@ -352,7 +353,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (CURSOR_EFFECTS.includes(activePointer) && effectsLevel !== "off" && motionLevel !== "off") {
     const cursorScript = document.createElement("script");
-    cursorScript.src = "/assets/js/cursor.js?v=lunar12";
+    cursorScript.src = "/assets/js/cursor.js?v=lunar13";
     cursorScript.onload = () => initCursorEffect();
     document.head.appendChild(cursorScript);
   }
