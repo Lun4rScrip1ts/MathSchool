@@ -13,7 +13,7 @@
     html.lunar-triangular-cursor-active *::after { cursor: none !important; }
     #lunar-triangular-cursor {
       position: fixed !important; display: block !important;
-      width: 28px !important; height: 28px !important;
+      width: 30px !important; height: 30px !important;
       left: 0; top: 0; margin: 0 !important; padding: 0 !important;
       z-index: 2147483647 !important; pointer-events: none !important;
       visibility: visible !important; opacity: 0;
@@ -24,7 +24,7 @@
     }
     #lunar-triangular-cursor.is-visible { opacity: 1 !important; }
     #lunar-triangular-cursor svg { display:block !important; width:100%; height:100%; overflow:visible; }
-    #lunar-triangular-cursor path { fill:#fff; stroke:rgba(0,0,0,.82); stroke-width:1.15; stroke-linejoin:round; }
+    #lunar-triangular-cursor path { fill:#fff; stroke:rgba(0,0,0,.82); stroke-width:1.35; stroke-linejoin:round; }
     @media (pointer: coarse) { #lunar-triangular-cursor { display:none !important; } }
   `;
   (document.head || document.documentElement).appendChild(style);
@@ -32,7 +32,7 @@
   const cursor = document.createElement("div");
   cursor.id = "lunar-triangular-cursor";
   cursor.setAttribute("aria-hidden", "true");
-  cursor.innerHTML = '<svg viewBox="0 0 30 30" focusable="false" aria-hidden="true"><path d="M2 1.5 27 24 2 24Z"/></svg>';
+  cursor.innerHTML = '<svg viewBox="0 0 30 30" focusable="false" aria-hidden="true"><path d="M3 2 C2 1 1 2 1 3 L1 25 C1 27 3 27.5 4.5 26 L12 18.5 L24.5 24 C26 24.7 27.5 23 26.5 21.5 Z"/></svg>';
   (document.body || document.documentElement).appendChild(cursor);
 
   let targetX = -100, targetY = -100;
