@@ -13,17 +13,16 @@
     html.lunar-triangular-cursor-active *::after { cursor: none !important; }
     #lunar-triangular-cursor {
       position: fixed !important; display: block !important;
-      width: 28px !important; height: 32px !important;
+      width: 28px !important; height: 28px !important;
       left: 0; top: 0; margin: 0 !important; padding: 0 !important;
       z-index: 2147483647 !important; pointer-events: none !important;
       visibility: visible !important; opacity: 0;
       transform: translate3d(-100px,-100px,0);
       transform-origin: 2px 2px; will-change: transform;
       filter: drop-shadow(0 1px 2px rgba(0,0,0,.8)) drop-shadow(0 0 1px #000);
-      transition: opacity .1s ease, scale .12s ease;
+      transition: opacity .1s ease;
     }
     #lunar-triangular-cursor.is-visible { opacity: 1 !important; }
-    #lunar-triangular-cursor.is-pressed { scale: .88; }
     #lunar-triangular-cursor svg { display:block !important; width:100%; height:100%; overflow:visible; }
     #lunar-triangular-cursor path { fill:#fff; stroke:rgba(0,0,0,.82); stroke-width:1.15; stroke-linejoin:round; }
     @media (pointer: coarse) { #lunar-triangular-cursor { display:none !important; } }
@@ -33,7 +32,7 @@
   const cursor = document.createElement("div");
   cursor.id = "lunar-triangular-cursor";
   cursor.setAttribute("aria-hidden", "true");
-  cursor.innerHTML = '<svg viewBox="0 0 30 34" focusable="false" aria-hidden="true"><path d="M2 1.5 27 21.2 16.8 21.2 21.4 31.2 16.2 33 11.8 22.7 5.2 29.4Z"/></svg>';
+  cursor.innerHTML = '<svg viewBox="0 0 30 30" focusable="false" aria-hidden="true"><path d="M2 1.5 27 24 2 24Z"/></svg>';
   (document.body || document.documentElement).appendChild(cursor);
 
   let targetX = -100, targetY = -100;
@@ -63,8 +62,5 @@
 
   window.addEventListener("pointermove", move, { passive: true, capture: true });
   window.addEventListener("mousemove", move, { passive: true, capture: true });
-  document.addEventListener("pointerdown", () => cursor.classList.add("is-pressed"), true);
-  document.addEventListener("pointerup", () => cursor.classList.remove("is-pressed"), true);
-  document.addEventListener("pointercancel", () => cursor.classList.remove("is-pressed"), true);
   requestAnimationFrame(animate);
 })();
