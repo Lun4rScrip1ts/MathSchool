@@ -343,7 +343,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   if (activePointer === "triangular-pointer") {
     const triangularCursorScript = document.createElement("script");
-    triangularCursorScript.src = "/assets/js/triangular-cursor.js?v=2";
+    triangularCursorScript.src = "/assets/js/triangular-cursor.js?v=3";
     triangularCursorScript.onerror = () => document.documentElement.classList.remove("lunar-triangular-cursor-active");
     document.head.appendChild(triangularCursorScript);
   }
