@@ -325,7 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!document.body) return;
     document.body.classList.remove("lunar-static-cursor", "lunar-default-cursor");
     STATIC_CURSORS.forEach(name => document.body.classList.remove("lunar-" + name));
-    const selected = store.get("pointer") || "default";
+    const selected = store.get("pointer") || "triangular-pointer";
     if (STATIC_CURSORS.includes(selected)) {
       document.body.classList.add("lunar-static-cursor", "lunar-" + selected);
     } else if (selected === "default") {
@@ -334,13 +334,19 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   window.applyLunarCursorSelection = applyStaticCursor;
   applyStaticCursor();
-  let activePointer = store.get("pointer");
-  const allowedPointers = new Set([...CURSOR_EFFECTS, ...STATIC_CURSORS, "default"]);
+  let activePointer = store.get("pointer") || "triangular-pointer";
+  const allowedPointers = new Set([...CURSOR_EFFECTS, ...STATIC_CURSORS, "triangular-pointer", "default"]);
   if (!allowedPointers.has(activePointer)) {
     store.remove("pointer");
     activePointer = "default";
     applyStaticCursor();
   }
+  if (activePointer === "triangular-pointer") {
+    const triangularCursorScript = document.createElement("script");
+    triangularCursorScript.src = "/assets/js/triangular-cursor.js?v=1";
+    document.head.appendChild(triangularCursorScript);
+  }
+
   const effectsLevel = store.get("interfaceEffects") || "full";
   const motionLevel = store.get("interfaceAnimations") || "on";
 
@@ -469,7 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const staticPointers = new Set(["normal-lunar","normal-graphite","normal-minimal","normal-outline","normal-cross"]);
   function sync(){
     if (!document.body || typeof store === "undefined") return;
-    const pointer = store.get("pointer") || "default";
+    const pointer = store.get("pointer") || "triangular-pointer";
     document.documentElement.classList.toggle("lunar-pointer-active", effectPointers.has(pointer));
     document.body.classList.toggle("lunar-custom-cursor-active", effectPointers.has(pointer));
   }
