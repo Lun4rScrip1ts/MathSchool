@@ -11,6 +11,16 @@
 </head>
 <body>
   <div class="lunar-player-window"><div id="lunar-player-mount"></div></div>
-  <script src="/assets/js/spotify-global-player.js?v=lunar2"></script>
+  <script>
+(async()=>{
+  const mount=document.getElementById("lunar-player-mount");
+  try{
+    const response=await fetch("/api/auth/me",{credentials:"same-origin",cache:"no-store"});
+    const data=response.ok?await response.json():null;
+    if(!data?.user||data.guest){mount.innerHTML='<section style="max-width:360px;padding:24px;border:1px solid #343b4a;border-radius:16px;background:#11151c;text-align:center"><h2>Spotify is for members</h2><p>Create an account or log in to use Spotify on Lunar.</p><a href="/account?mode=register" style="color:#b8a6ff">Create an account</a></section>';return;}
+    const player=document.createElement("script");player.src="/assets/js/spotify-global-player.js?v=lunar2";document.body.appendChild(player);
+  }catch{mount.textContent="Log in to use Spotify on Lunar.";}
+})();
+</script>
 </body>
 </html>
