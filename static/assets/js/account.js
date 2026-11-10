@@ -1,11 +1,6 @@
 (() => {
   const authCard=document.getElementById("auth-card"), profileCard=document.getElementById("profile-card");
   const authForm=document.getElementById("auth-form"), errorEl=document.getElementById("auth-error");
-  const resetCard=document.getElementById("password-reset-card");
-  const resetEmailForm=document.getElementById("reset-email-form");
-  const resetCodeForm=document.getElementById("reset-code-form");
-  const resetPasswordForm=document.getElementById("reset-password-form");
-  let resetEmail="",resetToken="";
   const profileImageDrafts={avatar:"",banner:"",background:""};
   let profileImageEditorCropper=null,profileImageEditorResolve=null,profileImageEditorKind="";
   const profileImageEditorConfig={
@@ -120,17 +115,13 @@
     }catch{}
   };
 
-  const showResetStep=step=>{if(!resetCard)return;[resetEmailForm,resetCodeForm,resetPasswordForm].forEach((form,index)=>{if(form)form.hidden=index+1!==step;});document.querySelectorAll("#reset-progress span").forEach(el=>el.classList.toggle("active",Number(el.dataset.step)<=step));document.getElementById("reset-title").textContent=step===1?"Reset your password":step===2?"Check your email":"Choose a new password";document.getElementById("reset-subtitle").textContent=step===1?"Enter the email connected to your Lunar account.":step===2?"Enter the 6-digit code we sent to your email.":"Set a new password for your Lunar account.";};
-  const openReset=()=>{authCard.hidden=true;profileCard.hidden=true;resetCard.hidden=false;resetEmail=document.getElementById("auth-identifier").value.trim();document.getElementById("reset-email").value=resetEmail;document.getElementById("reset-email-error").textContent="";document.getElementById("reset-code-error").textContent="";document.getElementById("reset-password-error").textContent="";showResetStep(1);document.getElementById("reset-email").focus();};
-  const closeReset=()=>{resetCard.hidden=true;authCard.hidden=false;profileCard.hidden=true;setMode("login");document.getElementById("auth-identifier").focus();};
   const setMode=m=>{mode=m;const reg=m==="register";tabs.forEach(t=>t.classList.toggle("active",t.dataset.mode===m));
     document.getElementById("auth-title").textContent=reg?"Create your Lunar account":"Welcome back";
-    document.getElementById("auth-subtitle").textContent=reg?"Use an email, username, and password to create your profile.":"Log in with your username or email.";
+    document.getElementById("auth-subtitle").textContent=reg?"Choose a username and password to create your account.":"Log in with your username and password.";
     document.getElementById("auth-submit").textContent=reg?"Create Account":"Log In";
-    document.getElementById("forgot-password-button").hidden=reg;
-    ["register-username-row","email-row","display-name-row"].forEach(id=>document.getElementById(id).hidden=!reg);
+    ["register-username-row","display-name-row"].forEach(id=>document.getElementById(id).hidden=!reg);
     document.getElementById("identifier-label").hidden=reg; document.getElementById("auth-identifier").required=!reg;
-    document.getElementById("auth-username").required=reg; document.getElementById("auth-email").required=reg;
+    document.getElementById("auth-username").required=reg;
     document.getElementById("auth-password").autocomplete=reg?"new-password":"current-password";
     document.getElementById("password-helper").textContent=reg?"Use Generate for a strong password, or let your browser suggest one.":"Use your saved password, or enter it manually.";
     document.getElementById("generate-password").hidden=!reg;
@@ -186,7 +177,6 @@
     document.getElementById("profile-username").textContent="@"+user.username;
     document.getElementById("profile-avatar").innerHTML=user.avatarUrl?'<img src="'+user.avatarUrl+'" alt="">':initials(user.displayName);
     document.getElementById("profile-username-input").value=user.username||"";
-    document.getElementById("profile-email").value=user.email||"";
     document.getElementById("profile-name").value=user.displayName||"";
     document.getElementById("profile-status").value=user.status||"";
     document.getElementById("profile-bio").value=user.bio||"";
@@ -285,15 +275,9 @@
   const identifierInput = document.getElementById("auth-identifier");
   if (identifierInput) identifierInput.value = savedLogin;
   tabs.forEach(t=>t.addEventListener("click",()=>setMode(t.dataset.mode)));
-  document.getElementById("forgot-password-button")?.addEventListener("click",openReset);
-  document.getElementById("reset-back-button")?.addEventListener("click",closeReset);
-  resetEmailForm?.addEventListener("submit",async e=>{e.preventDefault();const error=document.getElementById("reset-email-error"),button=document.getElementById("reset-email-submit");error.textContent="";button.disabled=true;resetEmail=document.getElementById("reset-email").value.trim().toLowerCase();try{await api("/api/auth/password-reset/request",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:resetEmail})});showResetStep(2);document.getElementById("reset-code").focus();}catch(err){error.textContent=err.message;}finally{button.disabled=false;}});
-  resetCodeForm?.addEventListener("submit",async e=>{e.preventDefault();const error=document.getElementById("reset-code-error"),button=document.getElementById("reset-code-submit");error.textContent="";button.disabled=true;try{const data=await api("/api/auth/password-reset/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:resetEmail,code:document.getElementById("reset-code").value.trim()})});resetToken=data.resetToken;showResetStep(3);document.getElementById("reset-password").focus();}catch(err){error.textContent=err.message;}finally{button.disabled=false;}});
-  document.getElementById("reset-resend-button")?.addEventListener("click",async()=>{document.getElementById("reset-code-error").textContent="";const button=document.getElementById("reset-resend-button");button.disabled=true;try{await api("/api/auth/password-reset/request",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:resetEmail})});document.getElementById("reset-code-error").textContent="A new verification code was sent.";}catch(err){document.getElementById("reset-code-error").textContent=err.message;}finally{button.disabled=false;}});
-  resetPasswordForm?.addEventListener("submit",async e=>{e.preventDefault();const error=document.getElementById("reset-password-error"),button=document.getElementById("reset-password-submit");error.textContent="";const password=document.getElementById("reset-password").value,confirm=document.getElementById("reset-password-confirm").value;if(password!==confirm){error.textContent="The passwords do not match.";return;}button.disabled=true;try{await api("/api/auth/password-reset/complete",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({resetToken,password})});resetToken="";alert("Your password was changed. Please log in again.");closeReset();document.getElementById("auth-identifier").value=resetEmail;document.getElementById("auth-password").value="";}catch(err){error.textContent=err.message;}finally{button.disabled=false;}});
   authForm.addEventListener("submit",async e=>{e.preventDefault();errorEl.textContent="";const b=document.getElementById("auth-submit");b.disabled=true;
     try{const data=await api(mode==="register"?"/api/auth/register":"/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(mode==="register"?{
-      username:document.getElementById("auth-username").value,email:document.getElementById("auth-email").value,
+      username:document.getElementById("auth-username").value,
       displayName:document.getElementById("auth-display-name").value,password:document.getElementById("auth-password").value}:{
       identifier:document.getElementById("auth-identifier").value,password:document.getElementById("auth-password").value})});
       const credentialIdentifier=mode==="register"
@@ -308,16 +292,14 @@
     catch(err){errorEl.textContent=err.message;}finally{b.disabled=false;}});
   profileForm.addEventListener("submit",async e=>{e.preventDefault();const ok=document.getElementById("profile-success"),err=document.getElementById("profile-error");ok.textContent="";err.textContent="";
     const username=document.getElementById("profile-username-input").value.trim();
-    const email=document.getElementById("profile-email").value.trim();
     const displayName=document.getElementById("profile-name").value.trim();
     if(!/^[A-Za-z0-9_]{4,20}$/.test(username)){err.textContent="Username must be 4–20 characters using letters, numbers, or underscores.";return;}
-    if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(email)){err.textContent="Please enter a valid email address.";return;}
     if(!displayName){err.textContent="Display name cannot be empty.";return;}
     profileSaveButton.disabled=true;
     profileSaveButton.textContent="Saving...";
     try{
       const data=await api("/api/profile",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-        username,email,
+        username,
         displayName,status:document.getElementById("profile-status").value.trim(),
         bio:document.getElementById("profile-bio").value.trim(),
         avatarData:profileImageDrafts.avatar,
