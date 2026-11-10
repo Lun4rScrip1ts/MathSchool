@@ -21,7 +21,7 @@
     <section class="account-card" id="auth-card">
       <div class="community-kicker"><i class="fa-solid fa-moon"></i> LUNAR ACCOUNT</div>
       <h1 id="auth-title">Welcome back</h1>
-      <p id="auth-subtitle">Log in with your username or email.</p>
+      <p id="auth-subtitle">Log in with your username and password.</p>
       <div class="auth-security-note" id="auth-security-note">
         <span class="auth-security-icon"><i class="fa-solid fa-shield-halved"></i></span>
         <span><strong>Your information is protected</strong><small>Passwords are securely hashed and never stored in plain text. When you use HTTPS, your information is encrypted while it travels between your browser and Lunar.</small></span>
@@ -40,9 +40,6 @@
             <button type="button" class="auth-generator" id="generate-username" title="Generate a username"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Generate</span></button>
           </div>
           <small>4–20 characters. Letters, numbers, and underscores only.</small>
-        </label>
-        <label id="email-row" hidden>Email
-          <input id="auth-email" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com">
         </label>
         <label id="display-name-row" hidden>Display name
           <div class="auth-generator-row">
@@ -65,13 +62,12 @@
           <span><strong>Remember your password.</strong> LunarProxys cannot retrieve your password if you forget it. Save it somewhere secure or use a password manager.</span>
         </div>
         <button class="community-primary" type="submit" id="auth-submit">Log In</button>
-        <button type="button" class="forgot-password-link" id="forgot-password-button">Forgot Password?</button>
         <p class="form-error" id="auth-error" role="alert"></p>
       </form>
     </section>
 
 
-    <section class="account-card password-reset-card" id="password-reset-card" hidden>
+    <section class="account-card profile-card" id="profile-card" hidden>
       <div class="community-kicker"><i class="fa-solid fa-shield-halved"></i> ACCOUNT RECOVERY</div>
       <h1 id="reset-title">Reset your password</h1>
       <p id="reset-subtitle">Enter the email connected to your Lunar account.</p>
@@ -126,9 +122,6 @@
           <label>Username
             <input id="profile-username-input" maxlength="20" minlength="4" pattern="[A-Za-z0-9_]{4,20}" required>
             <small>4–20 characters. Letters, numbers, and underscores only.</small>
-          </label>
-          <label>Email
-            <input id="profile-email" type="email" maxlength="254" required>
           </label>
         </div>
         <label>Display name
