@@ -36,10 +36,10 @@
         </label>
         <label id="register-username-row" hidden>Username
           <div class="auth-generator-row">
-            <input id="auth-username" autocomplete="username" maxlength="20" minlength="4" pattern="[A-Za-z0-9_]{4,20}" placeholder="4–20 letters, numbers, or _">
+            <input id="auth-username" autocomplete="username" maxlength="20" minlength="3" pattern="[a-z0-9_]{3,20}" placeholder="3–20 letters, numbers, or _">
             <button type="button" class="auth-generator" id="generate-username" title="Generate a username"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Generate</span></button>
           </div>
-          <small>4–20 characters. Letters, numbers, and underscores only.</small>
+          <small>Automatically lowercase; spaces and unsupported characters are removed. Use 3–20 letters, numbers, or underscores.</small>
         </label>
         <label id="display-name-row" hidden>Display name
           <div class="auth-generator-row">
@@ -63,6 +63,7 @@
         </div>
         <button class="community-primary" type="submit" id="auth-submit">Log In</button>
         <p class="form-error" id="auth-error" role="alert"></p>
+        <button type="button" class="community-secondary" id="browse-as-guest"><i class="fa-solid fa-eye"></i> Browse as Guest</button>
       </form>
     </section>
 
@@ -82,7 +83,7 @@
       <form id="profile-form" class="account-form" novalidate>
         <div class="form-grid">
           <label>Username
-            <input id="profile-username-input" maxlength="20" minlength="4" pattern="[A-Za-z0-9_]{4,20}" required>
+            <input id="profile-username-input" maxlength="20" minlength="3" pattern="[a-z0-9_]{3,20}" required>
             <small>4–20 characters. Letters, numbers, and underscores only.</small>
           </label>
         </div>
