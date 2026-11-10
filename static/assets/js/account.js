@@ -341,6 +341,10 @@
   });
   document.getElementById("logout-button").addEventListener("click",async()=>{try{await api("/api/auth/logout",{method:"POST"});}catch{}user=null;authCard.hidden=false;profileCard.hidden=true;setMode("login");});
   const initialMode = new URLSearchParams(location.search).get("mode");
+  if(new URLSearchParams(location.search).get("guest")==="1"){
+    const guestButton=document.getElementById("browse-as-guest");if(guestButton)guestButton.disabled=true;
+    api("/api/auth/guest",{method:"POST"}).then(()=>{const destination=returnTo.startsWith("/")&&!returnTo.startsWith("//")?returnTo:"/";location.replace(destination);}).catch(error=>{errorEl.textContent=error.message;if(guestButton)guestButton.disabled=false;});
+  }
   api("/api/auth/me").then(async d=>{user=d.user;if(d.guest){document.getElementById("auth-title").textContent="Browsing as Guest";document.getElementById("auth-subtitle").textContent="You can explore Lunar, but social features and settings require an account.";document.getElementById("auth-submit").hidden=false;document.getElementById("browse-as-guest").hidden=true;if(initialMode==="register")setMode("register");}else if(user){if(window.store?.loadAccountSettings) await window.store.loadAccountSettings();setProfile();}else setMode(initialMode==="register"?"register":"login");}).catch(()=>setMode(initialMode==="register"?"register":"login"));
 })();
 
