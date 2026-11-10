@@ -133,9 +133,16 @@
   const usernameNouns=["Fox","Wolf","Byte","Wave","Star","Comet","Echo","Drift","Ray","Spark"];
   const displayAdjectives=["Lunar","Nova","Cosmic","Starlit","Moonlit","Silver","Solar","Velvet","Astral","Quiet"];
   const displayNouns=["Rider","Dreamer","Voyager","Explorer","Pixel","Comet","Orbit","Wanderer","Signal","Pilot"];
+  const sanitizeUsername=value=>String(value||"").toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,20);
+  const registerUsernameInput=document.getElementById("auth-username");
+  const profileUsernameInput=document.getElementById("profile-username-input");
+  [registerUsernameInput,profileUsernameInput].forEach(input=>input?.addEventListener("input",()=>{
+    const cleaned=sanitizeUsername(input.value);
+    if(input.value!==cleaned){const start=input.selectionStart;input.value=cleaned;try{input.setSelectionRange(Math.min(start,cleaned.length),Math.min(start,cleaned.length));}catch{}}
+  }));
   const generateUsername=()=>{
     const value=usernameAdjectives[randomIndex(usernameAdjectives.length)]+usernameNouns[randomIndex(usernameNouns.length)]+String(100+randomIndex(900));
-    document.getElementById("auth-username").value=value.slice(0,20);
+    document.getElementById("auth-username").value=sanitizeUsername(value);
   };
   const generateDisplayName=()=>{
     document.getElementById("auth-display-name").value=(displayAdjectives[randomIndex(displayAdjectives.length)]+" "+displayNouns[randomIndex(displayNouns.length)]).slice(0,20);
@@ -277,11 +284,11 @@
   tabs.forEach(t=>t.addEventListener("click",()=>setMode(t.dataset.mode)));
   authForm.addEventListener("submit",async e=>{e.preventDefault();errorEl.textContent="";const b=document.getElementById("auth-submit");b.disabled=true;
     try{const data=await api(mode==="register"?"/api/auth/register":"/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(mode==="register"?{
-      username:document.getElementById("auth-username").value,
+      username:sanitizeUsername(document.getElementById("auth-username").value),
       displayName:document.getElementById("auth-display-name").value,password:document.getElementById("auth-password").value}:{
       identifier:document.getElementById("auth-identifier").value,password:document.getElementById("auth-password").value})});
       const credentialIdentifier=mode==="register"
-        ? document.getElementById("auth-username").value.trim()
+        ? sanitizeUsername(document.getElementById("auth-username").value)
         : document.getElementById("auth-identifier").value.trim();
       const credentialPassword=document.getElementById("auth-password").value;
       if (mode === "login") localStorage.setItem("ls_login_identifier", credentialIdentifier);
@@ -291,9 +298,9 @@
       setProfile(); setTimeout(() => { location.href = returnTo.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/"; }, 120);}
     catch(err){errorEl.textContent=err.message;}finally{b.disabled=false;}});
   profileForm.addEventListener("submit",async e=>{e.preventDefault();const ok=document.getElementById("profile-success"),err=document.getElementById("profile-error");ok.textContent="";err.textContent="";
-    const username=document.getElementById("profile-username-input").value.trim();
+    const username=sanitizeUsername(document.getElementById("profile-username-input").value);
     const displayName=document.getElementById("profile-name").value.trim();
-    if(!/^[A-Za-z0-9_]{4,20}$/.test(username)){err.textContent="Username must be 4–20 characters using letters, numbers, or underscores.";return;}
+    if(!/^[a-z0-9_]{3,20}$/.test(username)){err.textContent="Username must be at least 3 characters and use only letters, numbers, or underscores.";return;}
     if(!displayName){err.textContent="Display name cannot be empty.";return;}
     profileSaveButton.disabled=true;
     profileSaveButton.textContent="Saving...";
@@ -325,8 +332,16 @@
       button.disabled=false;
     }
   });
+  document.getElementById("browse-as-guest")?.addEventListener("click",async event=>{
+    const button=event.currentTarget;button.disabled=true;errorEl.textContent="";
+    try{
+      await api("/api/auth/guest",{method:"POST"});
+      const destination=returnTo.startsWith("/")&&!returnTo.startsWith("//")?returnTo:"/";
+      location.href=destination;
+    }catch(error){errorEl.textContent=error.message;button.disabled=false;}
+  });
   document.getElementById("logout-button").addEventListener("click",async()=>{try{await api("/api/auth/logout",{method:"POST"});}catch{}user=null;authCard.hidden=false;profileCard.hidden=true;setMode("login");});
   const initialMode = new URLSearchParams(location.search).get("mode");
-  api("/api/auth/me").then(async d=>{user=d.user;if(user){if(window.store?.loadAccountSettings) await window.store.loadAccountSettings();setProfile();}else setMode(initialMode==="register"?"register":"login");}).catch(()=>setMode(initialMode==="register"?"register":"login"));
+  api("/api/auth/me").then(async d=>{user=d.user;if(d.guest){document.getElementById("auth-title").textContent="Browsing as Guest";document.getElementById("auth-subtitle").textContent="You can explore Lunar, but social features and settings require an account.";document.getElementById("auth-submit").hidden=true;document.getElementById("browse-as-guest").hidden=true;}else if(user){if(window.store?.loadAccountSettings) await window.store.loadAccountSettings();setProfile();}else setMode(initialMode==="register"?"register":"login");}).catch(()=>setMode(initialMode==="register"?"register":"login"));
 })();
 
