@@ -342,6 +342,6 @@
   });
   document.getElementById("logout-button").addEventListener("click",async()=>{try{await api("/api/auth/logout",{method:"POST"});}catch{}user=null;authCard.hidden=false;profileCard.hidden=true;setMode("login");});
   const initialMode = new URLSearchParams(location.search).get("mode");
-  api("/api/auth/me").then(async d=>{user=d.user;if(d.guest){document.getElementById("auth-title").textContent="Browsing as Guest";document.getElementById("auth-subtitle").textContent="You can explore Lunar, but social features and settings require an account.";document.getElementById("auth-submit").hidden=true;document.getElementById("browse-as-guest").hidden=true;}else if(user){if(window.store?.loadAccountSettings) await window.store.loadAccountSettings();setProfile();}else setMode(initialMode==="register"?"register":"login");}).catch(()=>setMode(initialMode==="register"?"register":"login"));
+  api("/api/auth/me").then(async d=>{user=d.user;if(d.guest){document.getElementById("auth-title").textContent="Browsing as Guest";document.getElementById("auth-subtitle").textContent="You can explore Lunar, but social features and settings require an account.";document.getElementById("auth-submit").hidden=false;document.getElementById("browse-as-guest").hidden=true;}else if(user){if(window.store?.loadAccountSettings) await window.store.loadAccountSettings();setProfile();}else setMode(initialMode==="register"?"register":"login");}).catch(()=>setMode(initialMode==="register"?"register":"login"));
 })();
 
