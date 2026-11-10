@@ -22,6 +22,7 @@
   const attachmentKindEl = document.getElementById("attachment-kind");
   const cancelAttachmentButton = document.getElementById("cancel-attachment");
   let currentUser = null;
+  let guestMode = false;
   let messages = [];
   let replyTo = null;
   let editingId = null;
@@ -459,11 +460,14 @@ function canManageProfileRoles(){
         api("/api/chat/messages?limit=100")
       ]);
       currentUser = me.user;
-      status.textContent = currentUser ? `Signed in as @${currentUser.username}` : "Read-only mode";
-      accountLabel.textContent = currentUser ? "Profile" : "Log in";
+      guestMode = Boolean(me.guest);
+      status.textContent = currentUser ? `Signed in as @${currentUser.username}` : (guestMode ? "Browsing as guest · Read-only" : "Read-only mode");
+      accountLabel.textContent = currentUser ? "Profile" : (guestMode ? "Guest" : "Log in");
       note.hidden = Boolean(currentUser);
+      if (guestMode) note.querySelector("span").textContent = "Guest browsing is read-only. Create an account to send messages or use community features.";
+      form.hidden = guestMode;
       input.disabled = !currentUser;
-      input.placeholder = currentUser ? (editingId ? "Edit your message..." : "Write a message...") : "Log in to send a message";
+      input.placeholder = currentUser ? (editingId ? "Edit your message..." : "Write a message...") : (guestMode ? "Guest browsing is read-only" : "Log in to send a message");
       render(chat.messages);
       if (currentUser) renderStickers(currentUser.stickers || []);
     } catch (error) {
