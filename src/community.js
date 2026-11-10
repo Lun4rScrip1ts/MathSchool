@@ -226,9 +226,11 @@ function getGuestSession(req) {
   return session;
 }
 
-function setGuestSession(res) {
-  const previous = res.req?.cookies?.lunar_guest;
+function setGuestSession(req, res) {
+  const previous = req.cookies?.lunar_guest;
   if (previous) guestSessions.delete(previous);
+  const memberToken = req.cookies?.lunar_session;
+  if (memberToken) delete state.sessions[memberToken];
   const token = randomBytes(32).toString("hex");
   guestSessions.set(token, { kind: "guest", expiresAt: Date.now() + 12 * 60 * 60 * 1000, lastSeen: Date.now() });
   res.clearCookie("lunar_session", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
@@ -981,7 +983,7 @@ router.get("/auth/me", (req, res) => {
 });
 
 router.post("/auth/guest", (req, res) => {
-  setGuestSession(res);
+  setGuestSession(req, res);
   res.set("Cache-Control", "no-store");
   res.json({ guest: true });
 });
