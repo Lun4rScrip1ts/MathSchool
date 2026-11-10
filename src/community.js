@@ -982,8 +982,9 @@ router.get("/auth/me", (req, res) => {
   res.json({ user: user ? publicUser(user, true) : null, guest });
 });
 
-router.post("/auth/guest", (req, res) => {
+router.post("/auth/guest", async (req, res) => {
   setGuestSession(req, res);
+  await persist();
   res.set("Cache-Control", "no-store");
   res.json({ guest: true });
 });
