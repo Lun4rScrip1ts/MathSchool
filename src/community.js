@@ -1269,7 +1269,7 @@ router.patch("/profile", requireUser, async (req, res) => {
   const bio = cleanText(req.body?.bio, 160);
   const status = cleanText(req.body?.status, 80);
 
-  if (!validUsername(username)) return res.status(400).json({ error: "Username must be 4–20 characters using letters, numbers, or underscores." });
+  if (!validUsername(username)) return res.status(400).json({ error: "Username must be 3–20 characters using letters, numbers, or underscores." });
   if (email && !validEmail(email)) return res.status(400).json({ error: "Enter a valid email address." });
   if (!uniqueUsername(username, req.user.id)) return res.status(409).json({ error: "That username is already taken." });
   if (email && !uniqueEmail(email, req.user.id)) return res.status(409).json({ error: "That email is already registered." });
