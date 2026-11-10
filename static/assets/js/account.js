@@ -301,7 +301,6 @@
     const username=sanitizeUsername(document.getElementById("profile-username-input").value);
     const displayName=document.getElementById("profile-name").value.trim();
     if(!/^[a-z0-9_]{3,20}$/.test(username)){err.textContent="Username must be at least 3 characters and use only letters, numbers, or underscores.";return;}
-    if(!displayName){err.textContent="Display name cannot be empty.";return;}
     profileSaveButton.disabled=true;
     profileSaveButton.textContent="Saving...";
     try{
