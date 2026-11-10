@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Shared presence/deployment services run on every page, including proxy/search/game contexts.
   if (!document.querySelector('script[data-lunar-global-presence]')) {
     const presence=document.createElement("script");
-    presence.src="/assets/js/lunar-presence-heartbeat.js?v=presence4";
+    presence.src="/assets/js/lunar-presence-heartbeat.js?v=presence5";
     presence.dataset.lunarGlobalPresence="true";
     presence.defer=false;
     document.body.appendChild(presence);
@@ -168,6 +168,20 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname !== "/account" && window.location.pathname !== "/account.html") {
     fetch("/api/auth/me", {credentials:"same-origin", cache:"no-store"}).then(response => response.ok ? response.json() : {user:null}).then(data => {
       if (data?.user || document.getElementById("lunar-auth-gate")) return;
+      if (data?.guest) {
+        document.documentElement.dataset.lunarGuest = "true";
+        document.body.classList.add("lunar-guest-mode");
+        const guestStyle=document.createElement("style");
+        guestStyle.textContent='html[data-lunar-guest="true"] [href*="settings"],html[data-lunar-guest="true"] [href*="spotify"],html[data-lunar-guest="true"] [data-app*="spotify"],html[data-lunar-guest="true"] [data-app-id*="spotify"],html[data-lunar-guest="true"] .friend-action,html[data-lunar-guest="true"] .message-action,html[data-lunar-guest="true"] [data-friend-request],html[data-lunar-guest="true"] [data-dm-action],html[data-lunar-guest="true"] .chat-form,html[data-lunar-guest="true"] #reply-bar,html[data-lunar-guest="true"] #edit-bar,html[data-lunar-guest="true"] .chat-compose-tools{display:none!important}';
+        document.head.appendChild(guestStyle);
+        document.querySelectorAll('a[href*="settings"],a[href*="spotify"],[data-app*="spotify"],[data-app-id*="spotify"]').forEach(el=>el.hidden=true);
+        if (currentPath === "/settings" || currentPath === "/settings.html") {
+          const restriction=document.createElement("div");restriction.id="lunar-guest-restriction";restriction.style.cssText="position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;padding:24px;background:rgba(5,7,12,.94);color:#f5f6fa;text-align:center";
+          restriction.innerHTML='<section style="max-width:440px"><h2>Settings are for members</h2><p>Guest browsing is read-only. Create an account or log in to customize Lunar.</p><a href="/account?mode=register" style="display:inline-block;margin-top:12px">Create an account</a></section>';
+          document.body.appendChild(restriction);
+        }
+        return;
+      }
       const gate=document.createElement("div");
       gate.id="lunar-auth-gate";
       gate.innerHTML='<div class="lunar-auth-backdrop"></div><section class="lunar-auth-panel" role="dialog" aria-modal="true" aria-labelledby="lunar-auth-title"><div class="lunar-auth-orb"><i class="fa-solid fa-moon"></i></div><span class="lunar-auth-kicker">LUNAR MEMBERS</span><h2 id="lunar-auth-title">Create your Lunar account</h2><p>Register to unlock the proxy, chats, games, apps, settings, and the rest of Lunar.</p><div class="lunar-auth-actions"><a class="lunar-auth-primary" href="/account?mode=register&returnTo='+encodeURIComponent(location.pathname+location.search)+'">Register</a><a class="lunar-auth-secondary" href="/account?returnTo='+encodeURIComponent(location.pathname+location.search)+'">Log In</a></div><div class="lunar-auth-security"><i class="fa-solid fa-shield-halved"></i><span><strong>Your privacy matters</strong><br>Account credentials are protected and are not exposed to other users or displayed on the Lunar interface.</span></div><small>Your account keeps your profile, chat features, and preferences connected across Lunar.</small></section>';
