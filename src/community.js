@@ -27,6 +27,7 @@ const PROFILE_ROLE_MAX = 32;
 const ROLE_MANAGERS = new Set(["lunar", "lunarstudios"]);
 const USERNAME_MAX = 20;
 const DISPLAY_NAME_MAX = 20;
+const guestSessions = new Map();
 const MAX_REACTION_TEXT = 8;
 const MAX_MOVIE_BYTES = 500 * 1024 * 1024;
 const PUBLIC_MOVIE_UPLOADERS = new Set(["lunar", "lunarstudios"]);
@@ -139,8 +140,12 @@ function cleanText(value, max) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
+function normalizeUsername(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, USERNAME_MAX);
+}
+
 function validUsername(username) {
-  return /^[a-zA-Z0-9_]{4,20}$/.test(username);
+  return /^[a-z0-9_]{3,20}$/.test(username);
 }
 
 function validEmail(email) {
@@ -210,6 +215,28 @@ function getOnlineMemberCount() {
   return online.size;
 }
 
+function getGuestSession(req) {
+  const token = req.cookies?.lunar_guest;
+  const session = token ? guestSessions.get(token) : null;
+  if (!session || Date.now() > session.expiresAt) {
+    if (token) guestSessions.delete(token);
+    return null;
+  }
+  session.lastSeen = Date.now();
+  return session;
+}
+
+function setGuestSession(req, res) {
+  const previous = req.cookies?.lunar_guest;
+  if (previous) guestSessions.delete(previous);
+  const memberToken = req.cookies?.lunar_session;
+  if (memberToken) delete state.sessions[memberToken];
+  const token = randomBytes(32).toString("hex");
+  guestSessions.set(token, { kind: "guest", expiresAt: Date.now() + 12 * 60 * 60 * 1000, lastSeen: Date.now() });
+  res.clearCookie("lunar_session", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
+  res.cookie("lunar_guest", token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", maxAge: 12 * 60 * 60 * 1000, path: "/" });
+}
+
 function requireUser(req, res, next) {
   const user = getSessionUser(req);
   if (!user) return res.status(401).json({ error: "You need to log in first." });
@@ -218,6 +245,9 @@ function requireUser(req, res, next) {
 }
 
 function setSession(res, userId) {
+  const guestToken = res.req?.cookies?.lunar_guest;
+  if (guestToken) guestSessions.delete(guestToken);
+  res.clearCookie("lunar_guest", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
   const token = randomBytes(32).toString("hex");
   const rememberedToken = randomBytes(32).toString("hex");
   const expiresAt = Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000;
@@ -947,7 +977,16 @@ router.post("/lunar-console/discord-message", requireUser, async (req, res) => {
 
 router.get("/auth/me", (req, res) => {
   const user = getSessionUser(req);
-  res.json({ user: user ? publicUser(user, true) : null });
+  const guest = !user && Boolean(getGuestSession(req));
+  res.set("Cache-Control", "no-store");
+  res.json({ user: user ? publicUser(user, true) : null, guest });
+});
+
+router.post("/auth/guest", async (req, res) => {
+  setGuestSession(req, res);
+  await persist();
+  res.set("Cache-Control", "no-store");
+  res.json({ guest: true });
 });
 
 router.get("/members/online", (req, res) => {
@@ -961,12 +1000,12 @@ router.get("/members/online", (req, res) => {
 });
 
 router.post("/auth/register", async (req, res) => {
-  const username = cleanText(req.body?.username, USERNAME_MAX);
+  const username = normalizeUsername(req.body?.username);
   const email = cleanText(req.body?.email, 254).toLowerCase();
   const password = req.body?.password;
   const displayName = cleanText(req.body?.displayName, DISPLAY_NAME_MAX) || username;
 
-  if (!validUsername(username)) return res.status(400).json({ error: "Username must be 4–20 characters using letters, numbers, or underscores." });
+  if (!validUsername(username)) return res.status(400).json({ error: "Username must be 3–20 characters using letters, numbers, or underscores." });
   if (email && !validEmail(email)) return res.status(400).json({ error: "Enter a valid email address." });
   if (!validPassword(password)) return res.status(400).json({ error: "Password must be 8–128 characters." });
   if (!uniqueUsername(username)) return res.status(409).json({ error: "That username is already taken." });
@@ -1170,6 +1209,9 @@ router.post("/auth/login", async (req, res) => {
 });
 
 router.post("/auth/logout", async (req, res) => {
+  const guestToken = req.cookies?.lunar_guest;
+  if (guestToken) guestSessions.delete(guestToken);
+  res.clearCookie("lunar_guest", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
   const token = req.cookies?.lunar_session;
   if (token) delete state.sessions[token];
   res.clearCookie("lunar_session", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
@@ -1221,14 +1263,13 @@ router.patch("/profile/settings", requireUser, async (req, res) => {
 });
 
 router.patch("/profile", requireUser, async (req, res) => {
-  const username = cleanText(req.body?.username, USERNAME_MAX);
+  const username = normalizeUsername(req.body?.username);
   const email = cleanText(req.body?.email, 254).toLowerCase();
-  const displayName = cleanText(req.body?.displayName, DISPLAY_NAME_MAX);
+  const displayName = cleanText(req.body?.displayName, DISPLAY_NAME_MAX) || username;
   const bio = cleanText(req.body?.bio, 160);
   const status = cleanText(req.body?.status, 80);
 
-  if (!validUsername(username)) return res.status(400).json({ error: "Username must be 4–20 characters using letters, numbers, or underscores." });
-  if (!displayName) return res.status(400).json({ error: "Display name cannot be empty." });
+  if (!validUsername(username)) return res.status(400).json({ error: "Username must be 3–20 characters using letters, numbers, or underscores." });
   if (email && !validEmail(email)) return res.status(400).json({ error: "Enter a valid email address." });
   if (!uniqueUsername(username, req.user.id)) return res.status(409).json({ error: "That username is already taken." });
   if (email && !uniqueEmail(email, req.user.id)) return res.status(409).json({ error: "That email is already registered." });

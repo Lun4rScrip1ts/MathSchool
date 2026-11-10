@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/assets/css/lunar.css?v=lunar4">
   <link rel="stylesheet" href="/assets/css/community.css?v=lunar15">
   <script src="/assets/js/storage.js?v=lunar7"></script>
-  <script src="/assets/js/main.js?v=lunar17"></script>
+  <script src="/assets/js/main.js?v=lunar18"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
   <link rel="stylesheet" href="/assets/css/ui-stability.css?v=2">
@@ -36,10 +36,10 @@
         </label>
         <label id="register-username-row" hidden>Username
           <div class="auth-generator-row">
-            <input id="auth-username" autocomplete="username" maxlength="20" minlength="4" pattern="[A-Za-z0-9_]{4,20}" placeholder="4–20 letters, numbers, or _">
+            <input id="auth-username" autocomplete="username" maxlength="20" minlength="3" pattern="[a-z0-9_]{3,20}" placeholder="3–20 letters, numbers, or _">
             <button type="button" class="auth-generator" id="generate-username" title="Generate a username"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Generate</span></button>
           </div>
-          <small>4–20 characters. Letters, numbers, and underscores only.</small>
+          <small>Automatically lowercase; spaces and unsupported characters are removed. Use 3–20 letters, numbers, or underscores.</small>
         </label>
         <label id="display-name-row" hidden>Display name
           <div class="auth-generator-row">
@@ -63,6 +63,7 @@
         </div>
         <button class="community-primary" type="submit" id="auth-submit">Log In</button>
         <p class="form-error" id="auth-error" role="alert"></p>
+        <button type="button" class="community-secondary" id="browse-as-guest"><i class="fa-solid fa-eye"></i> Browse as Guest</button>
       </form>
     </section>
 
@@ -82,12 +83,12 @@
       <form id="profile-form" class="account-form" novalidate>
         <div class="form-grid">
           <label>Username
-            <input id="profile-username-input" maxlength="20" minlength="4" pattern="[A-Za-z0-9_]{4,20}" required>
+            <input id="profile-username-input" maxlength="20" minlength="3" pattern="[a-z0-9_]{3,20}" required>
             <small>4–20 characters. Letters, numbers, and underscores only.</small>
           </label>
         </div>
         <label>Display name
-          <input id="profile-name" maxlength="20" required>
+          <input id="profile-name" maxlength="20">
           <small>Up to 20 characters.</small>
         </label>
 
@@ -198,6 +199,6 @@
     </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
-  <script src="/assets/js/account.js?v=lunar10"></script>
+  <script src="/assets/js/account.js?v=lunar11"></script>
 </body>
 </html>

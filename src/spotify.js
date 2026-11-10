@@ -33,7 +33,7 @@ async function requireUser(req, res, next) {
   next();
 }
 
-router.get("/spotify/search", async (req, res) => {
+router.get("/spotify/search", requireUser, async (req, res) => {
   const q = String(req.query.q || "").trim().slice(0, 120);
   const requestedTypes = String(req.query.type || "track,album,artist,playlist").split(",").map(value => value.trim()).filter(Boolean);
   const allowedTypes = new Set(["track", "album", "artist", "playlist"]);
