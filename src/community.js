@@ -967,10 +967,10 @@ router.post("/auth/register", async (req, res) => {
   const displayName = cleanText(req.body?.displayName, DISPLAY_NAME_MAX) || username;
 
   if (!validUsername(username)) return res.status(400).json({ error: "Username must be 4–20 characters using letters, numbers, or underscores." });
-  if (!validEmail(email)) return res.status(400).json({ error: "Enter a valid email address." });
+  if (email && !validEmail(email)) return res.status(400).json({ error: "Enter a valid email address." });
   if (!validPassword(password)) return res.status(400).json({ error: "Password must be 8–128 characters." });
   if (!uniqueUsername(username)) return res.status(409).json({ error: "That username is already taken." });
-  if (!uniqueEmail(email)) return res.status(409).json({ error: "That email is already registered." });
+  if (email && !uniqueEmail(email)) return res.status(409).json({ error: "That email is already registered." });
   if (Object.keys(state.users).length >= MAX_USERS) return res.status(503).json({ error: "Registration is temporarily full." });
 
   const credentials = await hashPassword(password);
@@ -1229,12 +1229,12 @@ router.patch("/profile", requireUser, async (req, res) => {
 
   if (!validUsername(username)) return res.status(400).json({ error: "Username must be 4–20 characters using letters, numbers, or underscores." });
   if (!displayName) return res.status(400).json({ error: "Display name cannot be empty." });
-  if (!validEmail(email)) return res.status(400).json({ error: "Enter a valid email address." });
+  if (email && !validEmail(email)) return res.status(400).json({ error: "Enter a valid email address." });
   if (!uniqueUsername(username, req.user.id)) return res.status(409).json({ error: "That username is already taken." });
-  if (!uniqueEmail(email, req.user.id)) return res.status(409).json({ error: "That email is already registered." });
+  if (email && !uniqueEmail(email, req.user.id)) return res.status(409).json({ error: "That email is already registered." });
 
   req.user.username = username;
-  req.user.email = email;
+  if (email) req.user.email = email;
   req.user.displayName = displayName;
   req.user.bio = bio;
   req.user.status = status;
